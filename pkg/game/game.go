@@ -15,11 +15,10 @@ type Game struct {
 func New(term *os.File, width, height int) *Game {
 	return &Game{
 		term: term,
-		canvas: &canvas{
-			width:      width,
-			height:     height,
-			background: "\u001b[32m\u2588", // Green
-		},
+		canvas: newCanvas(
+			"\u001b[32m", // Green
+			width, height,
+		),
 	}
 }
 
@@ -59,9 +58,11 @@ func (g *Game) RunDemo(done chan bool) chan error {
 func (g *Game) handleDemoInput(input string) error {
 	switch input {
 	case "j":
-		g.canvas.background = "\u001b[32m\u2588" // Green
+		g.canvas.cells[0][0] = &cell{"\u001b[31m"} // Red
+		g.canvas.cells[0][1] = &cell{"\u001b[32m"} // Green
 	case "k":
-		g.canvas.background = "\u001b[31m\u2588" // Red
+		g.canvas.cells[0][1] = &cell{"\u001b[31m"} // Red
+		g.canvas.cells[0][0] = &cell{"\u001b[32m"} // Green
 	default:
 		log.Printf("unhandled input: %s", input)
 	}

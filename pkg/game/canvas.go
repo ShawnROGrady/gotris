@@ -3,9 +3,27 @@ package game
 import "os"
 
 type canvas struct {
-	width      int
-	height     int
 	background string
+	cells      [][]*cell
+}
+
+func newCanvas(background string, width, height int) *canvas {
+	var cells = [][]*cell{}
+
+	for i := 0; i < height; i++ {
+		row := []*cell{}
+		for j := 0; j < width; j++ {
+			row = append(row, &cell{
+				background: background,
+			})
+		}
+		cells = append(cells, row)
+	}
+
+	return &canvas{
+		background: background,
+		cells:      cells,
+	}
 }
 
 func (c *canvas) render(dest *os.File) error {
@@ -20,10 +38,10 @@ func (c *canvas) render(dest *os.File) error {
 		return err
 	}
 
-	for i := 0; i < c.height; i++ {
+	for _, row := range c.cells {
 		var buf = []byte{}
-		for j := 0; j < c.width; j++ {
-			buf = append(buf, []byte(c.background)...)
+		for _, cell := range row {
+			buf = append(buf, []byte(cell.String())...)
 		}
 		buf = append(buf, '\n')
 
