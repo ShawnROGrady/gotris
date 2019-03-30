@@ -7,8 +7,9 @@ import (
 
 // Game is responsible for handling the game state
 type Game struct {
-	term   *os.File
-	canvas *canvas
+	term         *os.File
+	canvas       *canvas
+	currentPiece *piece
 }
 
 // New returns a new game with the specified specifications
@@ -19,6 +20,9 @@ func New(term *os.File, width, height int) *Game {
 			"\u001b[32m", // Green
 			width, height,
 		),
+		currentPiece: &piece{
+			color: "\u001b[34m", //Blue
+		},
 	}
 }
 
@@ -46,6 +50,12 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					runErr <- err
 				}
 
+				coords := g.currentPiece.coordinates
+
+				g.canvas.cells[coords.y][coords.x] = &cell{
+					background: g.currentPiece.color,
+				}
+
 				if err := g.canvas.render(g.term); err != nil {
 					runErr <- err
 				}
@@ -56,16 +66,9 @@ func (g *Game) RunDemo(done chan bool) chan error {
 }
 
 func (g *Game) handleDemoInput(input string) error {
-	switch input {
-	case "j":
-		g.canvas.cells[0][0] = &cell{"\u001b[31m"} // Red
-		g.canvas.cells[0][1] = &cell{"\u001b[32m"} // Green
-	case "k":
-		g.canvas.cells[0][1] = &cell{"\u001b[31m"} // Red
-		g.canvas.cells[0][0] = &cell{"\u001b[32m"} // Green
-	default:
-		log.Printf("unhandled input: %s", input)
-	}
-
+	g.currentPiece.move(input,
+		len(g.canvas.cells[0])-1,
+		len(g.canvas.cells)-1,
+	)
 	return nil
 }
