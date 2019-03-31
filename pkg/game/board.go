@@ -31,8 +31,8 @@ func (b *block) cell() *canvas.Cell {
 	}
 }
 
-func (b *board) canvas() *canvas.Canvas {
-	canv := canvas.Canvas{}
+func (b *board) cells() [][]*canvas.Cell {
+	cells := [][]*canvas.Cell{}
 
 	// reverse the rows
 	for i := len(b.blocks) - 1; i >= 0; i-- {
@@ -46,7 +46,7 @@ func (b *board) canvas() *canvas.Canvas {
 			}
 			row = append(row, block.cell())
 		}
-		canv.Cells = append(canv.Cells, row)
+		cells = append(cells, row)
 	}
-	return &canv
+	return cells
 }

@@ -7,12 +7,13 @@ import (
 
 // Canvas represents what is actually rendered to the user
 type Canvas struct {
+	dest       *os.File
 	Background string
 	Cells      [][]*Cell
 }
 
 // New returns a new canvas
-func New(background string, width, height int) *Canvas {
+func New(dest *os.File, background string, width, height int) *Canvas {
 	var cells = [][]*Cell{}
 
 	for i := 0; i < height; i++ {
@@ -21,20 +22,21 @@ func New(background string, width, height int) *Canvas {
 	}
 
 	return &Canvas{
+		dest:       dest,
 		Background: background,
 		Cells:      cells,
 	}
 }
 
 // Render renders the current canvas
-func (c *Canvas) Render(dest *os.File) error {
+func (c *Canvas) Render() error {
 	// clear the canvas
-	_, err := dest.WriteString("\033[2J")
+	_, err := c.dest.WriteString("\033[2J")
 	if err != nil {
 		return err
 	}
 
-	_, err = dest.Seek(0, 0)
+	_, err = c.dest.Seek(0, 0)
 	if err != nil {
 		return err
 	}
@@ -52,7 +54,7 @@ func (c *Canvas) Render(dest *os.File) error {
 		}
 		buf = append(buf, '\n')
 
-		_, err := dest.Write(buf)
+		_, err := c.dest.Write(buf)
 		if err != nil {
 			return err
 		}

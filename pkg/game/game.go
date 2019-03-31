@@ -5,11 +5,12 @@ import (
 	"os"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/pkg/inputreader"
 )
 
 // Game is responsible for handling the game state
 type Game struct {
-	term         *os.File
+	inputreader  inputreader.InputReader
 	canvas       *canvas.Canvas
 	board        *board
 	currentPiece *piece
@@ -18,8 +19,9 @@ type Game struct {
 // New returns a new game with the specified specifications
 func New(term *os.File, width, height int) *Game {
 	return &Game{
-		term: term,
+		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
+			term,
 			"\u001b[32m", // Green
 			width, height,
 		),
@@ -39,7 +41,7 @@ func New(term *os.File, width, height int) *Game {
 
 // RunDemo is a placeholder function to test core functionality
 func (g *Game) RunDemo(done chan bool) chan error {
-	input, readErr := readInput(done, g.term)
+	input, readErr := g.inputreader.ReadInput(done)
 	runErr := make(chan error)
 
 	coords := g.currentPiece.coordinates
@@ -48,10 +50,10 @@ func (g *Game) RunDemo(done chan bool) chan error {
 		color: g.currentPiece.color,
 	}
 
-	g.canvas = g.board.canvas()
+	g.canvas.Cells = g.board.cells()
 
 	// render initial canvas
-	if err := g.canvas.Render(g.term); err != nil {
+	if err := g.canvas.Render(); err != nil {
 		runErr <- err
 		return runErr
 	}
@@ -100,9 +102,9 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					}
 				}
 
-				g.canvas = g.board.canvas()
+				g.canvas.Cells = g.board.cells()
 
-				if err := g.canvas.Render(g.term); err != nil {
+				if err := g.canvas.Render(); err != nil {
 					runErr <- err
 				}
 			}
