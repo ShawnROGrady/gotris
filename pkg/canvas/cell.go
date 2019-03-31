@@ -8,5 +8,5 @@ type Cell struct {
 }
 
 func (c *Cell) String() string {
-	return c.Background.Decorate(block)
+	return c.Background.decorate(block)
 }
