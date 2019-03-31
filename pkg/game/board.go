@@ -3,11 +3,11 @@ package game
 import "github.com/ShawnROGrady/gotris/pkg/canvas"
 
 type board struct {
-	background string
+	background canvas.Color
 	blocks     [][]*block
 }
 
-func newBoard(background string, width, height int) *board {
+func newBoard(background canvas.Color, width, height int) *board {
 	var blocks = [][]*block{}
 
 	for i := 0; i < height; i++ {
@@ -22,7 +22,7 @@ func newBoard(background string, width, height int) *board {
 }
 
 type block struct {
-	color string
+	color canvas.Color
 }
 
 func (b *block) cell() *canvas.Cell {

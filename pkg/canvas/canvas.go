@@ -8,12 +8,12 @@ import (
 // Canvas represents what is actually rendered to the user
 type Canvas struct {
 	dest       *os.File
-	Background string
+	Background Color
 	Cells      [][]*Cell
 }
 
 // New returns a new canvas
-func New(dest *os.File, background string, width, height int) *Canvas {
+func New(dest *os.File, background Color, width, height int) *Canvas {
 	var cells = [][]*Cell{}
 
 	for i := 0; i < height; i++ {

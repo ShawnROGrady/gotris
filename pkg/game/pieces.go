@@ -1,12 +1,14 @@
 package game
 
+import "github.com/ShawnROGrady/gotris/pkg/canvas"
+
 type coordinates struct {
 	x int
 	y int
 }
 
 type piece struct {
-	color       string
+	color       canvas.Color
 	coordinates coordinates
 }
 

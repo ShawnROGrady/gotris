@@ -22,15 +22,15 @@ func New(term *os.File, width, height int) *Game {
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
 			term,
-			"\u001b[32m", // Green
+			canvas.Green,
 			width, height,
 		),
 		board: newBoard(
-			"\u001b[32m", // Green
+			canvas.Green,
 			width, height,
 		),
 		currentPiece: &piece{
-			color: "\u001b[34m", //Blue
+			color: canvas.Blue,
 			coordinates: coordinates{
 				x: 0,
 				y: height - 1,
@@ -87,7 +87,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				// generate new current piece if at bottom
 				if coords.y == 0 {
 					g.currentPiece = &piece{
-						color: "\u001b[34m", //Blue
+						color: canvas.Blue,
 						coordinates: coordinates{
 							x: 0,
 							y: len(g.board.blocks) - 1,
