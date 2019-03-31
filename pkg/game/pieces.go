@@ -12,25 +12,25 @@ type piece struct {
 	coordinates coordinates
 }
 
-func (p *piece) move(direction string, xmax, ymax int) {
+func (p *piece) move(direction userInput, xmax, ymax int) {
 	// TODO: make direction its own type
 	switch direction {
-	case "h":
+	case moveLeft:
 		// left
 		if p.coordinates.x > 0 {
 			p.coordinates.x -= 1
 		}
-	case "j":
+	case moveDown:
 		// down
 		if p.coordinates.y > 0 {
 			p.coordinates.y -= 1
 		}
-	case "k":
+	case moveUp:
 		// up
 		if p.coordinates.y < ymax {
 			p.coordinates.y += 1
 		}
-	case "l":
+	case moveRight:
 		// right
 		if p.coordinates.x < xmax {
 			p.coordinates.x += 1

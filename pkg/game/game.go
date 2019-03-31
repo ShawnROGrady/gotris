@@ -41,7 +41,7 @@ func New(term *os.File, width, height int) *Game {
 
 // RunDemo is a placeholder function to test core functionality
 func (g *Game) RunDemo(done chan bool) chan error {
-	input, readErr := g.inputreader.ReadInput(done)
+	input, readErr := translateInput(done, g.inputreader)
 	runErr := make(chan error)
 
 	coords := g.currentPiece.coordinates
@@ -73,7 +73,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				// clear cell where piece was
 				g.board.blocks[coords.y][coords.x] = nil
 
-				if err := g.handleDemoInput(string(in)); err != nil {
+				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
 				}
 
@@ -113,7 +113,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	return runErr
 }
 
-func (g *Game) handleDemoInput(input string) error {
+func (g *Game) handleDemoInput(input userInput) error {
 	g.currentPiece.move(input,
 		len(g.board.blocks[0])-1,
 		len(g.board.blocks)-1,
