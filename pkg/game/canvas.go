@@ -1,6 +1,9 @@
 package game
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
 type canvas struct {
 	background string
@@ -11,12 +14,7 @@ func newCanvas(background string, width, height int) *canvas {
 	var cells = [][]*cell{}
 
 	for i := 0; i < height; i++ {
-		row := []*cell{}
-		for j := 0; j < width; j++ {
-			row = append(row, &cell{
-				background: background,
-			})
-		}
+		row := make([]*cell, width)
 		cells = append(cells, row)
 	}
 
@@ -41,6 +39,12 @@ func (c *canvas) render(dest *os.File) error {
 	for _, row := range c.cells {
 		var buf = []byte{}
 		for _, cell := range row {
+			if cell == nil {
+				buf = append(buf,
+					[]byte(fmt.Sprintf("%s%s", c.background, block))...,
+				)
+				continue
+			}
 			buf = append(buf, []byte(cell.String())...)
 		}
 		buf = append(buf, '\n')

@@ -50,9 +50,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				coords := g.currentPiece.coordinates
 
 				// clear cell where piece was
-				g.canvas.cells[coords.y][coords.x] = &cell{
-					background: g.canvas.background,
-				}
+				g.canvas.cells[coords.y][coords.x] = nil
 
 				if err := g.handleDemoInput(string(in)); err != nil {
 					runErr <- err
