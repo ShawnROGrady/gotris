@@ -63,6 +63,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 			select {
 			case err := <-readErr:
 				runErr <- err
+				return
 			case <-done:
 				return
 			case in := <-input:
@@ -75,6 +76,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
+					return
 				}
 
 				coords = g.currentPiece.coordinates
@@ -84,8 +86,8 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					color: g.currentPiece.color,
 				}
 
-				// generate new current piece if at bottom
-				if coords.y == 0 {
+				// generate new current piece if at bottom or on top of another piece
+				if coords.y == 0 || g.board.blocks[coords.y-1][coords.x] != nil {
 					g.currentPiece = &piece{
 						color: canvas.Blue,
 						coordinates: coordinates{
@@ -106,6 +108,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 
 				if err := g.canvas.Render(); err != nil {
 					runErr <- err
+					return
 				}
 			}
 		}
