@@ -46,12 +46,21 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				return
 			case in := <-input:
 				log.Printf("User input: %s", in)
+
+				coords := g.currentPiece.coordinates
+
+				// clear cell where piece was
+				g.canvas.cells[coords.y][coords.x] = &cell{
+					background: g.canvas.background,
+				}
+
 				if err := g.handleDemoInput(string(in)); err != nil {
 					runErr <- err
 				}
 
-				coords := g.currentPiece.coordinates
+				coords = g.currentPiece.coordinates
 
+				// update cell at pieces new position
 				g.canvas.cells[coords.y][coords.x] = &cell{
 					background: g.currentPiece.color,
 				}
