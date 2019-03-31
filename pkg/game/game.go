@@ -31,6 +31,12 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	input, readErr := readInput(done, g.term)
 	runErr := make(chan error)
 
+	coords := g.currentPiece.coordinates
+	// add initial piece to canvas
+	g.canvas.cells[coords.y][coords.x] = &cell{
+		background: g.currentPiece.color,
+	}
+
 	// render initial canvas
 	if err := g.canvas.render(g.term); err != nil {
 		runErr <- err
@@ -59,6 +65,21 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				coords = g.currentPiece.coordinates
 
 				// update cell at pieces new position
+				g.canvas.cells[coords.y][coords.x] = &cell{
+					background: g.currentPiece.color,
+				}
+
+				// generate new current piece if at bottom
+				// TODO: separate board management+canvas to reverse this logic
+				if coords.y == len(g.canvas.cells)-1 {
+					g.currentPiece = &piece{
+						color: "\u001b[34m", //Blue
+					}
+				}
+
+				coords = g.currentPiece.coordinates
+
+				// add new piece to canvas
 				g.canvas.cells[coords.y][coords.x] = &cell{
 					background: g.currentPiece.color,
 				}
