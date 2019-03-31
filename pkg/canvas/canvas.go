@@ -1,30 +1,33 @@
-package game
+package canvas
 
 import (
 	"fmt"
 	"os"
 )
 
-type canvas struct {
-	background string
-	cells      [][]*cell
+// Canvas represents what is actually rendered to the user
+type Canvas struct {
+	Background string
+	Cells      [][]*Cell
 }
 
-func newCanvas(background string, width, height int) *canvas {
-	var cells = [][]*cell{}
+// New returns a new canvas
+func New(background string, width, height int) *Canvas {
+	var cells = [][]*Cell{}
 
 	for i := 0; i < height; i++ {
-		row := make([]*cell, width)
+		row := make([]*Cell, width)
 		cells = append(cells, row)
 	}
 
-	return &canvas{
-		background: background,
-		cells:      cells,
+	return &Canvas{
+		Background: background,
+		Cells:      cells,
 	}
 }
 
-func (c *canvas) render(dest *os.File) error {
+// Render renders the current canvas
+func (c *Canvas) Render(dest *os.File) error {
 	// clear the canvas
 	_, err := dest.WriteString("\033[2J")
 	if err != nil {
@@ -36,12 +39,12 @@ func (c *canvas) render(dest *os.File) error {
 		return err
 	}
 
-	for _, row := range c.cells {
+	for _, row := range c.Cells {
 		var buf = []byte{}
 		for _, cell := range row {
 			if cell == nil {
 				buf = append(buf,
-					[]byte(fmt.Sprintf("%s%s", c.background, block))...,
+					[]byte(fmt.Sprintf("%s%s", c.Background, block))...,
 				)
 				continue
 			}

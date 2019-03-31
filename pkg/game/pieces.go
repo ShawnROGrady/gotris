@@ -20,13 +20,13 @@ func (p *piece) move(direction string, xmax, ymax int) {
 		}
 	case "j":
 		// down
-		if p.coordinates.y < ymax {
-			p.coordinates.y += 1
+		if p.coordinates.y > 0 {
+			p.coordinates.y -= 1
 		}
 	case "k":
 		// up
-		if p.coordinates.y > 0 {
-			p.coordinates.y -= 1
+		if p.coordinates.y < ymax {
+			p.coordinates.y += 1
 		}
 	case "l":
 		// right
