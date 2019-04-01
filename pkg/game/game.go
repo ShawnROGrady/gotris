@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"os"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
@@ -67,19 +66,31 @@ func (g *Game) RunDemo(done chan bool) chan error {
 			case <-done:
 				return
 			case in := <-input:
-				log.Printf("User input: %s", in)
+				// TODO: print if in debug mode
+				//log.Printf("User input: %s", in)
 
 				coords := g.currentPiece.coordinates
-
-				// clear cell where piece was
-				g.board.blocks[coords.y][coords.x] = nil
 
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
 					return
 				}
 
-				coords = g.currentPiece.coordinates
+				newCoords := g.currentPiece.coordinates
+
+				// check if space occupied
+				if g.board.blocks[newCoords.y][newCoords.x] != nil {
+					g.currentPiece.coordinates = coordinates{
+						x: coords.x,
+						y: coords.y,
+					}
+					continue
+				}
+
+				// clear cell where piece was
+				g.board.blocks[coords.y][coords.x] = nil
+
+				coords = newCoords
 
 				// update cell at pieces new position
 				g.board.blocks[coords.y][coords.x] = &block{
