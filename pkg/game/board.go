@@ -50,3 +50,25 @@ func (b *board) cells() [][]*canvas.Cell {
 	}
 	return cells
 }
+
+func (b *board) checkRows() {
+	for i, row := range b.blocks {
+		for j, cell := range row {
+			if cell == nil {
+				break
+			}
+
+			if j == len(row)-1 {
+				// all blocks in row non-nil->clear
+				copy(b.blocks[i:], b.blocks[i+1:])
+
+				// remove full row
+				b.blocks = b.blocks[:len(b.blocks)-1]
+
+				// insert empty row at top
+				b.blocks = append([][]*block{make([]*block, j+1)}, b.blocks...)
+			}
+		}
+	}
+
+}

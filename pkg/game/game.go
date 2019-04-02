@@ -99,6 +99,10 @@ func (g *Game) RunDemo(done chan bool) chan error {
 
 				// generate new current piece if at bottom or on top of another piece
 				if coords.y == 0 || g.board.blocks[coords.y-1][coords.x] != nil {
+					// check if any rows can be cleared
+					// TODO: add scoring
+					g.board.checkRows()
+
 					g.currentPiece = &piece{
 						color: canvas.Blue,
 						coordinates: coordinates{
