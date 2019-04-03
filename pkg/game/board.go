@@ -66,7 +66,7 @@ func (b *board) checkRows() {
 				b.blocks = b.blocks[:len(b.blocks)-1]
 
 				// insert empty row at top
-				b.blocks = append([][]*block{make([]*block, j+1)}, b.blocks...)
+				b.blocks = append(b.blocks, [][]*block{make([]*block, j+1)}...)
 			}
 		}
 	}

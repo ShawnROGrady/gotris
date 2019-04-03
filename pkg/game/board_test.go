@@ -13,15 +13,15 @@ var checkRowsTests = map[string]struct {
 }{
 	"only bottom row": {
 		initialBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
 			[]*block{
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewBlocks: [][]*block{
 			[]*block{nil, nil, nil, nil},
@@ -58,152 +58,158 @@ var checkRowsTests = map[string]struct {
 	},
 	"bottom row with other blocks": {
 		initialBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{
-				nil,
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-				nil,
-			},
 			[]*block{
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 			},
+			[]*block{
+				nil,
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				nil,
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
 			[]*block{
 				nil,
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				nil,
 			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
 				&canvas.Cell{Background: canvas.Blue},
 				&canvas.Cell{Background: canvas.Blue},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
 				&canvas.Cell{Background: canvas.Green},
 			},
 		},
 	},
 	"second from bottom row with other blocks": {
 		initialBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-			},
 			[]*block{
 				nil,
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				nil,
 			},
+			[]*block{
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
 			[]*block{
 				nil,
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				nil,
 			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
 				&canvas.Cell{Background: canvas.Blue},
 				&canvas.Cell{Background: canvas.Blue},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
 				&canvas.Cell{Background: canvas.Green},
 			},
 		},
 	},
 	"no clearing neccessary": {
 		initialBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{
-				&block{color: canvas.Blue},
-				nil,
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-			},
 			[]*block{
 				nil,
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				nil,
 			},
+			[]*block{
+				&block{color: canvas.Blue},
+				nil,
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewBlocks: [][]*block{
-			[]*block{nil, nil, nil, nil},
-			[]*block{nil, nil, nil, nil},
-			[]*block{
-				&block{color: canvas.Blue},
-				nil,
-				&block{color: canvas.Blue},
-				&block{color: canvas.Blue},
-			},
 			[]*block{
 				nil,
 				&block{color: canvas.Blue},
 				&block{color: canvas.Blue},
 				nil,
 			},
+			[]*block{
+				&block{color: canvas.Blue},
+				nil,
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
 		},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Blue},
-				&canvas.Cell{Background: canvas.Blue},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
 				&canvas.Cell{Background: canvas.Green},
 			},
 			[]*canvas.Cell{
@@ -214,14 +220,8 @@ var checkRowsTests = map[string]struct {
 			},
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-			},
-			[]*canvas.Cell{
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
-				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Blue},
+				&canvas.Cell{Background: canvas.Blue},
 				&canvas.Cell{Background: canvas.Green},
 			},
 		},
@@ -236,6 +236,11 @@ func TestCheckRows(t *testing.T) {
 		}
 
 		b.checkRows()
+
+		if len(b.blocks) != len(test.initialBlocks) {
+			t.Fatalf("checking rows resulted in new row count for test case '%s' [expected = %d, actual = %d]", testName, len(test.initialBlocks), len(b.blocks))
+			return
+		}
 
 		if len(b.blocks) != len(test.expectedNewBlocks) {
 			t.Fatalf("unexpected number of columns for test case '%s' [expected = %d, actual = %d]", testName, len(test.expectedNewBlocks), len(b.blocks))
@@ -270,6 +275,11 @@ func TestCheckRows(t *testing.T) {
 		cells := b.cells()
 		if len(cells) != len(test.expectedNewCells) {
 			t.Fatalf("unexpected number of cells for test case '%s' [expected = %d, actual = %d]", testName, len(test.expectedNewCells), len(cells))
+		}
+
+		if len(cells) != len(test.initialBlocks) {
+			t.Fatalf("checking rows resulted in new cell count for test case '%s' [expected = %d, actual = %d]", testName, len(test.initialBlocks), len(cells))
+			return
 		}
 
 		for i := range cells {
