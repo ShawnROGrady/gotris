@@ -6,9 +6,10 @@ import (
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
 )
 
-var checkRowsTests = map[string]struct {
+var clearRowsTests = map[string]struct {
 	initialBlocks     [][]*block
 	expectedNewBlocks [][]*block
+	expectedFullRows  []int
 	expectedNewCells  [][]*canvas.Cell
 }{
 	"only bottom row": {
@@ -29,6 +30,7 @@ var checkRowsTests = map[string]struct {
 			[]*block{nil, nil, nil, nil},
 			[]*block{nil, nil, nil, nil},
 		},
+		expectedFullRows: []int{0},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
@@ -84,6 +86,7 @@ var checkRowsTests = map[string]struct {
 			[]*block{nil, nil, nil, nil},
 			[]*block{nil, nil, nil, nil},
 		},
+		expectedFullRows: []int{0},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
@@ -139,6 +142,119 @@ var checkRowsTests = map[string]struct {
 			[]*block{nil, nil, nil, nil},
 			[]*block{nil, nil, nil, nil},
 		},
+		expectedFullRows: []int{1},
+		expectedNewCells: [][]*canvas.Cell{
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Blue},
+				&canvas.Cell{Background: canvas.Blue},
+				&canvas.Cell{Background: canvas.Green},
+			},
+		},
+	},
+	"just bottom two": {
+		initialBlocks: [][]*block{
+			[]*block{
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+		},
+		expectedNewBlocks: [][]*block{
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+		},
+		expectedFullRows: []int{0, 1},
+		expectedNewCells: [][]*canvas.Cell{
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+			[]*canvas.Cell{
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+				&canvas.Cell{Background: canvas.Green},
+			},
+		},
+	},
+	"bottom two rows with other blocks": {
+		initialBlocks: [][]*block{
+			[]*block{
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+			},
+			[]*block{
+				nil,
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				nil,
+			},
+			[]*block{nil, nil, nil, nil},
+		},
+		expectedNewBlocks: [][]*block{
+			[]*block{
+				nil,
+				&block{color: canvas.Blue},
+				&block{color: canvas.Blue},
+				nil,
+			},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+			[]*block{nil, nil, nil, nil},
+		},
+		expectedFullRows: []int{0, 1},
 		expectedNewCells: [][]*canvas.Cell{
 			[]*canvas.Cell{
 				&canvas.Cell{Background: canvas.Green},
@@ -229,13 +345,35 @@ var checkRowsTests = map[string]struct {
 }
 
 func TestCheckRows(t *testing.T) {
-	for testName, test := range checkRowsTests {
+	for testName, test := range clearRowsTests {
 		b := &board{
 			background: canvas.Green,
 			blocks:     test.initialBlocks,
 		}
 
-		b.checkRows()
+		fullRows := b.checkRows()
+
+		if len(fullRows) != len(test.expectedFullRows) {
+			t.Fatalf("Unexpected full rows detected for test case '%s' [expected = %v, actual = %v", testName, test.expectedFullRows, fullRows)
+		}
+
+		for i := range fullRows {
+			if fullRows[i] != test.expectedFullRows[i] {
+				t.Fatalf("Unexpected full rows detected for test case '%s' [expected = %v, actual = %v", testName, test.expectedFullRows, fullRows)
+				return
+			}
+		}
+	}
+}
+
+func TestClearFullRows(t *testing.T) {
+	for testName, test := range clearRowsTests {
+		b := &board{
+			background: canvas.Green,
+			blocks:     test.initialBlocks,
+		}
+
+		b.clearFullRows()
 
 		if len(b.blocks) != len(test.initialBlocks) {
 			t.Fatalf("checking rows resulted in new row count for test case '%s' [expected = %d, actual = %d]", testName, len(test.initialBlocks), len(b.blocks))

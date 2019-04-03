@@ -51,7 +51,27 @@ func (b *board) cells() [][]*canvas.Cell {
 	return cells
 }
 
-func (b *board) checkRows() {
+func (b *board) clearFullRows() {
+	// TODO this should return a score
+	fullRows := b.checkRows()
+
+	blocksPerRow := len(b.blocks[0])
+	for i, fullRow := range fullRows {
+		// all blocks in row non-nil->clear
+		// subtract i to account for rows already cleared
+		copy(b.blocks[fullRow-i:], b.blocks[fullRow+1-i:])
+
+		// remove full row
+		b.blocks = b.blocks[:len(b.blocks)-1]
+
+		// insert empty row at top
+		b.blocks = append(b.blocks, [][]*block{make([]*block, blocksPerRow)}...)
+	}
+}
+
+func (b *board) checkRows() []int {
+	fullRows := []int{}
+
 	for i, row := range b.blocks {
 		for j, cell := range row {
 			if cell == nil {
@@ -59,16 +79,10 @@ func (b *board) checkRows() {
 			}
 
 			if j == len(row)-1 {
-				// all blocks in row non-nil->clear
-				copy(b.blocks[i:], b.blocks[i+1:])
-
-				// remove full row
-				b.blocks = b.blocks[:len(b.blocks)-1]
-
-				// insert empty row at top
-				b.blocks = append(b.blocks, [][]*block{make([]*block, j+1)}...)
+				fullRows = append(fullRows, i)
 			}
 		}
 	}
 
+	return fullRows
 }

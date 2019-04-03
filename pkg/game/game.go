@@ -101,7 +101,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				if coords.y == 0 || g.board.blocks[coords.y-1][coords.x] != nil {
 					// check if any rows can be cleared
 					// TODO: add scoring
-					g.board.checkRows()
+					g.board.clearFullRows()
 
 					g.currentPiece = &piece{
 						color: canvas.Blue,
