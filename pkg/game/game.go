@@ -12,7 +12,7 @@ type Game struct {
 	inputreader  inputreader.InputReader
 	canvas       *canvas.Canvas
 	board        *board
-	currentPiece *piece
+	currentPiece tetrimino
 }
 
 // New returns a new game with the specified specifications
@@ -28,11 +28,16 @@ func New(term *os.File, width, height int) *Game {
 			canvas.Green,
 			width, height,
 		),
-		currentPiece: &piece{
-			color: canvas.Blue,
-			coordinates: coordinates{
-				x: 0,
-				y: height - 1,
+		currentPiece: &iPiece{
+			box: box{
+				topLeft: coordinates{
+					x: 0,
+					y: height - 1,
+				},
+				bottomRight: coordinates{
+					x: 3,
+					y: height - 4,
+				},
 			},
 		},
 	}
@@ -43,10 +48,20 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	input, readErr := translateInput(done, g.inputreader)
 	runErr := make(chan error)
 
-	coords := g.currentPiece.coordinates
+	blocks := g.currentPiece.blocks()
+	topL := g.currentPiece.containingBox().topLeft
+
 	// add initial piece to canvas
-	g.board.blocks[coords.y][coords.x] = &block{
-		color: g.currentPiece.color,
+	for i, row := range blocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := topL.x + j
+			y := topL.y - i
+
+			g.board.blocks[y][x] = block
+		}
 	}
 
 	g.canvas.Cells = g.board.cells()
@@ -69,53 +84,81 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				// TODO: print if in debug mode
 				//log.Printf("User input: %s", in)
 
-				coords := g.currentPiece.coordinates
+				topL := g.currentPiece.containingBox().topLeft
+
+				// add initial piece to canvas
 
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
 					return
 				}
 
-				newCoords := g.currentPiece.coordinates
-
-				// check if space occupied
-				if g.board.blocks[newCoords.y][newCoords.x] != nil {
-					g.currentPiece.coordinates = coordinates{
-						x: coords.x,
-						y: coords.y,
-					}
-					continue
-				}
+				newTopL := g.currentPiece.containingBox().topLeft
+				newBottomR := g.currentPiece.containingBox().bottomRight
 
 				// clear cell where piece was
-				g.board.blocks[coords.y][coords.x] = nil
+				for i, row := range blocks {
+					for j, block := range row {
+						if block == nil {
+							continue
+						}
+						x := topL.x + j
+						y := topL.y - i
 
-				coords = newCoords
+						g.board.blocks[y][x] = nil
+					}
+				}
+
+				topL = newTopL
+				bottomR := newBottomR
 
 				// update cell at pieces new position
-				g.board.blocks[coords.y][coords.x] = &block{
-					color: g.currentPiece.color,
+				blocks = g.currentPiece.blocks()
+				for i, row := range blocks {
+					for j, block := range row {
+						if block == nil {
+							continue
+						}
+						x := topL.x + j
+						y := topL.y - i
+
+						g.board.blocks[y][x] = block
+					}
 				}
 
 				// generate new current piece if at bottom or on top of another piece
-				if coords.y == 0 || g.board.blocks[coords.y-1][coords.x] != nil {
+				if bottomR.y == 0 || g.board.blocks[g.currentPiece.yMin().y-1][g.currentPiece.yMin().x] != nil {
 					// check if any rows can be cleared
 					// TODO: add scoring
 					g.board.clearFullRows()
 
-					g.currentPiece = &piece{
-						color: canvas.Blue,
-						coordinates: coordinates{
-							x: 0,
-							y: len(g.board.blocks) - 1,
+					g.currentPiece = &iPiece{
+						box: box{
+							topLeft: coordinates{
+								x: 0,
+								y: len(g.board.blocks) - 1,
+							},
+							bottomRight: coordinates{
+								x: 3,
+								y: len(g.board.blocks) - 4,
+							},
 						},
 					}
 
-					coords = g.currentPiece.coordinates
+					topL = newTopL
+					blocks = g.currentPiece.blocks()
 
 					// add new piece to canvas
-					g.board.blocks[coords.y][coords.x] = &block{
-						color: g.currentPiece.color,
+					for i, row := range blocks {
+						for j, block := range row {
+							if block == nil {
+								continue
+							}
+							x := topL.x + j
+							y := topL.y - i
+
+							g.board.blocks[y][x] = block
+						}
 					}
 				}
 
