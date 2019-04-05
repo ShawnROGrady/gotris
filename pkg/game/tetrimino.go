@@ -13,6 +13,23 @@ type tetrimino interface {
 	xMin() coordinates
 }
 
+// NewPiece generates a new tetrimino
+func NewPiece(boardWidth, boardHeight int) tetrimino {
+	// TODO: should randomly generate piece type
+	return &iPiece{
+		box: box{
+			topLeft: coordinates{
+				x: 0,
+				y: boardHeight - 1,
+			},
+			bottomRight: coordinates{
+				x: 3,
+				y: boardHeight - 4,
+			},
+		},
+	}
+}
+
 // each piece can be thought of as being contained in a box
 // this way we don't have to track the coordinates of each block
 type box struct {

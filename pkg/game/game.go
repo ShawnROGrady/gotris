@@ -17,6 +17,7 @@ type Game struct {
 
 // New returns a new game with the specified specifications
 func New(term *os.File, width, height int) *Game {
+	piece := NewPiece(width, height)
 	return &Game{
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
@@ -28,18 +29,7 @@ func New(term *os.File, width, height int) *Game {
 			canvas.Green,
 			width, height,
 		),
-		currentPiece: &iPiece{
-			box: box{
-				topLeft: coordinates{
-					x: 0,
-					y: height - 1,
-				},
-				bottomRight: coordinates{
-					x: 3,
-					y: height - 4,
-				},
-			},
-		},
+		currentPiece: piece,
 	}
 }
 
@@ -49,20 +39,9 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	runErr := make(chan error)
 
 	blocks := g.currentPiece.blocks()
-	topL := g.currentPiece.containingBox().topLeft
 
 	// add initial piece to canvas
-	for i, row := range blocks {
-		for j, block := range row {
-			if block == nil {
-				continue
-			}
-			x := topL.x + j
-			y := topL.y - i
-
-			g.board.blocks[y][x] = block
-		}
-	}
+	g.addPieceToBoard(g.currentPiece)
 
 	g.canvas.Cells = g.board.cells()
 
@@ -86,15 +65,12 @@ func (g *Game) RunDemo(done chan bool) chan error {
 
 				topL := g.currentPiece.containingBox().topLeft
 
-				// add initial piece to canvas
-
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
 					return
 				}
 
 				newTopL := g.currentPiece.containingBox().topLeft
-				newBottomR := g.currentPiece.containingBox().bottomRight
 
 				// clear cell where piece was
 				for i, row := range blocks {
@@ -110,56 +86,20 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				}
 
 				topL = newTopL
-				bottomR := newBottomR
 
 				// update cell at pieces new position
-				blocks = g.currentPiece.blocks()
-				for i, row := range blocks {
-					for j, block := range row {
-						if block == nil {
-							continue
-						}
-						x := topL.x + j
-						y := topL.y - i
-
-						g.board.blocks[y][x] = block
-					}
-				}
+				g.addPieceToBoard(g.currentPiece)
 
 				// generate new current piece if at bottom or on top of another piece
-				if bottomR.y == 0 || g.board.blocks[g.currentPiece.yMin().y-1][g.currentPiece.yMin().x] != nil {
+				if g.currentPiece.yMin().y == 0 || g.board.blocks[g.currentPiece.yMin().y-1][g.currentPiece.yMin().x] != nil {
 					// check if any rows can be cleared
 					// TODO: add scoring
 					g.board.clearFullRows()
 
-					g.currentPiece = &iPiece{
-						box: box{
-							topLeft: coordinates{
-								x: 0,
-								y: len(g.board.blocks) - 1,
-							},
-							bottomRight: coordinates{
-								x: 3,
-								y: len(g.board.blocks) - 4,
-							},
-						},
-					}
-
-					topL = newTopL
-					blocks = g.currentPiece.blocks()
+					g.currentPiece = NewPiece(len(g.board.blocks[0]), len(g.board.blocks))
 
 					// add new piece to canvas
-					for i, row := range blocks {
-						for j, block := range row {
-							if block == nil {
-								continue
-							}
-							x := topL.x + j
-							y := topL.y - i
-
-							g.board.blocks[y][x] = block
-						}
-					}
+					g.addPieceToBoard(g.currentPiece)
 				}
 
 				g.canvas.Cells = g.board.cells()
@@ -172,6 +112,25 @@ func (g *Game) RunDemo(done chan bool) chan error {
 		}
 	}()
 	return runErr
+}
+
+func (g *Game) addPieceToBoard(piece tetrimino) {
+	var (
+		topL   = piece.containingBox().topLeft
+		blocks = piece.blocks()
+	)
+
+	for i, row := range blocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := topL.x + j
+			y := topL.y - i
+
+			g.board.blocks[y][x] = block
+		}
+	}
 }
 
 func (g *Game) handleDemoInput(input userInput) error {
