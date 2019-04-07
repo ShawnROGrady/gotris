@@ -9,6 +9,7 @@ const (
 	moveDown
 	moveUp
 	moveRight
+	ignore
 )
 
 func (u userInput) String() string {
@@ -20,6 +21,21 @@ func (u userInput) String() string {
 	}
 
 	return inputDescriptions[u]
+}
+
+func (u userInput) opposite() userInput {
+	var oppositeInput = map[userInput]userInput{
+		moveLeft:  moveRight,
+		moveDown:  moveUp,
+		moveUp:    moveDown,
+		moveRight: moveLeft,
+	}
+
+	if opposite, ok := oppositeInput[u]; ok {
+		return opposite
+	}
+
+	return ignore
 }
 
 func translateInput(done chan bool, inputreader inputreader.InputReader) (chan userInput, chan error) {

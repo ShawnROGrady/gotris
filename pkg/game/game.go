@@ -41,7 +41,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	blocks := g.currentPiece.blocks()
 
 	// add initial piece to canvas
-	g.addPieceToBoard(g.currentPiece)
+	g.addPieceToBoard()
 
 	g.canvas.Cells = g.board.cells()
 
@@ -70,6 +70,18 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					return
 				}
 
+				// new space already occupied
+				if (in == moveLeft || in == moveRight) && g.pieceConflicts(topL) {
+					// move back to original spot
+					if opposite := in.opposite(); opposite != ignore {
+						if err := g.handleDemoInput(opposite); err != nil {
+							runErr <- err
+							return
+						}
+						continue
+					}
+				}
+
 				newTopL := g.currentPiece.containingBox().topLeft
 
 				// clear cell where piece was
@@ -88,7 +100,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				topL = newTopL
 
 				// update cell at pieces new position
-				g.addPieceToBoard(g.currentPiece)
+				g.addPieceToBoard()
 
 				// generate new current piece if at bottom or on top of another piece
 				if g.currentPiece.yMin().y == 0 || g.board.blocks[g.currentPiece.yMin().y-1][g.currentPiece.yMin().x] != nil {
@@ -99,7 +111,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					g.currentPiece = NewPiece(len(g.board.blocks[0]), len(g.board.blocks))
 
 					// add new piece to canvas
-					g.addPieceToBoard(g.currentPiece)
+					g.addPieceToBoard()
 				}
 
 				g.canvas.Cells = g.board.cells()
@@ -114,8 +126,9 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	return runErr
 }
 
-func (g *Game) addPieceToBoard(piece tetrimino) {
+func (g *Game) addPieceToBoard() {
 	var (
+		piece  = g.currentPiece
 		topL   = piece.containingBox().topLeft
 		blocks = piece.blocks()
 	)
@@ -131,6 +144,35 @@ func (g *Game) addPieceToBoard(piece tetrimino) {
 			g.board.blocks[y][x] = block
 		}
 	}
+}
+
+// pieceConflicts checks if the current piece is in an occupied space
+func (g *Game) pieceConflicts(oldTopL coordinates) bool {
+	var (
+		topL   = g.currentPiece.containingBox().topLeft
+		blocks = g.currentPiece.blocks()
+	)
+
+	if oldTopL == topL {
+		// piece didn't move
+		return false
+	}
+
+	for i, row := range blocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := topL.x + j
+			y := topL.y - i
+
+			if g.board.blocks[y][x] != nil {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (g *Game) handleDemoInput(input userInput) error {
