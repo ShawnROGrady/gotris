@@ -4,6 +4,8 @@ import (
 	"os"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/pkg/game/board"
+	"github.com/ShawnROGrady/gotris/pkg/game/tetrimino"
 	"github.com/ShawnROGrady/gotris/pkg/inputreader"
 )
 
@@ -11,13 +13,13 @@ import (
 type Game struct {
 	inputreader  inputreader.InputReader
 	canvas       *canvas.Canvas
-	board        *board
-	currentPiece tetrimino
+	board        *board.Board
+	currentPiece tetrimino.Tetrimino
 }
 
 // New returns a new game with the specified specifications
 func New(term *os.File, width, height int) *Game {
-	piece := NewPiece(width, height)
+	piece := tetrimino.New(width, height)
 	return &Game{
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
@@ -25,7 +27,7 @@ func New(term *os.File, width, height int) *Game {
 			canvas.Green,
 			width, height,
 		),
-		board: newBoard(
+		board: board.New(
 			canvas.Green,
 			width, height,
 		),
@@ -38,12 +40,12 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	input, readErr := translateInput(done, g.inputreader)
 	runErr := make(chan error)
 
-	blocks := g.currentPiece.blocks()
+	blocks := g.currentPiece.Blocks()
 
 	// add initial piece to canvas
 	g.addPieceToBoard()
 
-	g.canvas.Cells = g.board.cells()
+	g.canvas.Cells = g.board.Cells()
 
 	// render initial canvas
 	if err := g.canvas.Render(); err != nil {
@@ -63,7 +65,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				// TODO: print if in debug mode
 				//log.Printf("User input: %s", in)
 
-				topL := g.currentPiece.containingBox().topLeft
+				topL := g.currentPiece.ContainingBox().TopLeft
 
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
@@ -82,7 +84,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					}
 				}
 
-				newTopL := g.currentPiece.containingBox().topLeft
+				newTopL := g.currentPiece.ContainingBox().TopLeft
 
 				// clear cell where piece was
 				for i, row := range blocks {
@@ -90,10 +92,10 @@ func (g *Game) RunDemo(done chan bool) chan error {
 						if block == nil {
 							continue
 						}
-						x := topL.x + j
-						y := topL.y - i
+						x := topL.X + j
+						y := topL.Y - i
 
-						g.board.blocks[y][x] = nil
+						g.board.Blocks[y][x] = nil
 					}
 				}
 
@@ -103,18 +105,18 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				g.addPieceToBoard()
 
 				// generate new current piece if at bottom or on top of another piece
-				if g.currentPiece.yMin().y == 0 || g.board.blocks[g.currentPiece.yMin().y-1][g.currentPiece.yMin().x] != nil {
+				if g.currentPiece.YMin().Y == 0 || g.board.Blocks[g.currentPiece.YMin().Y-1][g.currentPiece.YMin().X] != nil {
 					// check if any rows can be cleared
 					// TODO: add scoring
-					g.board.clearFullRows()
+					g.board.ClearFullRows()
 
-					g.currentPiece = NewPiece(len(g.board.blocks[0]), len(g.board.blocks))
+					g.currentPiece = tetrimino.New(len(g.board.Blocks[0]), len(g.board.Blocks))
 
 					// add new piece to canvas
 					g.addPieceToBoard()
 				}
 
-				g.canvas.Cells = g.board.cells()
+				g.canvas.Cells = g.board.Cells()
 
 				if err := g.canvas.Render(); err != nil {
 					runErr <- err
@@ -129,8 +131,8 @@ func (g *Game) RunDemo(done chan bool) chan error {
 func (g *Game) addPieceToBoard() {
 	var (
 		piece  = g.currentPiece
-		topL   = piece.containingBox().topLeft
-		blocks = piece.blocks()
+		topL   = piece.ContainingBox().TopLeft
+		blocks = piece.Blocks()
 	)
 
 	for i, row := range blocks {
@@ -138,19 +140,19 @@ func (g *Game) addPieceToBoard() {
 			if block == nil {
 				continue
 			}
-			x := topL.x + j
-			y := topL.y - i
+			x := topL.X + j
+			y := topL.Y - i
 
-			g.board.blocks[y][x] = block
+			g.board.Blocks[y][x] = block
 		}
 	}
 }
 
 // pieceConflicts checks if the current piece is in an occupied space
-func (g *Game) pieceConflicts(oldTopL coordinates) bool {
+func (g *Game) pieceConflicts(oldTopL tetrimino.Coordinates) bool {
 	var (
-		topL   = g.currentPiece.containingBox().topLeft
-		blocks = g.currentPiece.blocks()
+		topL   = g.currentPiece.ContainingBox().TopLeft
+		blocks = g.currentPiece.Blocks()
 	)
 
 	if oldTopL == topL {
@@ -163,10 +165,10 @@ func (g *Game) pieceConflicts(oldTopL coordinates) bool {
 			if block == nil {
 				continue
 			}
-			x := topL.x + j
-			y := topL.y - i
+			x := topL.X + j
+			y := topL.Y - i
 
-			if g.board.blocks[y][x] != nil {
+			if g.board.Blocks[y][x] != nil {
 				return true
 			}
 		}
@@ -176,9 +178,25 @@ func (g *Game) pieceConflicts(oldTopL coordinates) bool {
 }
 
 func (g *Game) handleDemoInput(input userInput) error {
-	g.currentPiece.move(input,
-		len(g.board.blocks[0])-1,
-		len(g.board.blocks)-1,
-	)
+	g.movePiece(input)
 	return nil
+}
+
+func (g *Game) movePiece(input userInput) {
+	var (
+		xmax  = len(g.board.Blocks[0]) - 1
+		ymax  = len(g.board.Blocks) - 1
+		piece = g.currentPiece
+	)
+
+	switch input {
+	case moveLeft:
+		piece.MoveLeft()
+	case moveDown:
+		piece.MoveDown()
+	case moveUp:
+		piece.MoveUp(ymax)
+	case moveRight:
+		piece.MoveRight(xmax)
+	}
 }
