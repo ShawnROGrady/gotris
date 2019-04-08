@@ -6,7 +6,8 @@ import (
 )
 
 type iPiece struct {
-	box Box
+	box         Box
+	orientation *orientation
 }
 
 func (i *iPiece) ContainingBox() Box {
@@ -114,15 +115,58 @@ func (i *iPiece) XMin() Coordinates {
 }
 
 func (i *iPiece) Blocks() [][]*board.Block {
-	return iBlocks
+	switch *i.orientation {
+	case spawn:
+		return [][]*board.Block{
+			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
+		}
+	case clockwise:
+		return [][]*board.Block{
+			[]*board.Block{nil, nil, nil, nil},
+			[]*board.Block{nil, nil, nil, nil},
+			[]*board.Block{
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+			},
+			[]*board.Block{nil, nil, nil, nil},
+		}
+	case opposite:
+		return [][]*board.Block{
+			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
+		}
+	case counterclockwise:
+		return [][]*board.Block{
+			[]*board.Block{nil, nil, nil, nil},
+			[]*board.Block{
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: canvas.Cyan},
+			},
+			[]*board.Block{nil, nil, nil, nil},
+			[]*board.Block{nil, nil, nil, nil},
+		}
+
+	}
+	return nil
 }
 
+/*
 var iBlocks = [][]*board.Block{
 	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
 	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
 	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
 	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
 }
+*/
 
 func (i *iPiece) MoveUp(ymax int) {
 	if i.YMax().Y < ymax {
@@ -150,4 +194,12 @@ func (i *iPiece) MoveRight(xmax int) {
 		i.box.BottomRight.X++
 		i.box.TopLeft.X++
 	}
+}
+
+func (i *iPiece) RotateClockwise() {
+	i.orientation.rotateClockwise()
+}
+
+func (i *iPiece) RotateCounter() {
+	i.orientation.rotateCounter()
 }

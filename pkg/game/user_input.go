@@ -9,15 +9,19 @@ const (
 	moveDown
 	moveUp
 	moveRight
+	rotateLeft
+	rotateRight
 	ignore
 )
 
 func (u userInput) String() string {
 	inputDescriptions := map[userInput]string{
-		moveLeft:  "move left",
-		moveDown:  "move down",
-		moveUp:    "move up",
-		moveRight: "move right",
+		moveLeft:    "move left",
+		moveDown:    "move down",
+		moveUp:      "move up",
+		moveRight:   "move right",
+		rotateLeft:  "rotate left",
+		rotateRight: "rotate right",
 	}
 
 	return inputDescriptions[u]
@@ -25,10 +29,12 @@ func (u userInput) String() string {
 
 func (u userInput) opposite() userInput {
 	var oppositeInput = map[userInput]userInput{
-		moveLeft:  moveRight,
-		moveDown:  moveUp,
-		moveUp:    moveDown,
-		moveRight: moveLeft,
+		moveLeft:    moveRight,
+		moveDown:    moveUp,
+		moveUp:      moveDown,
+		moveRight:   moveLeft,
+		rotateLeft:  rotateRight,
+		rotateRight: rotateLeft,
 	}
 
 	if opposite, ok := oppositeInput[u]; ok {
@@ -49,6 +55,8 @@ func translateInput(done chan bool, inputreader inputreader.InputReader) (chan u
 		"j": moveDown,
 		"k": moveUp,
 		"l": moveRight,
+		"a": rotateLeft,
+		"d": rotateRight,
 	}
 
 	go func() {

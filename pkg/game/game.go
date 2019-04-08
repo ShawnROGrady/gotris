@@ -66,6 +66,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				//log.Printf("User input: %s", in)
 
 				topL := g.currentPiece.ContainingBox().TopLeft
+				blocks = g.currentPiece.Blocks()
 
 				if err := g.handleDemoInput(in); err != nil {
 					runErr <- err
@@ -73,7 +74,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				}
 
 				// new space already occupied
-				if (in == moveLeft || in == moveRight) && g.pieceConflicts(topL) {
+				if (in == moveLeft || in == moveRight) && g.pieceConflicts(topL, blocks) {
 					// move back to original spot
 					if opposite := in.opposite(); opposite != ignore {
 						if err := g.handleDemoInput(opposite); err != nil {
@@ -149,15 +150,30 @@ func (g *Game) addPieceToBoard() {
 }
 
 // pieceConflicts checks if the current piece is in an occupied space
-func (g *Game) pieceConflicts(oldTopL tetrimino.Coordinates) bool {
+func (g *Game) pieceConflicts(oldTopL tetrimino.Coordinates, oldBlocks [][]*board.Block) bool {
 	var (
-		topL   = g.currentPiece.ContainingBox().TopLeft
-		blocks = g.currentPiece.Blocks()
+		topL       = g.currentPiece.ContainingBox().TopLeft
+		blocks     = g.currentPiece.Blocks()
+		prevCoords = make(map[tetrimino.Coordinates]bool)
 	)
 
 	if oldTopL == topL {
 		// piece didn't move
 		return false
+	}
+
+	for i, row := range oldBlocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := oldTopL.X + j
+			y := oldTopL.Y - i
+			prevCoords[tetrimino.Coordinates{
+				X: x,
+				Y: y,
+			}] = true
+		}
 	}
 
 	for i, row := range blocks {
@@ -168,7 +184,7 @@ func (g *Game) pieceConflicts(oldTopL tetrimino.Coordinates) bool {
 			x := topL.X + j
 			y := topL.Y - i
 
-			if g.board.Blocks[y][x] != nil {
+			if g.board.Blocks[y][x] != nil && !prevCoords[tetrimino.Coordinates{X: x, Y: y}] {
 				return true
 			}
 		}
@@ -198,5 +214,9 @@ func (g *Game) movePiece(input userInput) {
 		piece.MoveUp(ymax)
 	case moveRight:
 		piece.MoveRight(xmax)
+	case rotateLeft:
+		piece.RotateCounter()
+	case rotateRight:
+		piece.RotateClockwise()
 	}
 }

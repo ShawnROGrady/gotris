@@ -11,6 +11,8 @@ type Tetrimino interface {
 	MoveDown()
 	MoveLeft()
 	MoveRight(xmax int)
+	RotateClockwise()
+	RotateCounter()
 	ContainingBox() Box
 	// used for detecting collisions
 	YMax() Coordinates
@@ -28,7 +30,9 @@ type Coordinates struct {
 // New generates a new tetrimino
 func New(boardWidth, boardHeight int) Tetrimino {
 	// TODO: should randomly generate piece type
+	spawnOrientation := spawn
 	return &iPiece{
+		orientation: &spawnOrientation,
 		box: Box{
 			TopLeft: Coordinates{
 				X: 0,
@@ -47,4 +51,39 @@ func New(boardWidth, boardHeight int) Tetrimino {
 type Box struct {
 	TopLeft     Coordinates
 	BottomRight Coordinates
+}
+
+type orientation int
+
+const (
+	spawn orientation = iota
+	clockwise
+	opposite
+	counterclockwise
+)
+
+func (o *orientation) rotateClockwise() {
+	switch *o {
+	case spawn:
+		*o = clockwise
+	case clockwise:
+		*o = opposite
+	case opposite:
+		*o = counterclockwise
+	case counterclockwise:
+		*o = spawn
+	}
+}
+
+func (o *orientation) rotateCounter() {
+	switch *o {
+	case spawn:
+		*o = counterclockwise
+	case clockwise:
+		*o = spawn
+	case opposite:
+		*o = clockwise
+	case counterclockwise:
+		*o = opposite
+	}
 }
