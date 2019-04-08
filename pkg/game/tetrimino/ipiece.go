@@ -17,14 +17,17 @@ func (i *iPiece) ContainingBox() Box {
 func (i *iPiece) YMax() Coordinates {
 	boxBottomRight := i.box.BottomRight
 
-	var yMax = boxBottomRight
+	var (
+		yMax   = boxBottomRight
+		blocks = i.Blocks()
+	)
 
-	for i, row := range i.Blocks() {
+	for i, row := range blocks {
 		for j, block := range row {
 			if block == nil {
 				continue
 			}
-			y := boxBottomRight.Y + i
+			y := boxBottomRight.Y + (len(blocks) - 1) - i
 			x := boxBottomRight.X - (len(row) - 1) + j
 
 			if y > yMax.Y {
@@ -42,9 +45,12 @@ func (i *iPiece) YMax() Coordinates {
 func (i *iPiece) YMin() Coordinates {
 	boxTopLeft := i.box.TopLeft
 
-	var yMin = boxTopLeft
+	var (
+		yMin   = boxTopLeft
+		blocks = i.Blocks()
+	)
 
-	for i, row := range i.Blocks() {
+	for i, row := range blocks {
 		for j, block := range row {
 			if block == nil {
 				continue
@@ -67,9 +73,12 @@ func (i *iPiece) YMin() Coordinates {
 func (i *iPiece) XMax() Coordinates {
 	boxTopLeft := i.box.TopLeft
 
-	var xMax = boxTopLeft
+	var (
+		xMax   = boxTopLeft
+		blocks = i.Blocks()
+	)
 
-	for i, row := range i.Blocks() {
+	for i, row := range blocks {
 		for j, block := range row {
 			if block == nil {
 				continue
@@ -92,14 +101,17 @@ func (i *iPiece) XMax() Coordinates {
 func (i *iPiece) XMin() Coordinates {
 	boxBottomRight := i.box.BottomRight
 
-	var xMin = boxBottomRight
+	var (
+		xMin   = boxBottomRight
+		blocks = i.Blocks()
+	)
 
-	for i, row := range i.Blocks() {
+	for i, row := range blocks {
 		for j, block := range row {
 			if block == nil {
 				continue
 			}
-			y := boxBottomRight.Y + i
+			y := boxBottomRight.Y + (len(blocks) - 1) - i
 			x := boxBottomRight.X - (len(row) - 1) + j
 
 			if x < xMin.X {
@@ -158,15 +170,6 @@ func (i *iPiece) Blocks() [][]*board.Block {
 	}
 	return nil
 }
-
-/*
-var iBlocks = [][]*board.Block{
-	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-	[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-}
-*/
 
 func (i *iPiece) MoveUp(ymax int) {
 	if i.YMax().Y < ymax {
