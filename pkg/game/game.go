@@ -74,7 +74,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 				}
 
 				// new space already occupied
-				if (in == moveLeft || in == moveRight) && g.pieceConflicts(topL, blocks) {
+				if (in == moveLeft || in == moveRight || in == rotateLeft || in == rotateRight) && g.pieceConflicts(topL, blocks) {
 					// move back to original spot
 					if opposite := in.opposite(); opposite != ignore {
 						if err := g.handleDemoInput(opposite); err != nil {
