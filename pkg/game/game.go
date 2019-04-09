@@ -24,11 +24,11 @@ func New(term *os.File, width, height int) *Game {
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
 			term,
-			canvas.Green,
+			canvas.White,
 			width, height,
 		),
 		board: board.New(
-			canvas.Green,
+			canvas.White,
 			width, height,
 		),
 		currentPiece: piece,

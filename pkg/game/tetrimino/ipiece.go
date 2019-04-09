@@ -10,118 +10,67 @@ type iPiece struct {
 	orientation *orientation
 }
 
+func newIPiece(boardWidth, boardHeight int) Tetrimino {
+	spawnOrientation := spawn
+	return &iPiece{
+		orientation: &spawnOrientation,
+		box: Box{
+			TopLeft: Coordinates{
+				X: 0,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: 3,
+				Y: boardHeight - 4,
+			},
+		},
+	}
+}
+
 func (i *iPiece) ContainingBox() Box {
 	return i.box
 }
 
 func (i *iPiece) YMax() Coordinates {
-	boxBottomRight := i.box.BottomRight
-
 	var (
-		yMax   = boxBottomRight
-		blocks = i.Blocks()
+		boxBottomRight = i.box.BottomRight
+		blocks         = i.Blocks()
 	)
 
-	for i, row := range blocks {
-		for j, block := range row {
-			if block == nil {
-				continue
-			}
-			y := boxBottomRight.Y + (len(blocks) - 1) - i
-			x := boxBottomRight.X - (len(row) - 1) + j
-
-			if y > yMax.Y {
-				yMax = Coordinates{
-					X: x,
-					Y: y,
-				}
-			}
-		}
-	}
+	yMax := findMaxY(blocks, boxBottomRight)
 
 	return yMax
 }
 
 func (i *iPiece) YMin() Coordinates {
-	boxTopLeft := i.box.TopLeft
-
 	var (
-		yMin   = boxTopLeft
-		blocks = i.Blocks()
+		boxTopLeft = i.box.TopLeft
+		blocks     = i.Blocks()
 	)
 
-	for i, row := range blocks {
-		for j, block := range row {
-			if block == nil {
-				continue
-			}
-			y := boxTopLeft.Y - i
-			x := boxTopLeft.X + j
-
-			if y < yMin.Y {
-				yMin = Coordinates{
-					X: x,
-					Y: y,
-				}
-			}
-		}
-	}
+	yMin := findMinY(blocks, boxTopLeft)
 
 	return yMin
 }
 
 func (i *iPiece) XMax() Coordinates {
-	boxTopLeft := i.box.TopLeft
-
 	var (
-		xMax   = boxTopLeft
-		blocks = i.Blocks()
+		boxTopLeft = i.box.TopLeft
+		blocks     = i.Blocks()
 	)
 
-	for i, row := range blocks {
-		for j, block := range row {
-			if block == nil {
-				continue
-			}
-			y := boxTopLeft.Y - i
-			x := boxTopLeft.X + j
-
-			if x > xMax.X {
-				xMax = Coordinates{
-					X: x,
-					Y: y,
-				}
-			}
-		}
-	}
+	xMax := findMaxX(blocks, boxTopLeft)
 
 	return xMax
 }
 
 func (i *iPiece) XMin() Coordinates {
-	boxBottomRight := i.box.BottomRight
-
 	var (
-		xMin   = boxBottomRight
-		blocks = i.Blocks()
+		boxBottomRight = i.box.BottomRight
+		blocks         = i.Blocks()
 	)
 
-	for i, row := range blocks {
-		for j, block := range row {
-			if block == nil {
-				continue
-			}
-			y := boxBottomRight.Y + (len(blocks) - 1) - i
-			x := boxBottomRight.X - (len(row) - 1) + j
-
-			if x < xMin.X {
-				xMin = Coordinates{
-					X: x,
-					Y: y,
-				}
-			}
-		}
-	}
+	xMin := findMinX(blocks, boxBottomRight)
 
 	return xMin
 }

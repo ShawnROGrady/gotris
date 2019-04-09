@@ -7,6 +7,7 @@ type Color int
 
 // the available colors
 const (
+	// normal colors
 	Black Color = iota
 	Red
 	Green
@@ -15,22 +16,51 @@ const (
 	Magenta
 	Cyan
 	White
+
+	// bright colors
+	BrightBlack
+	BrightRed
+	BrightGreen
+	BrightYellow
+	BrightBlue
+	BrightMagenta
+	BrightCyan
+	BrightWhite
+
+	// other colors
+	Orange Color = 208
 )
 
 func (c Color) String() string {
-	return fmt.Sprintf("\u001b[3%dm", c)
+	switch c {
+	case BrightBlack, BrightRed, BrightGreen, BrightYellow, BrightBlue, BrightMagenta, BrightCyan, BrightWhite:
+		return fmt.Sprintf("\u001b[3%d;1m", c-8)
+	case Orange:
+		return fmt.Sprintf("\u001b[38;5;%dm", c)
+	default:
+		return fmt.Sprintf("\u001b[3%dm", c)
+	}
 }
 
 func (c Color) description() string {
 	colorDescriptions := map[Color]string{
-		Black:   "black",
-		Red:     "red",
-		Green:   "green",
-		Yellow:  "yellow",
-		Blue:    "blue",
-		Magenta: "magenta",
-		Cyan:    "cyan",
-		White:   "white",
+		Black:         "black",
+		Red:           "red",
+		Green:         "green",
+		Yellow:        "yellow",
+		Blue:          "blue",
+		Magenta:       "magenta",
+		Cyan:          "cyan",
+		White:         "white",
+		BrightBlack:   "bright black",
+		BrightRed:     "bright red",
+		BrightGreen:   "bright green",
+		BrightYellow:  "bright yellow",
+		BrightBlue:    "bright blue",
+		BrightMagenta: "bright magenta",
+		BrightCyan:    "bright cyan",
+		BrightWhite:   "bright white",
+		Orange:        "orange",
 	}
 
 	return colorDescriptions[c]

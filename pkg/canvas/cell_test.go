@@ -29,6 +29,33 @@ var cellColorTests = map[Color]struct {
 	White: {
 		ExpectedString: "\u001b[37m\u2588",
 	},
+	BrightBlack: {
+		ExpectedString: "\u001b[30;1m\u2588",
+	},
+	BrightRed: {
+		ExpectedString: "\u001b[31;1m\u2588",
+	},
+	BrightGreen: {
+		ExpectedString: "\u001b[32;1m\u2588",
+	},
+	BrightYellow: {
+		ExpectedString: "\u001b[33;1m\u2588",
+	},
+	BrightBlue: {
+		ExpectedString: "\u001b[34;1m\u2588",
+	},
+	BrightMagenta: {
+		ExpectedString: "\u001b[35;1m\u2588",
+	},
+	BrightCyan: {
+		ExpectedString: "\u001b[36;1m\u2588",
+	},
+	BrightWhite: {
+		ExpectedString: "\u001b[37;1m\u2588",
+	},
+	Orange: {
+		ExpectedString: "\u001b[38;5;208m\u2588",
+	},
 }
 
 func TestCellColors(t *testing.T) {

@@ -47,6 +47,46 @@ var colorTests = map[Color]struct {
 		ExpectedString:         "\u001b[37m",
 		ExpectedDecoratedInput: "\u001b[37minput",
 	},
+	BrightBlack: {
+		ExpectedDescription:    "bright black",
+		ExpectedString:         "\u001b[30;1m",
+		ExpectedDecoratedInput: "\u001b[30;1minput",
+	},
+	BrightRed: {
+		ExpectedDescription:    "bright red",
+		ExpectedString:         "\u001b[31;1m",
+		ExpectedDecoratedInput: "\u001b[31;1minput",
+	},
+	BrightGreen: {
+		ExpectedDescription:    "bright green",
+		ExpectedString:         "\u001b[32;1m",
+		ExpectedDecoratedInput: "\u001b[32;1minput",
+	},
+	BrightYellow: {
+		ExpectedDescription:    "bright yellow",
+		ExpectedString:         "\u001b[33;1m",
+		ExpectedDecoratedInput: "\u001b[33;1minput",
+	},
+	BrightBlue: {
+		ExpectedDescription:    "bright blue",
+		ExpectedString:         "\u001b[34;1m",
+		ExpectedDecoratedInput: "\u001b[34;1minput",
+	},
+	BrightMagenta: {
+		ExpectedDescription:    "bright magenta",
+		ExpectedString:         "\u001b[35;1m",
+		ExpectedDecoratedInput: "\u001b[35;1minput",
+	},
+	BrightCyan: {
+		ExpectedDescription:    "bright cyan",
+		ExpectedString:         "\u001b[36;1m",
+		ExpectedDecoratedInput: "\u001b[36;1minput",
+	},
+	BrightWhite: {
+		ExpectedDescription:    "bright white",
+		ExpectedString:         "\u001b[37;1m",
+		ExpectedDecoratedInput: "\u001b[37;1minput",
+	},
 }
 
 func TestColors(t *testing.T) {
