@@ -28,16 +28,16 @@ func New(dest *os.File, background Color, width, height int) *Canvas {
 	}
 }
 
+// Init sets up the canvas in order to be written to
+// for now this just clears the entire screen
+func (c *Canvas) Init() error {
+	return c.clear()
+}
+
 // Render renders the current canvas
 func (c *Canvas) Render() error {
 	// clear the canvas
-	_, err := c.dest.WriteString("\033[2J")
-	if err != nil {
-		return err
-	}
-
-	_, err = c.dest.Seek(0, 0)
-	if err != nil {
+	if err := c.setCursor(0, 0); err != nil {
 		return err
 	}
 
@@ -58,7 +58,26 @@ func (c *Canvas) Render() error {
 		if err != nil {
 			return err
 		}
+		if err := c.dest.Sync(); err != nil {
+			return err
+		}
 	}
 
+	return nil
+}
+
+func (c *Canvas) clear() error {
+	_, err := c.dest.WriteString("\033[2J")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Canvas) setCursor(x, y int) error {
+	_, err := c.dest.WriteString(fmt.Sprintf("\033[%d;%dH", x, y))
+	if err != nil {
+		return err
+	}
 	return nil
 }

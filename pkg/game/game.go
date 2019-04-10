@@ -47,6 +47,12 @@ func (g *Game) RunDemo(done chan bool) chan error {
 
 	g.canvas.Cells = g.board.Cells()
 
+	// initialize the canvas
+	if err := g.canvas.Init(); err != nil {
+		runErr <- err
+		return runErr
+	}
+
 	// render initial canvas
 	if err := g.canvas.Render(); err != nil {
 		runErr <- err
