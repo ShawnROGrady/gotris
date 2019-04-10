@@ -22,6 +22,8 @@ type Tetrimino interface {
 	YMin() Coordinates
 	XMax() Coordinates
 	XMin() Coordinates
+	// primarily used for testing
+	pieceOrientation() orientation
 }
 
 // Coordinates represent a blocks position on the board
@@ -158,6 +160,21 @@ const (
 	opposite
 	counterclockwise
 )
+
+func (o *orientation) String() string {
+	switch *o {
+	case spawn:
+		return "spawn"
+	case clockwise:
+		return "clockwise"
+	case opposite:
+		return "opposite"
+	case counterclockwise:
+		return "counterclockwise"
+	default:
+		return ""
+	}
+}
 
 func (o *orientation) rotateClockwise() {
 	switch *o {

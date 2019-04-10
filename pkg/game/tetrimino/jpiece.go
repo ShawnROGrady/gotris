@@ -27,6 +27,10 @@ func newJPiece(boardWidth, boardHeight int) Tetrimino {
 	}
 }
 
+func (j jPiece) pieceOrientation() orientation {
+	return *j.orientation
+}
+
 func (j *jPiece) ContainingBox() Box {
 	return j.box
 }

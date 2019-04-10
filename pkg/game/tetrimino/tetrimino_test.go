@@ -2,76 +2,143 @@ package tetrimino
 
 import "testing"
 
-func TestIPiece(t *testing.T) {
-	spawnOrientation := spawn
-	var piece = &iPiece{
-		orientation: &spawnOrientation,
-		box: Box{
-			TopLeft: Coordinates{
-				X: 0,
-				Y: 3,
-			},
-			BottomRight: Coordinates{
-				X: 3,
-				Y: 0,
-			},
-		},
+type tetriminoTestCase struct {
+	expectedMaxY tetriminoCoordTest
+	expectedMinY tetriminoCoordTest
+	expectedMaxX tetriminoCoordTest
+	expectedMinX tetriminoCoordTest
+}
+
+type tetriminoCoordTest struct {
+	x       int
+	ignoreX bool
+	y       int
+	ignoreY bool
+}
+
+func testPiece(t *testing.T, piece Tetrimino, pieceTests map[orientation]tetriminoTestCase) {
+	// test spawn orientation
+	testCase, ok := pieceTests[piece.pieceOrientation()]
+	if ok {
+		testOrientation(t, piece, testCase)
 	}
 
-	maxY := piece.YMax()
-	if maxY.Y != 3 {
-		t.Errorf("Unexpected yMax in spawn orientation [expected = %d, actual = %d]", 3, maxY.Y)
-	}
-	if maxY.X != 2 {
-		t.Errorf("Unexpected yMax.x in spawn orientation [expected = %d, actual = %d]", 2, maxY.X)
-	}
-
-	minY := piece.YMin()
-	if minY.Y != 0 {
-		t.Errorf("Unexpected yMin in spawn orientation [expected = %d, actual = %d]", 0, minY.Y)
-	}
-	if minY.X != 2 {
-		t.Errorf("Unexpected yMin.x in spawn orientation [expected = %d, actual = %d]", 2, minY.X)
-	}
-
-	maxX := piece.XMax()
-	if maxX.X != 2 {
-		t.Errorf("Unexpected xMax in spawn orientation [expected = %d, actual = %d]", 2, maxX.X)
-	}
-
-	minX := piece.XMin()
-	if minX.X != 2 {
-		t.Errorf("Unexpected xMin in spawn orientation [expected = %d, actual = %d]", 2, minX.X)
+	// test right rotation
+	piece.RotateClockwise()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// clockwise
+		testOrientation(t, piece, testCase)
 	}
 
 	piece.RotateClockwise()
-	if *piece.orientation != clockwise {
-		t.Errorf("Unexpected orientation after rotating clockwise: %d", *piece.orientation)
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// opposite
+		testOrientation(t, piece, testCase)
 	}
 
-	maxY = piece.YMax()
-	if maxY.Y != 1 {
-		t.Errorf("Unexpected yMax in clockwise orientation [expected = %d, actual = %d]", 1, maxY.Y)
+	piece.RotateClockwise()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// counter
+		testOrientation(t, piece, testCase)
 	}
 
-	minY = piece.YMin()
-	if minY.Y != 1 {
-		t.Errorf("Unexpected yMin in clockwise orientation [expected = %d, actual = %d]", 1, minY.Y)
+	piece.RotateClockwise()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// spawn
+		testOrientation(t, piece, testCase)
 	}
 
-	maxX = piece.XMax()
-	if maxX.X != 3 {
-		t.Errorf("Unexpected xMax in clockwise orientation [expected = %d, actual = %d]", 3, maxX.X)
-	}
-	if maxX.Y != 1 {
-		t.Errorf("Unexpected xMax.y in clockwise orientation [expected = %d, actual = %d]", 1, maxX.Y)
+	// test left rotation
+	piece.RotateCounter()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// counter
+		testOrientation(t, piece, testCase)
 	}
 
-	minX = piece.XMin()
-	if minX.X != 0 {
-		t.Errorf("Unexpected xMin in clockwise orientation [expected = %d, actual = %d]", 0, minX.X)
+	piece.RotateCounter()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// opposite
+		testOrientation(t, piece, testCase)
 	}
-	if minX.Y != 1 {
-		t.Errorf("Unexpected xMin.y in clockwise orientation [expected = %d, actual = %d]", 1, minX.Y)
+
+	piece.RotateCounter()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// clockwise
+		testOrientation(t, piece, testCase)
+	}
+
+	piece.RotateCounter()
+	testCase, ok = pieceTests[piece.pieceOrientation()]
+	if ok {
+		// spawn
+		testOrientation(t, piece, testCase)
+	}
+
+}
+
+func testOrientation(t *testing.T, piece Tetrimino, testCase tetriminoTestCase) {
+	orientation := piece.pieceOrientation()
+
+	// test XMax
+	maxX := piece.XMax()
+	if !testCase.expectedMaxX.ignoreX {
+		if maxX.X != testCase.expectedMaxX.x {
+			t.Errorf("Unexpected xMax in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMaxX.x, maxX.X)
+		}
+	}
+
+	if !testCase.expectedMaxX.ignoreY {
+		if maxX.Y != testCase.expectedMaxX.y {
+			t.Errorf("Unexpected xMax.y in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMaxX.y, maxX.Y)
+		}
+	}
+
+	// test XMin
+	minX := piece.XMin()
+	if !testCase.expectedMinX.ignoreX {
+		if minX.X != testCase.expectedMinX.x {
+			t.Errorf("Unexpected xMin in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMinX.x, minX.X)
+		}
+	}
+
+	if !testCase.expectedMinX.ignoreY {
+		if minX.Y != testCase.expectedMinX.y {
+			t.Errorf("Unexpected xMin.y in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMinX.y, minX.Y)
+		}
+	}
+
+	// test YMax
+	maxY := piece.YMax()
+	if !testCase.expectedMaxY.ignoreX {
+		if maxY.X != testCase.expectedMaxY.x {
+			t.Errorf("Unexpected yMax.x in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMaxY.x, maxY.X)
+		}
+	}
+
+	if !testCase.expectedMaxY.ignoreY {
+		if maxY.Y != testCase.expectedMaxY.y {
+			t.Errorf("Unexpected yMax in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMaxY.y, maxY.Y)
+		}
+	}
+
+	// test YMin
+	minY := piece.YMin()
+	if !testCase.expectedMinY.ignoreX {
+		if minY.X != testCase.expectedMinY.x {
+			t.Errorf("Unexpected yMin.x in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMinY.x, minY.X)
+		}
+	}
+
+	if !testCase.expectedMinY.ignoreY {
+		if minY.Y != testCase.expectedMinY.y {
+			t.Errorf("Unexpected yMin in %s orientation [expected = %d, actual = %d]", &orientation, testCase.expectedMinY.y, minY.Y)
+		}
 	}
 }
