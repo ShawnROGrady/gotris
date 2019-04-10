@@ -43,12 +43,20 @@ func (b *Board) Cells() [][]*canvas.Cell {
 		row := []*canvas.Cell{}
 		for _, block := range b.Blocks[i] {
 			if block == nil {
-				row = append(row, &canvas.Cell{
-					Background: b.background,
-				})
+				row = append(row, []*canvas.Cell{
+					{
+						Background: b.background,
+					},
+					{
+						Background: b.background,
+					},
+				}...)
 				continue
 			}
-			row = append(row, block.cell())
+			row = append(row, []*canvas.Cell{
+				block.cell(),
+				block.cell(),
+			}...)
 		}
 		cells = append(cells, row)
 	}
