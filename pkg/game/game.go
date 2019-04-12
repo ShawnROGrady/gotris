@@ -18,7 +18,7 @@ type Game struct {
 }
 
 // New returns a new game with the specified specifications
-func New(term *os.File, width, height int) *Game {
+func New(term *os.File, width, height, hiddenRows int) *Game {
 	piece := tetrimino.New(width, height)
 	return &Game{
 		inputreader: inputreader.NewTermReader(term),
@@ -30,15 +30,19 @@ func New(term *os.File, width, height int) *Game {
 		board: board.New(
 			canvas.White,
 			width, height,
+			hiddenRows,
 		),
 		currentPiece: piece,
 	}
 }
 
 // RunDemo is a placeholder function to test core functionality
-func (g *Game) RunDemo(done chan bool) chan error {
+func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 	input, readErr := translateInput(done, g.inputreader)
-	runErr := make(chan error)
+	var (
+		runErr   = make(chan error)
+		endScore = make(chan int)
+	)
 
 	blocks := g.currentPiece.Blocks()
 
@@ -50,13 +54,13 @@ func (g *Game) RunDemo(done chan bool) chan error {
 	// initialize the canvas
 	if err := g.canvas.Init(); err != nil {
 		runErr <- err
-		return runErr
+		return endScore, runErr
 	}
 
 	// render initial canvas
 	if err := g.canvas.Render(); err != nil {
 		runErr <- err
-		return runErr
+		return endScore, runErr
 	}
 
 	go func() {
@@ -128,6 +132,17 @@ func (g *Game) RunDemo(done chan bool) chan error {
 					// TODO: add scoring
 					g.board.ClearFullRows()
 
+					if g.pieceAtTop() {
+						// still render game-over state
+						g.canvas.Cells = g.board.Cells()
+						if err := g.canvas.Render(); err != nil {
+							runErr <- err
+							return
+						}
+						endScore <- 0
+						return
+					}
+
 					g.currentPiece = tetrimino.New(len(g.board.Blocks[0]), len(g.board.Blocks))
 
 					// add new piece to canvas
@@ -143,7 +158,7 @@ func (g *Game) RunDemo(done chan bool) chan error {
 			}
 		}
 	}()
-	return runErr
+	return endScore, runErr
 }
 
 func (g *Game) addPieceToBoard() {
@@ -236,6 +251,11 @@ func (g *Game) pieceOutOfBounds() bool {
 		}
 	}
 	return false
+}
+
+// checks if the current piece is in the hidden row(s)
+func (g *Game) pieceAtTop() bool {
+	return g.currentPiece.YMax().Y > len(g.board.Blocks)-g.board.HiddenRows-1
 }
 
 // current piece is at minimum vertical position

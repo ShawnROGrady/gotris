@@ -31,12 +31,12 @@ func main() {
 	}
 	defer f.Close()
 
-	g := game.New(f, 8, 20)
+	g := game.New(f, 8, 20, 2)
 
 	done := make(chan bool)
 	defer close(done)
 
-	runErr := g.RunDemo(done)
+	endScore, runErr := g.RunDemo(done)
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -47,6 +47,9 @@ func main() {
 	case err := <-runErr:
 		log.Fatalf("Error running game: %s", err)
 		os.Exit(1)
+	case score := <-endScore:
+		fmt.Printf("GAME OVER (score = %d)\n", score)
+		return
 	case sig := <-sigs:
 		fmt.Printf("received signal: %s\n", sig)
 		return

@@ -6,13 +6,14 @@ import "github.com/ShawnROGrady/gotris/pkg/canvas"
 type Board struct {
 	background canvas.Color
 	Blocks     [][]*Block
+	HiddenRows int
 }
 
 // New creates a new board
-func New(background canvas.Color, width, height int) *Board {
+func New(background canvas.Color, width, height, hiddenRows int) *Board {
 	var blocks = [][]*Block{}
 
-	for i := 0; i < height; i++ {
+	for i := 0; i < height+hiddenRows; i++ {
 		row := make([]*Block, width)
 		blocks = append(blocks, row)
 	}
@@ -20,6 +21,7 @@ func New(background canvas.Color, width, height int) *Board {
 	return &Board{
 		background: background,
 		Blocks:     blocks,
+		HiddenRows: hiddenRows,
 	}
 }
 
@@ -39,7 +41,7 @@ func (b *Board) Cells() [][]*canvas.Cell {
 	cells := [][]*canvas.Cell{}
 
 	// reverse the rows
-	for i := len(b.Blocks) - 1; i >= 0; i-- {
+	for i := len(b.Blocks) - b.HiddenRows - 1; i >= 0; i-- {
 		row := []*canvas.Cell{}
 		for _, block := range b.Blocks[i] {
 			if block == nil {
