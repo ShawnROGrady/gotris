@@ -217,14 +217,20 @@ func (g *Game) pieceOutOfBounds() bool {
 		topL   = g.currentPiece.ContainingBox().TopLeft
 		blocks = g.currentPiece.Blocks()
 	)
-	for _, row := range blocks {
+	for i, row := range blocks {
 		for j, block := range row {
 			if block == nil {
 				continue
 			}
 			x := topL.X + j
+			y := topL.Y - i
 
+			// can't rotate due to horizontal constraints
 			if x < 0 || x > len(g.board.Blocks[0])-1 {
+				return true
+			}
+
+			if y < 0 || y > len(g.board.Blocks)-1 {
 				return true
 			}
 		}
