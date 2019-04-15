@@ -12,19 +12,14 @@ type lPiece struct {
 
 func newLPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
-	return &lPiece{
+
+	piece := &lPiece{
 		orientation: &spawnOrientation,
-		box: Box{
-			TopLeft: Coordinates{
-				X: 0,
-				Y: boardHeight - 1,
-			},
-			BottomRight: Coordinates{
-				X: 2,
-				Y: boardHeight - 3,
-			},
-		},
 	}
+
+	box := startingBox(boardWidth, boardHeight, piece)
+	piece.box = box
+	return piece
 }
 
 func (l lPiece) pieceOrientation() orientation {
@@ -81,7 +76,7 @@ func (l *lPiece) XMin() Coordinates {
 
 func (l *lPiece) Blocks() [][]*board.Block {
 	switch *l.orientation {
-	case spawn:
+	case clockwise:
 		return [][]*board.Block{
 			[]*board.Block{nil, &board.Block{Color: canvas.Orange}, nil},
 			[]*board.Block{nil, &board.Block{Color: canvas.Orange}, nil},
@@ -91,7 +86,7 @@ func (l *lPiece) Blocks() [][]*board.Block {
 				&board.Block{Color: canvas.Orange},
 			},
 		}
-	case clockwise:
+	case opposite:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil},
 			[]*board.Block{
@@ -105,7 +100,7 @@ func (l *lPiece) Blocks() [][]*board.Block {
 				nil,
 			},
 		}
-	case opposite:
+	case counterclockwise:
 		return [][]*board.Block{
 			[]*board.Block{
 				&board.Block{Color: canvas.Orange},
@@ -115,7 +110,7 @@ func (l *lPiece) Blocks() [][]*board.Block {
 			[]*board.Block{nil, &board.Block{Color: canvas.Orange}, nil},
 			[]*board.Block{nil, &board.Block{Color: canvas.Orange}, nil},
 		}
-	case counterclockwise:
+	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{
 				nil,

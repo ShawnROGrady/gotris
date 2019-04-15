@@ -53,6 +53,45 @@ type Box struct {
 	BottomRight Coordinates
 }
 
+func startingBox(boardWidth, boardHeight int, piece Tetrimino) Box {
+	midpoint := (boardWidth / 2) - 1
+	switch piece.(type) {
+	case *iPiece:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 2,
+				Y: boardHeight - 4,
+			},
+		}
+	case *oPiece:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 2,
+				Y: boardHeight - 3,
+			},
+		}
+	default:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 1,
+				Y: boardHeight - 3,
+			},
+		}
+	}
+}
+
 func findMaxY(blocks [][]*board.Block, boxBottomRight Coordinates) Coordinates {
 	var (
 		yMax = boxBottomRight

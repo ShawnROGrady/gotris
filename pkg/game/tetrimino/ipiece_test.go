@@ -3,7 +3,7 @@ package tetrimino
 import "testing"
 
 var iPieceTests = map[orientation]tetriminoTestCase{
-	spawn: tetriminoTestCase{
+	clockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
 			y: 3,
 			x: 2,
@@ -21,7 +21,7 @@ var iPieceTests = map[orientation]tetriminoTestCase{
 			ignoreY: true,
 		},
 	},
-	clockwise: tetriminoTestCase{
+	opposite: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
 			y:       1,
 			ignoreX: true,
@@ -39,7 +39,7 @@ var iPieceTests = map[orientation]tetriminoTestCase{
 			y: 1,
 		},
 	},
-	opposite: tetriminoTestCase{
+	counterclockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
 			y: 3,
 			x: 1,
@@ -57,7 +57,7 @@ var iPieceTests = map[orientation]tetriminoTestCase{
 			ignoreY: true,
 		},
 	},
-	counterclockwise: tetriminoTestCase{
+	spawn: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
 			y:       2,
 			ignoreX: true,
