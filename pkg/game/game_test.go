@@ -24,7 +24,7 @@ type tetriminoCoordTest struct {
 }
 
 func newTestGame(width, height, hiddenRows int, pieceConstructor tetrimino.PieceConstructor) *Game {
-	piece := pieceConstructor(width, height)
+	piece := pieceConstructor(width, height+hiddenRows)
 	return &Game{
 		board: board.New(
 			canvas.White,
@@ -41,14 +41,15 @@ var addPieceToBoardTests = map[string]struct {
 	boardWidth       int
 	boardHeight      int
 	hiddenRows       int
+	expectAtTop      bool
 	expectedPosition tetriminoTestCase
 }{
 	"new i piece no hidden rows": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
-		//pieceConstructor: tetrimino.NewTestIPiece,
-		boardWidth:  10,
-		boardHeight: 20,
-		hiddenRows:  0,
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       0,
+		expectAtTop:      false,
 		expectedPosition: tetriminoTestCase{
 			expectedMaxY: tetriminoCoordTest{
 				y:       18,
@@ -68,6 +69,181 @@ var addPieceToBoardTests = map[string]struct {
 			},
 		},
 	},
+	"new i piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 6,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
+				x: 3,
+			},
+		},
+	},
+	"new j piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[1],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 23,
+				x: 3,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       3,
+			},
+		},
+	},
+	"new l piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[2],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 23,
+				x: 5,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 23,
+				x: 5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       3,
+			},
+		},
+	},
+	"new o piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[3],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       23,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       4,
+			},
+		},
+	},
+	"new s piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[4],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       23,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 23,
+				x: 5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
+				x: 3,
+			},
+		},
+	},
+	"new t piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[5],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 23,
+				x: 4,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
+				x: 3,
+			},
+		},
+	},
+	"new z piece 4 hidden rows": {
+		pieceConstructor: tetrimino.PieceConstructors[6],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       23,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 5,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 23,
+				x: 3,
+			},
+		},
+	},
 }
 
 func TestAddPieceToBoard(t *testing.T) {
@@ -80,6 +256,20 @@ func TestAddPieceToBoard(t *testing.T) {
 		// verify piece coordinates
 		if err := testPieceCoords(g.currentPiece, testName, test.expectedPosition); err != nil {
 			t.Errorf("%s", err)
+		}
+
+		// check if piece at top
+		if test.expectAtTop && !g.pieceAtTop() {
+			t.Errorf("Piece unexpectedly not at top for test case '%s'", testName)
+		}
+
+		if !test.expectAtTop && g.pieceAtTop() {
+			t.Errorf("Piece unexpectedly at top for test case '%s'", testName)
+		}
+
+		// verify piece not at bottom
+		if g.pieceAtBottom() {
+			t.Errorf("New piece unexpectedly at bottom of board for test case '%s'", testName)
 		}
 	}
 }

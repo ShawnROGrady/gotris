@@ -19,7 +19,7 @@ type Game struct {
 
 // New returns a new game with the specified specifications
 func New(term *os.File, width, height, hiddenRows int) *Game {
-	piece := tetrimino.New(width, height)
+	piece := tetrimino.New(width, height+hiddenRows)
 	return &Game{
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
