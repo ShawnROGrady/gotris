@@ -5,11 +5,11 @@ import "testing"
 var oPieceTests = map[orientation]tetriminoTestCase{
 	spawn: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       2,
+			y:       3,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -23,11 +23,11 @@ var oPieceTests = map[orientation]tetriminoTestCase{
 	},
 	clockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       2,
+			y:       3,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -41,11 +41,11 @@ var oPieceTests = map[orientation]tetriminoTestCase{
 	},
 	opposite: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       2,
+			y:       3,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -59,11 +59,11 @@ var oPieceTests = map[orientation]tetriminoTestCase{
 	},
 	counterclockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       2,
+			y:       3,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -78,7 +78,7 @@ var oPieceTests = map[orientation]tetriminoTestCase{
 }
 
 func TestOPiece(t *testing.T) {
-	piece := newOPiece(4, 3)
+	piece := newOPiece(4, 4)
 
 	testPiece(t, piece, oPieceTests)
 }

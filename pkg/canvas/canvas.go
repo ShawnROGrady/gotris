@@ -5,15 +5,22 @@ import (
 	"os"
 )
 
-// Canvas represents what is actually rendered to the user
-type Canvas struct {
+// Canvas represents a way to render to game to the user
+type Canvas interface {
+	Init() error
+	Render() error
+	UpdateCells(newCells [][]*Cell)
+}
+
+// TermCanvas represents what is actually rendered to the user via the terminal
+type TermCanvas struct {
 	dest       *os.File
 	Background Color
-	Cells      [][]*Cell
+	cells      [][]*Cell
 }
 
 // New returns a new canvas
-func New(dest *os.File, background Color, width, height int) *Canvas {
+func New(dest *os.File, background Color, width, height int) *TermCanvas {
 	var cells = [][]*Cell{}
 
 	for i := 0; i < height; i++ {
@@ -21,27 +28,27 @@ func New(dest *os.File, background Color, width, height int) *Canvas {
 		cells = append(cells, row)
 	}
 
-	return &Canvas{
+	return &TermCanvas{
 		dest:       dest,
 		Background: background,
-		Cells:      cells,
+		cells:      cells,
 	}
 }
 
 // Init sets up the canvas in order to be written to
 // for now this just clears the entire screen
-func (c *Canvas) Init() error {
+func (c *TermCanvas) Init() error {
 	return c.clear()
 }
 
 // Render renders the current canvas
-func (c *Canvas) Render() error {
+func (c *TermCanvas) Render() error {
 	// clear the canvas
 	if err := c.setCursor(0, 0); err != nil {
 		return err
 	}
 
-	for _, row := range c.Cells {
+	for _, row := range c.cells {
 		var buf = []byte{}
 		for _, cell := range row {
 			if cell == nil {
@@ -66,7 +73,12 @@ func (c *Canvas) Render() error {
 	return nil
 }
 
-func (c *Canvas) clear() error {
+// UpdateCells updates the cells to be rendered
+func (c *TermCanvas) UpdateCells(newCells [][]*Cell) {
+	c.cells = newCells
+}
+
+func (c *TermCanvas) clear() error {
 	_, err := c.dest.WriteString("\033[2J")
 	if err != nil {
 		return err
@@ -74,7 +86,7 @@ func (c *Canvas) clear() error {
 	return nil
 }
 
-func (c *Canvas) setCursor(x, y int) error {
+func (c *TermCanvas) setCursor(x, y int) error {
 	_, err := c.dest.WriteString(fmt.Sprintf("\033[%d;%dH", x, y))
 	if err != nil {
 		return err

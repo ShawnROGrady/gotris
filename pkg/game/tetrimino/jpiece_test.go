@@ -3,31 +3,31 @@ package tetrimino
 import "testing"
 
 var jPieceTests = map[orientation]tetriminoTestCase{
-	spawn: tetriminoTestCase{
+	clockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       2,
+			y:       3,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y: 0,
+			y: 1,
 			x: 1,
 		},
 		expectedMaxX: tetriminoCoordTest{
 			x: 2,
-			y: 2,
+			y: 3,
 		},
 		expectedMinX: tetriminoCoordTest{
 			x:       1,
 			ignoreY: true,
 		},
 	},
-	clockwise: tetriminoTestCase{
+	opposite: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y: 0,
+			y: 1,
 			x: 2,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -36,16 +36,16 @@ var jPieceTests = map[orientation]tetriminoTestCase{
 		},
 		expectedMinX: tetriminoCoordTest{
 			x: 0,
-			y: 1,
+			y: 2,
 		},
 	},
-	opposite: tetriminoTestCase{
+	counterclockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y: 2,
+			y: 3,
 			x: 1,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       0,
+			y:       1,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -54,21 +54,21 @@ var jPieceTests = map[orientation]tetriminoTestCase{
 		},
 		expectedMinX: tetriminoCoordTest{
 			x: 0,
-			y: 0,
+			y: 1,
 		},
 	},
-	counterclockwise: tetriminoTestCase{
+	spawn: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y: 2,
+			y: 3,
 			x: 0,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y:       1,
+			y:       2,
 			ignoreX: true,
 		},
 		expectedMaxX: tetriminoCoordTest{
 			x: 2,
-			y: 1,
+			y: 2,
 		},
 		expectedMinX: tetriminoCoordTest{
 			x:       0,
@@ -78,7 +78,7 @@ var jPieceTests = map[orientation]tetriminoTestCase{
 }
 
 func TestJPiece(t *testing.T) {
-	piece := newJPiece(3, 3)
+	piece := newJPiece(4, 4)
 
 	testPiece(t, piece, jPieceTests)
 }

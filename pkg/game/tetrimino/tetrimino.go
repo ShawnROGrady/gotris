@@ -32,18 +32,24 @@ type Coordinates struct {
 	Y int
 }
 
-type pieceConstructor func(boardWidth, boardHeight int) Tetrimino
+// PieceConstructor represents the function signature of each pieces constructor
+// Currently only exporting this to test game logic
+// TODO: figure out better way to enable testing
+type PieceConstructor func(boardWidth, boardHeight int) Tetrimino
 
-var pieceConstructors = []pieceConstructor{newIPiece, newJPiece, newLPiece, newOPiece, newSPiece, newTPiece, newZPiece}
+// PieceConstructors represent all constructors for all possible pieces
+// Currently only exporting this to test game logic
+// TODO: figure out better way to enable testing
+var PieceConstructors = []PieceConstructor{newIPiece, newJPiece, newLPiece, newOPiece, newSPiece, newTPiece, newZPiece}
 
 // New generates a new tetrimino
 func New(boardWidth, boardHeight int) Tetrimino {
 	var (
 		r = rand.New(rand.NewSource(time.Now().UnixNano()))
-		i = r.Intn(len(pieceConstructors))
+		i = r.Intn(len(PieceConstructors))
 	)
 
-	return pieceConstructors[i](boardWidth, boardHeight)
+	return PieceConstructors[i](boardWidth, boardHeight)
 }
 
 // Box represents the box surrounding the current piece
@@ -51,6 +57,45 @@ func New(boardWidth, boardHeight int) Tetrimino {
 type Box struct {
 	TopLeft     Coordinates
 	BottomRight Coordinates
+}
+
+func startingBox(boardWidth, boardHeight int, piece Tetrimino) Box {
+	midpoint := (boardWidth / 2) - 1
+	switch piece.(type) {
+	case *iPiece:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 2,
+				Y: boardHeight - 4,
+			},
+		}
+	case *oPiece:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 2,
+				Y: boardHeight - 3,
+			},
+		}
+	default:
+		return Box{
+			TopLeft: Coordinates{
+				X: midpoint - 1,
+				Y: boardHeight - 1,
+			},
+			BottomRight: Coordinates{
+				X: midpoint + 1,
+				Y: boardHeight - 3,
+			},
+		}
+	}
 }
 
 func findMaxY(blocks [][]*board.Block, boxBottomRight Coordinates) Coordinates {

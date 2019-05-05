@@ -12,14 +12,15 @@ import (
 // Game is responsible for handling the game state
 type Game struct {
 	inputreader  inputreader.InputReader
-	canvas       *canvas.Canvas
+	canvas       canvas.Canvas
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
+	newPiece     func(width, height int) tetrimino.Tetrimino
 }
 
 // New returns a new game with the specified specifications
 func New(term *os.File, width, height, hiddenRows int) *Game {
-	piece := tetrimino.New(width, height)
+	piece := tetrimino.New(width, height+hiddenRows)
 	return &Game{
 		inputreader: inputreader.NewTermReader(term),
 		canvas: canvas.New(
@@ -33,6 +34,7 @@ func New(term *os.File, width, height, hiddenRows int) *Game {
 			hiddenRows,
 		),
 		currentPiece: piece,
+		newPiece:     tetrimino.New,
 	}
 }
 
@@ -44,12 +46,10 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 		endScore = make(chan int)
 	)
 
-	blocks := g.currentPiece.Blocks()
-
 	// add initial piece to canvas
 	g.addPieceToBoard()
 
-	g.canvas.Cells = g.board.Cells()
+	g.canvas.UpdateCells(g.board.Cells())
 
 	// initialize the canvas
 	if err := g.canvas.Init(); err != nil {
@@ -75,86 +75,11 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 				// TODO: print if in debug mode
 				//log.Printf("User input: %s", in)
 
-				topL := g.currentPiece.ContainingBox().TopLeft
-				blocks = g.currentPiece.Blocks()
-
-				if err := g.handleDemoInput(in); err != nil {
+				if err := g.handleInput(in, endScore); err != nil {
 					runErr <- err
 					return
 				}
 
-				// new space already occupied
-				if (in == moveLeft || in == moveRight || in == rotateLeft || in == rotateRight) && g.pieceConflicts(topL, blocks) {
-					// move back to original spot
-					if opposite := in.opposite(); opposite != ignore {
-						if err := g.handleDemoInput(opposite); err != nil {
-							runErr <- err
-							return
-						}
-						continue
-					}
-				}
-				if (in == rotateLeft || in == rotateRight) && g.pieceOutOfBounds() {
-					// TODO: allow for 'kickback' off wall
-					// move back to original spot
-					if opposite := in.opposite(); opposite != ignore {
-						if err := g.handleDemoInput(opposite); err != nil {
-							runErr <- err
-							return
-						}
-						continue
-					}
-				}
-
-				newTopL := g.currentPiece.ContainingBox().TopLeft
-
-				// clear cell where piece was
-				for i, row := range blocks {
-					for j, block := range row {
-						if block == nil {
-							continue
-						}
-						x := topL.X + j
-						y := topL.Y - i
-
-						g.board.Blocks[y][x] = nil
-					}
-				}
-
-				topL = newTopL
-
-				// update cell at pieces new position
-				g.addPieceToBoard()
-
-				// generate new current piece if at bottom or on top of another piece
-				if g.pieceAtBottom() {
-					// check if any rows can be cleared
-					// TODO: add scoring
-					g.board.ClearFullRows()
-
-					if g.pieceAtTop() {
-						// still render game-over state
-						g.canvas.Cells = g.board.Cells()
-						if err := g.canvas.Render(); err != nil {
-							runErr <- err
-							return
-						}
-						endScore <- 0
-						return
-					}
-
-					g.currentPiece = tetrimino.New(len(g.board.Blocks[0]), len(g.board.Blocks))
-
-					// add new piece to canvas
-					g.addPieceToBoard()
-				}
-
-				g.canvas.Cells = g.board.Cells()
-
-				if err := g.canvas.Render(); err != nil {
-					runErr <- err
-					return
-				}
 			}
 		}
 	}()
@@ -302,9 +227,82 @@ func (g *Game) pieceAtBottom() bool {
 	return false
 }
 
-func (g *Game) handleDemoInput(input userInput) error {
+func (g *Game) handleInput(input userInput, endScore chan int) error {
+	topL := g.currentPiece.ContainingBox().TopLeft
+	blocks := g.currentPiece.Blocks()
+
 	g.movePiece(input)
-	return nil
+	// new space already occupied
+	if (input == moveLeft || input == moveRight || input == rotateLeft || input == rotateRight) && g.pieceConflicts(topL, blocks) {
+		// move back to original spot
+		if opposite := input.opposite(); opposite != ignore {
+			g.movePiece(opposite)
+			return nil
+		}
+	}
+	if (input == rotateLeft || input == rotateRight) && g.pieceOutOfBounds() {
+		// TODO: allow for 'kickback' off wall
+		// move back to original spot
+		if opposite := input.opposite(); opposite != ignore {
+			g.movePiece(opposite)
+			return nil
+		}
+	}
+
+	newTopL := g.currentPiece.ContainingBox().TopLeft
+
+	// clear cell where piece was
+	for i, row := range blocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := topL.X + j
+			y := topL.Y - i
+
+			g.board.Blocks[y][x] = nil
+		}
+	}
+
+	topL = newTopL
+
+	// update cell at pieces new position
+	g.addPieceToBoard()
+
+	// generate new current piece if at bottom or on top of another piece
+	if g.pieceAtBottom() {
+		// check if any rows can be cleared
+		// TODO: add scoring
+		g.board.ClearFullRows()
+
+		if g.pieceAtTop() {
+			// still render game-over state
+			g.canvas.UpdateCells(g.board.Cells())
+			if err := g.canvas.Render(); err != nil {
+				return err
+			}
+			endScore <- 0
+			return nil
+		}
+
+		g.currentPiece = g.newPiece(len(g.board.Blocks[0]), len(g.board.Blocks))
+
+		// add new piece to canvas
+		g.addPieceToBoard()
+		if g.pieceAtBottom() {
+			// new piece already at bottom -> game over
+			g.canvas.UpdateCells(g.board.Cells())
+			if err := g.canvas.Render(); err != nil {
+				return err
+			}
+			endScore <- 0
+			return nil
+		}
+	}
+
+	g.canvas.UpdateCells(g.board.Cells())
+
+	return g.canvas.Render()
 }
 
 func (g *Game) movePiece(input userInput) {

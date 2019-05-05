@@ -3,13 +3,13 @@ package tetrimino
 import "testing"
 
 var sPieceTests = map[orientation]tetriminoTestCase{
-	spawn: tetriminoTestCase{
+	clockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
-			y: 2,
+			y: 3,
 			x: 1,
 		},
 		expectedMinY: tetriminoCoordTest{
-			y: 0,
+			y: 1,
 			x: 2,
 		},
 		expectedMaxX: tetriminoCoordTest{
@@ -21,43 +21,7 @@ var sPieceTests = map[orientation]tetriminoTestCase{
 			ignoreY: true,
 		},
 	},
-	clockwise: tetriminoTestCase{
-		expectedMaxY: tetriminoCoordTest{
-			y:       1,
-			ignoreX: true,
-		},
-		expectedMinY: tetriminoCoordTest{
-			y:       0,
-			ignoreX: true,
-		},
-		expectedMaxX: tetriminoCoordTest{
-			x: 2,
-			y: 1,
-		},
-		expectedMinX: tetriminoCoordTest{
-			x: 0,
-			y: 0,
-		},
-	},
 	opposite: tetriminoTestCase{
-		expectedMaxY: tetriminoCoordTest{
-			y: 2,
-			x: 0,
-		},
-		expectedMinY: tetriminoCoordTest{
-			y: 0,
-			x: 1,
-		},
-		expectedMaxX: tetriminoCoordTest{
-			x:       1,
-			ignoreY: true,
-		},
-		expectedMinX: tetriminoCoordTest{
-			x:       0,
-			ignoreY: true,
-		},
-	},
-	counterclockwise: tetriminoTestCase{
 		expectedMaxY: tetriminoCoordTest{
 			y:       2,
 			ignoreX: true,
@@ -75,10 +39,46 @@ var sPieceTests = map[orientation]tetriminoTestCase{
 			y: 1,
 		},
 	},
+	counterclockwise: tetriminoTestCase{
+		expectedMaxY: tetriminoCoordTest{
+			y: 3,
+			x: 0,
+		},
+		expectedMinY: tetriminoCoordTest{
+			y: 1,
+			x: 1,
+		},
+		expectedMaxX: tetriminoCoordTest{
+			x:       1,
+			ignoreY: true,
+		},
+		expectedMinX: tetriminoCoordTest{
+			x:       0,
+			ignoreY: true,
+		},
+	},
+	spawn: tetriminoTestCase{
+		expectedMaxY: tetriminoCoordTest{
+			y:       3,
+			ignoreX: true,
+		},
+		expectedMinY: tetriminoCoordTest{
+			y:       2,
+			ignoreX: true,
+		},
+		expectedMaxX: tetriminoCoordTest{
+			x: 2,
+			y: 3,
+		},
+		expectedMinX: tetriminoCoordTest{
+			x: 0,
+			y: 2,
+		},
+	},
 }
 
 func TestSPiece(t *testing.T) {
-	piece := newSPiece(3, 3)
+	piece := newSPiece(4, 4)
 
 	testPiece(t, piece, sPieceTests)
 }

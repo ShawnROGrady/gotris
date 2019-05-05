@@ -12,19 +12,14 @@ type oPiece struct {
 
 func newOPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
-	return &oPiece{
+
+	piece := &oPiece{
 		orientation: &spawnOrientation,
-		box: Box{
-			TopLeft: Coordinates{
-				X: 0,
-				Y: boardHeight - 1,
-			},
-			BottomRight: Coordinates{
-				X: 3,
-				Y: boardHeight - 3,
-			},
-		},
 	}
+
+	box := startingBox(boardWidth, boardHeight, piece)
+	piece.box = box
+	return piece
 }
 
 func (o oPiece) pieceOrientation() orientation {

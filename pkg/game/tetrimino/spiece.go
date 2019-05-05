@@ -12,19 +12,14 @@ type sPiece struct {
 
 func newSPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
-	return &sPiece{
+
+	piece := &sPiece{
 		orientation: &spawnOrientation,
-		box: Box{
-			TopLeft: Coordinates{
-				X: 0,
-				Y: boardHeight - 1,
-			},
-			BottomRight: Coordinates{
-				X: 2,
-				Y: boardHeight - 3,
-			},
-		},
 	}
+
+	box := startingBox(boardWidth, boardHeight, piece)
+	piece.box = box
+	return piece
 }
 
 func (s sPiece) pieceOrientation() orientation {
@@ -81,7 +76,7 @@ func (s *sPiece) XMin() Coordinates {
 
 func (s *sPiece) Blocks() [][]*board.Block {
 	switch *s.orientation {
-	case spawn:
+	case clockwise:
 		return [][]*board.Block{
 			[]*board.Block{
 				nil,
@@ -99,7 +94,7 @@ func (s *sPiece) Blocks() [][]*board.Block {
 				&board.Block{Color: canvas.Green},
 			},
 		}
-	case clockwise:
+	case opposite:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil},
 			[]*board.Block{
@@ -113,7 +108,7 @@ func (s *sPiece) Blocks() [][]*board.Block {
 				nil,
 			},
 		}
-	case opposite:
+	case counterclockwise:
 		return [][]*board.Block{
 			[]*board.Block{
 				&board.Block{Color: canvas.Green},
@@ -131,7 +126,7 @@ func (s *sPiece) Blocks() [][]*board.Block {
 				nil,
 			},
 		}
-	case counterclockwise:
+	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{
 				nil,
