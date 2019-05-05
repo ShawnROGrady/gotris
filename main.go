@@ -31,7 +31,7 @@ func main() {
 	}
 	defer f.Close()
 
-	g := game.New(f, 8, 20, 2)
+	g := game.New(f, 8, 20, 4)
 
 	done := make(chan bool)
 	defer close(done)

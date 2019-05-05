@@ -15,6 +15,7 @@ type Game struct {
 	canvas       canvas.Canvas
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
+	newPiece     func(width, height int) tetrimino.Tetrimino
 }
 
 // New returns a new game with the specified specifications
@@ -33,6 +34,7 @@ func New(term *os.File, width, height, hiddenRows int) *Game {
 			hiddenRows,
 		),
 		currentPiece: piece,
+		newPiece:     tetrimino.New,
 	}
 }
 
@@ -283,10 +285,19 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			return nil
 		}
 
-		g.currentPiece = tetrimino.New(len(g.board.Blocks[0]), len(g.board.Blocks))
+		g.currentPiece = g.newPiece(len(g.board.Blocks[0]), len(g.board.Blocks))
 
 		// add new piece to canvas
 		g.addPieceToBoard()
+		if g.pieceAtBottom() {
+			// new piece already at bottom -> game over
+			g.canvas.UpdateCells(g.board.Cells())
+			if err := g.canvas.Render(); err != nil {
+				return err
+			}
+			endScore <- 0
+			return nil
+		}
 	}
 
 	g.canvas.UpdateCells(g.board.Cells())

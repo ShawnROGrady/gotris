@@ -23,6 +23,14 @@ type tetriminoCoordTest struct {
 	ignoreY bool
 }
 
+type testCanvas struct {
+	cells [][]*canvas.Cell
+}
+
+func (t *testCanvas) Init() error                           { return nil }
+func (t *testCanvas) Render() error                         { return nil }
+func (t *testCanvas) UpdateCells(newCells [][]*canvas.Cell) { t.cells = newCells }
+
 func newTestGame(width, height, hiddenRows int, pieceConstructor tetrimino.PieceConstructor) *Game {
 	piece := pieceConstructor(width, height+hiddenRows)
 	return &Game{
@@ -32,6 +40,8 @@ func newTestGame(width, height, hiddenRows int, pieceConstructor tetrimino.Piece
 			hiddenRows,
 		),
 		currentPiece: piece,
+		canvas:       &testCanvas{cells: [][]*canvas.Cell{}},
+		newPiece:     pieceConstructor,
 	}
 
 }
@@ -330,4 +340,176 @@ func testPieceCoords(piece tetrimino.Tetrimino, testName string, testCase tetrim
 		}
 	}
 	return nil
+}
+
+func fillInputSequence(input userInput, count int) []userInput {
+	sequence := []userInput{}
+	for i := 0; i <= count; i++ {
+		sequence = append(sequence, input)
+	}
+	return sequence
+}
+
+func combineInputSequences(sequences ...[]userInput) []userInput {
+	inputSequence := []userInput{}
+	for _, sequence := range sequences {
+		inputSequence = append(inputSequence, sequence...)
+	}
+	return inputSequence
+}
+
+var handleInputTests = map[string]struct {
+	pieceConstructor tetrimino.PieceConstructor
+	boardWidth       int
+	boardHeight      int
+	hiddenRows       int
+	inputSequence    []userInput
+	expectAtTop      bool
+	expectedPosition tetriminoTestCase
+	expectGameOver   bool
+}{
+	"move i piece to bottom once": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      true,
+		inputSequence:    fillInputSequence(moveDown, 21),
+		// new piece will also be an "I" piece
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 6,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
+				x: 3,
+			},
+		},
+	},
+	"move i piece to bottom then horizontal conflict": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateLeft}, fillInputSequence(moveDown, 19), // rotate then move to bottom
+			[]userInput{rotateLeft, moveRight}, fillInputSequence(moveDown, 17), []userInput{moveLeft}, // rotate, move right, move down then attempt to move left
+		),
+		// final move should fail
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 5,
+				x: 5,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y: 2,
+				x: 5,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				x:       5,
+				ignoreY: true,
+			},
+			expectedMinX: tetriminoCoordTest{
+				x:       5,
+				ignoreY: true,
+			},
+		},
+	},
+	"move i piece to bottom until end": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		inputSequence:    append(fillInputSequence(moveDown, 252)), // sum(x, 2, 22)
+		expectAtTop:      true,
+		expectGameOver:   true,
+	},
+	"new j piece move down then all the right": {
+		pieceConstructor: tetrimino.PieceConstructors[1],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence:    []userInput{moveDown, moveRight, moveRight, moveRight, moveRight, moveRight, moveRight},
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 22,
+				x: 7,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       21,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 21,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       7,
+			},
+		},
+	},
+}
+
+func TestHandleInput(t *testing.T) {
+	for testName, test := range handleInputTests {
+		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, test.pieceConstructor)
+		// add piece to board
+		g.addPieceToBoard()
+
+		var (
+			endScore  = make(chan int)
+			handleErr = make(chan error)
+			inputOver = make(chan bool)
+			gameOver  = make(chan bool)
+		)
+
+		go func(gameOver chan bool) {
+			for _, input := range test.inputSequence {
+				select {
+				case <-gameOver:
+					return
+				default:
+					if err := g.handleInput(input, endScore); err != nil {
+						handleErr <- err
+					}
+				}
+			}
+			inputOver <- true
+		}(gameOver)
+
+		select {
+		case err := <-handleErr:
+			t.Fatalf("Unexpected error handling user input for test case '%s': %s", testName, err)
+		case score := <-endScore:
+			if !test.expectGameOver {
+				t.Fatalf("Game unexpectedly over for test case '%s' (final score = %d)", testName, score)
+			}
+		case <-inputOver:
+			if test.expectGameOver {
+				t.Fatalf("Game unexpectedly not over for test case '%s' (current piece maxY = %v, minY = %v)", testName, g.currentPiece.YMax(), g.currentPiece.YMin())
+			}
+			// verify piece coordinates
+			if err := testPieceCoords(g.currentPiece, testName, test.expectedPosition); err != nil {
+				t.Errorf("%s", err)
+			}
+
+			// check if piece at top
+			if test.expectAtTop && !g.pieceAtTop() {
+				t.Errorf("Piece unexpectedly not at top for test case '%s' (maxY = %v, minY = %v)", testName, g.currentPiece.YMax(), g.currentPiece.YMin())
+			}
+		}
+
+	}
 }
