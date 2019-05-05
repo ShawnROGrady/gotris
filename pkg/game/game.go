@@ -12,7 +12,7 @@ import (
 // Game is responsible for handling the game state
 type Game struct {
 	inputreader  inputreader.InputReader
-	canvas       *canvas.Canvas
+	canvas       canvas.Canvas
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
 }
@@ -47,7 +47,7 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 	// add initial piece to canvas
 	g.addPieceToBoard()
 
-	g.canvas.Cells = g.board.Cells()
+	g.canvas.UpdateCells(g.board.Cells())
 
 	// initialize the canvas
 	if err := g.canvas.Init(); err != nil {
@@ -275,7 +275,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 		if g.pieceAtTop() {
 			// still render game-over state
-			g.canvas.Cells = g.board.Cells()
+			g.canvas.UpdateCells(g.board.Cells())
 			if err := g.canvas.Render(); err != nil {
 				return err
 			}
@@ -289,7 +289,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		g.addPieceToBoard()
 	}
 
-	g.canvas.Cells = g.board.Cells()
+	g.canvas.UpdateCells(g.board.Cells())
 
 	return g.canvas.Render()
 }
