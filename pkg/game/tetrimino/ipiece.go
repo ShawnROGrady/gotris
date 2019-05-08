@@ -1,6 +1,8 @@
 package tetrimino
 
 import (
+	"fmt"
+
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
 	"github.com/ShawnROGrady/gotris/pkg/game/board"
 )
@@ -164,6 +166,176 @@ func (i *iPiece) RotateCounter() {
 }
 
 func (i *iPiece) RotationTests() []RotationTest {
-	// TODO: iPiece has different logic than other pieces
+	return iPieceRotationTests(i, i.prevOrientation, i.pieceOrientation())
+}
+
+func iPieceRotationTests(t Tetrimino, prevOrientation, newOrientation orientation) []RotationTest {
+	switch prevOrientation {
+	case spawn:
+		switch newOrientation {
+		case clockwise:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveUp(ymax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveUp(ymax); t.MoveUp(ymax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveDown(); t.MoveDown() },
+				},
+			}
+		case counterclockwise:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveUp(ymax); t.MoveUp(ymax) },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveDown(); t.MoveDown() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveUp(ymax) },
+				},
+			}
+		}
+	case clockwise:
+		switch newOrientation {
+		case spawn:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveUp(ymax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveDown() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveDown(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveUp(ymax); t.MoveUp(ymax) },
+				},
+			}
+		case opposite:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveUp(ymax); t.MoveUp(ymax) },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveDown(); t.MoveDown() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveUp(ymax) },
+				},
+			}
+		}
+	case opposite:
+		switch newOrientation {
+		case clockwise:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveDown(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveUp(ymax); t.MoveUp(ymax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveUp(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveDown() },
+				},
+			}
+		case counterclockwise:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveUp(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveDown() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveDown(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveUp(ymax); t.MoveUp(ymax) },
+				},
+			}
+		}
+	case counterclockwise:
+		switch newOrientation {
+		case opposite:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveUp(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveUp(ymax); t.MoveUp(ymax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveDown(); t.MoveDown() },
+				},
+			}
+		case spawn:
+			return []RotationTest{
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft() },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft() },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveRight(xmax); t.MoveDown(); t.MoveDown() },
+					RevertTest: func(xmax, ymax int) { t.MoveLeft(); t.MoveUp(ymax); t.MoveUp(ymax) },
+				},
+				{
+					ApplyTest:  func(xmax, ymax int) { t.MoveLeft(); t.MoveLeft(); t.MoveUp(xmax) },
+					RevertTest: func(xmax, ymax int) { t.MoveRight(xmax); t.MoveRight(xmax); t.MoveDown() },
+				},
+			}
+		}
+	}
+	fmt.Printf("Unhandled orientation combo (prev, new) = (%s, %s)\n", &prevOrientation, &newOrientation)
 	return []RotationTest{}
 }

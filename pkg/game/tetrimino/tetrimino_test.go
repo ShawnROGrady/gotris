@@ -186,6 +186,7 @@ func testRotationTests(piece Tetrimino) error {
 	piece.MoveDown()
 	piece.MoveDown()
 	piece.MoveDown()
+	piece.MoveDown()
 
 	// test spawn orientation
 	if err := checkRotationTests(piece); err != nil {
