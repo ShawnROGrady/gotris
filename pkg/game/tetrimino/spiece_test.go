@@ -81,4 +81,9 @@ func TestSPiece(t *testing.T) {
 	piece := newSPiece(4, 4)
 
 	testPiece(t, piece, sPieceTests)
+
+	piece = newSPiece(10, 24)
+	if err := testRotationTests(piece); err != nil {
+		t.Errorf("%s", err)
+	}
 }

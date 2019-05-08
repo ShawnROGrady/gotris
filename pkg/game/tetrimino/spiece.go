@@ -6,15 +6,17 @@ import (
 )
 
 type sPiece struct {
-	box         Box
-	orientation *orientation
+	box             Box
+	orientation     *orientation
+	prevOrientation orientation
 }
 
 func newSPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
 
 	piece := &sPiece{
-		orientation: &spawnOrientation,
+		orientation:     &spawnOrientation,
+		prevOrientation: spawnOrientation,
 	}
 
 	box := startingBox(boardWidth, boardHeight, piece)
@@ -24,6 +26,10 @@ func newSPiece(boardWidth, boardHeight int) Tetrimino {
 
 func (s sPiece) pieceOrientation() orientation {
 	return *s.orientation
+}
+
+func (s *sPiece) previousOrientation() orientation {
+	return s.prevOrientation
 }
 
 func (s *sPiece) ContainingBox() Box {
@@ -173,9 +179,15 @@ func (s *sPiece) MoveRight(xmax int) {
 }
 
 func (s *sPiece) RotateClockwise() {
+	s.prevOrientation = *s.orientation
 	s.orientation.rotateClockwise()
 }
 
 func (s *sPiece) RotateCounter() {
+	s.prevOrientation = *s.orientation
 	s.orientation.rotateCounter()
+}
+
+func (s *sPiece) RotationTests() []RotationTest {
+	return defaultRotationTests(s, s.prevOrientation, s.pieceOrientation())
 }

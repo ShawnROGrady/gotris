@@ -1,6 +1,9 @@
 package tetrimino
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type tetriminoTestCase struct {
 	expectedMaxY tetriminoCoordTest
@@ -176,4 +179,95 @@ func testOrientation(t *testing.T, piece Tetrimino, testCase tetriminoTestCase, 
 			t.Errorf("Unexpected yMin in %s orientation (offset = %v) [expected = %d, actual = %d]", &orientation, offset, testCase.expectedMinY.y, minY.Y+offset.Y)
 		}
 	}
+}
+
+func testRotationTests(piece Tetrimino) error {
+	// move down some first so there's room
+	piece.MoveDown()
+	piece.MoveDown()
+	piece.MoveDown()
+
+	// test spawn orientation
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	// test right rotation
+	piece.RotateClockwise()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateClockwise()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateClockwise()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateClockwise()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	// test left rotation
+	piece.RotateCounter()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateCounter()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateCounter()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+
+	piece.RotateCounter()
+	if err := checkRotationTests(piece); err != nil {
+		return err
+	}
+	return nil
+}
+
+func checkRotationTests(piece Tetrimino) error {
+	var (
+		maxX            = piece.XMax()
+		minX            = piece.XMin()
+		maxY            = piece.YMax()
+		minY            = piece.YMin()
+		orientation     = piece.pieceOrientation()
+		prevOrientation = piece.previousOrientation()
+	)
+
+	// verify that applying then reverting a rotation test results in no net movement
+	for i, rotationTest := range piece.RotationTests() {
+		rotationTest.ApplyTest(20, 24)
+		rotationTest.RevertTest(20, 24)
+		var (
+			newMaxX = piece.XMax()
+			newMinX = piece.XMin()
+			newMaxY = piece.YMax()
+			newMinY = piece.YMin()
+		)
+		if newMaxX != maxX {
+			return fmt.Errorf("Unexpected maxX in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, maxX, newMaxX)
+		}
+		if newMinX != minX {
+			return fmt.Errorf("Unexpected minX in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, minX, newMinX)
+		}
+		if newMaxY != maxY {
+			return fmt.Errorf("Unexpected maxY in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, maxY, newMaxY)
+		}
+		if newMinY != minY {
+			return fmt.Errorf("Unexpected minY in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, minY, newMinY)
+		}
+	}
+	return nil
 }

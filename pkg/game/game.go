@@ -114,11 +114,6 @@ func (g *Game) pieceConflicts(oldTopL tetrimino.Coordinates, oldBlocks [][]*boar
 		prevCoords = make(map[tetrimino.Coordinates]bool)
 	)
 
-	if oldTopL == topL {
-		// piece didn't move
-		return false
-	}
-
 	for i, row := range oldBlocks {
 		for j, block := range row {
 			if block == nil {
@@ -233,19 +228,20 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 	g.movePiece(input)
 	// new space already occupied
-	if (input == moveLeft || input == moveRight || input == rotateLeft || input == rotateRight) && g.pieceConflicts(topL, blocks) {
+	if (input == moveLeft || input == moveRight) && g.pieceConflicts(topL, blocks) {
 		// move back to original spot
 		if opposite := input.opposite(); opposite != ignore {
 			g.movePiece(opposite)
 			return nil
 		}
 	}
-	if (input == rotateLeft || input == rotateRight) && g.pieceOutOfBounds() {
-		// TODO: allow for 'kickback' off wall
-		// move back to original spot
-		if opposite := input.opposite(); opposite != ignore {
-			g.movePiece(opposite)
-			return nil
+	if (input == rotateLeft || input == rotateRight) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
+		if !g.resolveRotation() {
+			// move back to original spot
+			if opposite := input.opposite(); opposite != ignore {
+				g.movePiece(opposite)
+				return nil
+			}
 		}
 	}
 
@@ -326,4 +322,25 @@ func (g *Game) movePiece(input userInput) {
 	case rotateRight:
 		piece.RotateClockwise()
 	}
+}
+
+func (g *Game) resolveRotation() bool {
+	var (
+		xmax   = len(g.board.Blocks[0]) - 1
+		ymax   = len(g.board.Blocks) - 1
+		piece  = g.currentPiece
+		topL   = g.currentPiece.ContainingBox().TopLeft
+		blocks = g.currentPiece.Blocks()
+	)
+
+	for _, rotationTest := range piece.RotationTests() {
+		rotationTest.ApplyTest(xmax, ymax)
+		if !(g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
+			return true
+		}
+
+		rotationTest.RevertTest(xmax, ymax)
+	}
+
+	return false
 }

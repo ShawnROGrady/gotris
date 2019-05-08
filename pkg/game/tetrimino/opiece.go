@@ -6,8 +6,9 @@ import (
 )
 
 type oPiece struct {
-	box         Box
-	orientation *orientation
+	box             Box
+	orientation     *orientation
+	prevOrientation orientation
 }
 
 func newOPiece(boardWidth, boardHeight int) Tetrimino {
@@ -24,6 +25,10 @@ func newOPiece(boardWidth, boardHeight int) Tetrimino {
 
 func (o oPiece) pieceOrientation() orientation {
 	return *o.orientation
+}
+
+func (o *oPiece) previousOrientation() orientation {
+	return o.prevOrientation
 }
 
 func (o *oPiece) ContainingBox() Box {
@@ -133,9 +138,16 @@ func (o *oPiece) MoveRight(xmax int) {
 }
 
 func (o *oPiece) RotateClockwise() {
+	o.prevOrientation = *o.orientation
 	o.orientation.rotateClockwise()
 }
 
 func (o *oPiece) RotateCounter() {
+	o.prevOrientation = *o.orientation
 	o.orientation.rotateCounter()
+}
+
+func (o *oPiece) RotationTests() []RotationTest {
+	// oPiece can't be resolved in case of conflicts
+	return []RotationTest{}
 }

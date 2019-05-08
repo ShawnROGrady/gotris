@@ -6,15 +6,17 @@ import (
 )
 
 type iPiece struct {
-	box         Box
-	orientation *orientation
+	box             Box
+	orientation     *orientation
+	prevOrientation orientation
 }
 
 func newIPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
 
 	piece := &iPiece{
-		orientation: &spawnOrientation,
+		orientation:     &spawnOrientation,
+		prevOrientation: spawnOrientation,
 	}
 
 	box := startingBox(boardWidth, boardHeight, piece)
@@ -24,6 +26,10 @@ func newIPiece(boardWidth, boardHeight int) Tetrimino {
 
 func (i *iPiece) pieceOrientation() orientation {
 	return *i.orientation
+}
+
+func (i *iPiece) previousOrientation() orientation {
+	return i.prevOrientation
 }
 
 func (i *iPiece) ContainingBox() Box {
@@ -148,9 +154,16 @@ func (i *iPiece) MoveRight(xmax int) {
 }
 
 func (i *iPiece) RotateClockwise() {
+	i.prevOrientation = *i.orientation
 	i.orientation.rotateClockwise()
 }
 
 func (i *iPiece) RotateCounter() {
+	i.prevOrientation = *i.orientation
 	i.orientation.rotateCounter()
+}
+
+func (i *iPiece) RotationTests() []RotationTest {
+	// TODO: iPiece has different logic than other pieces
+	return []RotationTest{}
 }

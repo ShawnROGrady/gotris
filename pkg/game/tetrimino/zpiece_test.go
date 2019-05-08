@@ -81,4 +81,9 @@ func TestZPiece(t *testing.T) {
 	piece := newZPiece(4, 4)
 
 	testPiece(t, piece, zPieceTests)
+
+	piece = newZPiece(10, 24)
+	if err := testRotationTests(piece); err != nil {
+		t.Errorf("%s", err)
+	}
 }
