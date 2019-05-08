@@ -228,7 +228,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 	g.movePiece(input)
 	// new space already occupied
-	if (input == moveLeft || input == moveRight) && g.pieceConflicts(topL, blocks) {
+	if (input == moveLeft || input == moveRight || input == moveUp) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
 		// move back to original spot
 		if opposite := input.opposite(); opposite != ignore {
 			g.movePiece(opposite)
@@ -303,8 +303,6 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 func (g *Game) movePiece(input userInput) {
 	var (
-		xmax  = len(g.board.Blocks[0]) - 1
-		ymax  = len(g.board.Blocks) - 1
 		piece = g.currentPiece
 	)
 
@@ -314,9 +312,9 @@ func (g *Game) movePiece(input userInput) {
 	case moveDown:
 		piece.MoveDown()
 	case moveUp:
-		piece.MoveUp(ymax)
+		piece.MoveUp()
 	case moveRight:
-		piece.MoveRight(xmax)
+		piece.MoveRight()
 	case rotateLeft:
 		piece.RotateCounter()
 	case rotateRight:
@@ -326,20 +324,18 @@ func (g *Game) movePiece(input userInput) {
 
 func (g *Game) resolveRotation() bool {
 	var (
-		xmax   = len(g.board.Blocks[0]) - 1
-		ymax   = len(g.board.Blocks) - 1
 		piece  = g.currentPiece
 		topL   = g.currentPiece.ContainingBox().TopLeft
 		blocks = g.currentPiece.Blocks()
 	)
 
 	for _, rotationTest := range piece.RotationTests() {
-		rotationTest.ApplyTest(xmax, ymax)
+		rotationTest.ApplyTest()
 		if !(g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
 			return true
 		}
 
-		rotationTest.RevertTest(xmax, ymax)
+		rotationTest.RevertTest()
 	}
 
 	return false

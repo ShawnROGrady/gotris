@@ -27,14 +27,14 @@ func testPiece(t *testing.T, piece Tetrimino, pieceTests map[orientation]tetrimi
 	})
 
 	// move piece up (within allowed range)
-	piece.MoveUp(20)
+	piece.MoveUp()
 	testPieceRotations(t, piece, pieceTests, Coordinates{
 		X: 0,
 		Y: 1,
 	})
 
 	// move piece right (within allowed range)
-	piece.MoveRight(20)
+	piece.MoveRight()
 	testPieceRotations(t, piece, pieceTests, Coordinates{
 		X: 1,
 		Y: 1,
@@ -249,8 +249,8 @@ func checkRotationTests(piece Tetrimino) error {
 
 	// verify that applying then reverting a rotation test results in no net movement
 	for i, rotationTest := range piece.RotationTests() {
-		rotationTest.ApplyTest(20, 24)
-		rotationTest.RevertTest(20, 24)
+		rotationTest.ApplyTest()
+		rotationTest.RevertTest()
 		var (
 			newMaxX = piece.XMax()
 			newMinX = piece.XMin()

@@ -432,7 +432,7 @@ var handleInputTests = map[string]struct {
 		hiddenRows:       4,
 		expectAtTop:      false,
 		inputSequence: combineInputSequences(
-			[]userInput{rotateLeft}, fillInputSequence(moveRight, 5), // rotate then move to right
+			[]userInput{rotateLeft}, fillInputSequence(moveRight, 4), // rotate then move to right
 			[]userInput{rotateLeft},
 		),
 		// rotation should succeed
@@ -451,6 +451,96 @@ var handleInputTests = map[string]struct {
 			},
 			expectedMinX: tetriminoCoordTest{
 				y: 21,
+				x: 6,
+			},
+		},
+	},
+	"left rotate i piece, move to right then right rotate": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateLeft}, fillInputSequence(moveRight, 4), // rotate then move to right
+			[]userInput{rotateRight},
+		),
+		// rotation should succeed
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
+				x: 6,
+			},
+		},
+	},
+	"right rotate i piece, move to right then right rotate": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateRight}, fillInputSequence(moveRight, 4), // rotate then move to right
+			[]userInput{rotateRight},
+		),
+		// rotation should succeed
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       21,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       21,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 21,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 21,
+				x: 6,
+			},
+		},
+	},
+	"right rotate i piece, move to right then left rotate": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateRight}, fillInputSequence(moveRight, 4), // rotate then move to right
+			[]userInput{rotateLeft},
+		),
+		// rotation should succeed
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       22,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 22,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 22,
 				x: 6,
 			},
 		},

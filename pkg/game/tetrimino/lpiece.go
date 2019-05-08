@@ -134,32 +134,24 @@ func (l *lPiece) Blocks() [][]*board.Block {
 	return nil
 }
 
-func (l *lPiece) MoveUp(ymax int) {
-	if l.YMax().Y < ymax {
-		l.box.TopLeft.Y++
-		l.box.BottomRight.Y++
-	}
+func (l *lPiece) MoveUp() {
+	l.box.TopLeft.Y++
+	l.box.BottomRight.Y++
 }
 
 func (l *lPiece) MoveDown() {
-	if l.YMin().Y > 0 {
-		l.box.BottomRight.Y--
-		l.box.TopLeft.Y--
-	}
+	l.box.BottomRight.Y--
+	l.box.TopLeft.Y--
 }
 
 func (l *lPiece) MoveLeft() {
-	if l.XMin().X > 0 {
-		l.box.TopLeft.X--
-		l.box.BottomRight.X--
-	}
+	l.box.TopLeft.X--
+	l.box.BottomRight.X--
 }
 
-func (l *lPiece) MoveRight(xmax int) {
-	if l.XMax().X < xmax {
-		l.box.BottomRight.X++
-		l.box.TopLeft.X++
-	}
+func (l *lPiece) MoveRight() {
+	l.box.BottomRight.X++
+	l.box.TopLeft.X++
 }
 
 func (l *lPiece) RotateClockwise() {
