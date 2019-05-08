@@ -425,6 +425,36 @@ var handleInputTests = map[string]struct {
 			},
 		},
 	},
+	"left rotate i piece, move to right then left rotate": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		expectAtTop:      false,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateLeft}, fillInputSequence(moveRight, 5), // rotate then move to right
+			[]userInput{rotateLeft},
+		),
+		// rotation should succeed
+		expectedPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       21,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       21,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 21,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 21,
+				x: 6,
+			},
+		},
+	},
 	"move i piece to bottom until end": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
 		boardWidth:       10,
