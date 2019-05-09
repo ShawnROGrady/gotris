@@ -257,6 +257,7 @@ type RotationTest struct {
 	RevertTest func()
 }
 
+// https://harddrop.com/wiki/SRS#Wall_Kicks
 func defaultRotationTests(t Tetrimino, prevOrientation, newOrientation orientation) []RotationTest {
 	switch prevOrientation {
 	case spawn:
@@ -268,8 +269,8 @@ func defaultRotationTests(t Tetrimino, prevOrientation, newOrientation orientati
 					RevertTest: func() { t.MoveRight() },
 				},
 				{
-					ApplyTest:  func() { t.MoveLeft(); t.MoveDown() },
-					RevertTest: func() { t.MoveRight(); t.MoveUp() },
+					ApplyTest:  func() { t.MoveLeft(); t.MoveUp() },
+					RevertTest: func() { t.MoveRight(); t.MoveDown() },
 				},
 				{
 					ApplyTest:  func() { t.MoveDown(); t.MoveDown() },

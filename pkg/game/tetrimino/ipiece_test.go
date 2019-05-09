@@ -83,7 +83,9 @@ func TestIPiece(t *testing.T) {
 	testPiece(t, piece, iPieceTests)
 
 	piece = newIPiece(10, 24)
-	if err := testRotationTests(piece); err != nil {
+	// TODO: define iPiece wallKickTests
+	iPieceWallKickTests := make(map[orientation]map[orientation][]wallKickTest)
+	if err := testRotationTests(piece, iPieceWallKickTests); err != nil {
 		t.Errorf("%s", err)
 	}
 }

@@ -181,7 +181,73 @@ func testOrientation(t *testing.T, piece Tetrimino, testCase tetriminoTestCase, 
 	}
 }
 
-func testRotationTests(piece Tetrimino) error {
+type wallKickTest struct {
+	xChange int
+	yChange int
+}
+
+func defaultWallKickTests() map[orientation]map[orientation][]wallKickTest {
+	defaultTests := make(map[orientation]map[orientation][]wallKickTest)
+	defaultTests[spawn] = map[orientation][]wallKickTest{
+		clockwise: []wallKickTest{
+			{xChange: -1, yChange: 0},
+			{xChange: -1, yChange: 1},
+			{xChange: 0, yChange: -2},
+			{xChange: -1, yChange: -2},
+		},
+		counterclockwise: []wallKickTest{
+			{xChange: 1, yChange: 0},
+			{xChange: 1, yChange: 1},
+			{xChange: 0, yChange: -2},
+			{xChange: 1, yChange: -2},
+		},
+	}
+	defaultTests[clockwise] = map[orientation][]wallKickTest{
+		spawn: []wallKickTest{
+			{xChange: 1, yChange: 0},
+			{xChange: 1, yChange: -1},
+			{xChange: 0, yChange: 2},
+			{xChange: 1, yChange: 2},
+		},
+		opposite: []wallKickTest{
+			{xChange: 1, yChange: 0},
+			{xChange: 1, yChange: -1},
+			{xChange: 0, yChange: 2},
+			{xChange: 1, yChange: 2},
+		},
+	}
+	defaultTests[opposite] = map[orientation][]wallKickTest{
+		clockwise: []wallKickTest{
+			{xChange: -1, yChange: 0},
+			{xChange: -1, yChange: 1},
+			{xChange: 0, yChange: -2},
+			{xChange: -1, yChange: -2},
+		},
+		counterclockwise: []wallKickTest{
+			{xChange: 1, yChange: 0},
+			{xChange: 1, yChange: 1},
+			{xChange: 0, yChange: -2},
+			{xChange: 1, yChange: -2},
+		},
+	}
+	defaultTests[counterclockwise] = map[orientation][]wallKickTest{
+		opposite: []wallKickTest{
+			{xChange: -1, yChange: 0},
+			{xChange: -1, yChange: -1},
+			{xChange: 0, yChange: 2},
+			{xChange: -1, yChange: 2},
+		},
+		spawn: []wallKickTest{
+			{xChange: -1, yChange: 0},
+			{xChange: -1, yChange: -1},
+			{xChange: 0, yChange: 2},
+			{xChange: -1, yChange: 2},
+		},
+	}
+	return defaultTests
+}
+
+func testRotationTests(piece Tetrimino, wallKickTests map[orientation]map[orientation][]wallKickTest) error {
 	// move down some first so there's room
 	piece.MoveDown()
 	piece.MoveDown()
@@ -189,55 +255,57 @@ func testRotationTests(piece Tetrimino) error {
 	piece.MoveDown()
 
 	// test spawn orientation
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	// test right rotation
 	piece.RotateClockwise()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateClockwise()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateClockwise()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateClockwise()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	// test left rotation
 	piece.RotateCounter()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateCounter()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateCounter()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 
 	piece.RotateCounter()
-	if err := checkRotationTests(piece); err != nil {
+	if err := checkRotationTests(piece, wallKickTests); err != nil {
 		return err
 	}
 	return nil
 }
 
-func checkRotationTests(piece Tetrimino) error {
+// NOTE: these are just to verify that the rotation tests do what we expect them to
+// the actual logic determining wich test to apply will be handled by the game logic
+func checkRotationTests(piece Tetrimino, wallKickTests map[orientation]map[orientation][]wallKickTest) error {
 	var (
 		maxX            = piece.XMax()
 		minX            = piece.XMin()
@@ -245,18 +313,46 @@ func checkRotationTests(piece Tetrimino) error {
 		minY            = piece.YMin()
 		orientation     = piece.pieceOrientation()
 		prevOrientation = piece.previousOrientation()
+		tests           = []wallKickTest{}
 	)
 
+	if prevOr, ok := wallKickTests[prevOrientation]; ok {
+		if newOr, ok := prevOr[orientation]; ok {
+			tests = newOr
+		}
+	}
 	// verify that applying then reverting a rotation test results in no net movement
 	for i, rotationTest := range piece.RotationTests() {
 		rotationTest.ApplyTest()
-		rotationTest.RevertTest()
 		var (
 			newMaxX = piece.XMax()
 			newMinX = piece.XMin()
 			newMaxY = piece.YMax()
 			newMinY = piece.YMin()
 		)
+
+		if i < len(tests) {
+			test := tests[i]
+			if newMaxX.X-maxX.X != test.xChange {
+				return fmt.Errorf("Unexpected maxX change in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, test.xChange, newMaxX.X-maxX.X)
+			}
+			if newMinX.X-minX.X != test.xChange {
+				return fmt.Errorf("Unexpected minX change in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, test.xChange, newMinX.X-minX.X)
+			}
+			if newMaxY.Y-maxY.Y != test.yChange {
+				return fmt.Errorf("Unexpected maxY change in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, test.yChange, newMaxY.Y-maxY.Y)
+			}
+			if newMinY.Y-minY.Y != test.yChange {
+				return fmt.Errorf("Unexpected minY change in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, test.yChange, newMinY.Y-minY.Y)
+			}
+		}
+		rotationTest.RevertTest()
+
+		newMaxX = piece.XMax()
+		newMinX = piece.XMin()
+		newMaxY = piece.YMax()
+		newMinY = piece.YMin()
+
 		if newMaxX != maxX {
 			return fmt.Errorf("Unexpected maxX in %s orientation (prevOrientation=%s) after applying then reverting rotationTests[%d] (expected=%v, actual=%v)", &orientation, &prevOrientation, i, maxX, newMaxX)
 		}

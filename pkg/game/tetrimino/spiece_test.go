@@ -83,7 +83,7 @@ func TestSPiece(t *testing.T) {
 	testPiece(t, piece, sPieceTests)
 
 	piece = newSPiece(10, 24)
-	if err := testRotationTests(piece); err != nil {
+	if err := testRotationTests(piece, defaultWallKickTests()); err != nil {
 		t.Errorf("%s", err)
 	}
 }

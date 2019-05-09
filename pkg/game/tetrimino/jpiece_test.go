@@ -82,8 +82,8 @@ func TestJPiece(t *testing.T) {
 
 	testPiece(t, piece, jPieceTests)
 
-	piece = newTPiece(10, 24)
-	if err := testRotationTests(piece); err != nil {
+	piece = newJPiece(10, 24)
+	if err := testRotationTests(piece, defaultWallKickTests()); err != nil {
 		t.Errorf("%s", err)
 	}
 }
