@@ -8,7 +8,8 @@ type Color int
 // the available colors
 const (
 	// normal colors
-	Black Color = iota
+	Reset Color = iota
+	Black Color = iota + 29
 	Red
 	Green
 	Yellow
@@ -34,11 +35,11 @@ const (
 func (c Color) String() string {
 	switch c {
 	case BrightBlack, BrightRed, BrightGreen, BrightYellow, BrightBlue, BrightMagenta, BrightCyan, BrightWhite:
-		return fmt.Sprintf("\u001b[3%d;1m", c-8)
+		return fmt.Sprintf("\u001b[%d;1m", c-8)
 	case Orange:
 		return fmt.Sprintf("\u001b[38;5;%dm", c)
 	default:
-		return fmt.Sprintf("\u001b[3%dm", c)
+		return fmt.Sprintf("\u001b[%dm", c)
 	}
 }
 
@@ -61,6 +62,7 @@ func (c Color) description() string {
 		BrightCyan:    "bright cyan",
 		BrightWhite:   "bright white",
 		Orange:        "orange",
+		Reset:         "reset",
 	}
 
 	return colorDescriptions[c]

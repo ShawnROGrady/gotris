@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,14 @@ import (
 )
 
 func main() {
+	colorTest := flag.Bool("colors", false, "display the colors that will be used throughout the game")
+	flag.Parse()
+
+	if colorTest != nil && *colorTest {
+		printPotentialColors()
+		os.Exit(0)
+	}
+
 	// set min number of characters for reading to 1
 	if err := exec.Command("stty", "-f", "/dev/tty", "-icanon", "min", "1").Run(); err != nil {
 		log.Fatalf("error limiting input minimum: %s", err)
