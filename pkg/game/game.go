@@ -17,7 +17,8 @@ type Game struct {
 	canvas       canvas.Canvas
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
-	newPiece     func(width, height int) tetrimino.Tetrimino
+	newPieceSet  func(width, height int) []tetrimino.Tetrimino
+	nextPieces   []tetrimino.Tetrimino
 	level        level
 	debugMode    bool
 }
@@ -33,7 +34,8 @@ type Config struct {
 
 // New returns a new game with the specified specifications
 func New(c Config) *Game {
-	piece := tetrimino.New(c.Width, c.Height+c.HiddenRows)
+	initPieces := tetrimino.NewSet(c.Width, c.Height+c.HiddenRows)
+	piece, pieceSet := initPieces[0], initPieces[1:]
 	return &Game{
 		inputreader: inputreader.NewTermReader(c.Term),
 		canvas: canvas.New(canvas.Config{
@@ -49,7 +51,8 @@ func New(c Config) *Game {
 			c.HiddenRows,
 		),
 		currentPiece: piece,
-		newPiece:     tetrimino.New,
+		newPieceSet:  tetrimino.NewSet,
+		nextPieces:   pieceSet,
 		level:        1,
 		debugMode:    c.DebugMode,
 	}
@@ -308,7 +311,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			return nil
 		}
 
-		g.currentPiece = g.newPiece(len(g.board.Blocks[0]), len(g.board.Blocks))
+		g.currentPiece = g.nextPiece()
 
 		// add new piece to canvas
 		g.addPieceToBoard()
@@ -347,6 +350,21 @@ func (g *Game) movePiece(input userInput) {
 	case rotateRight:
 		piece.RotateClockwise()
 	}
+}
+
+func (g *Game) nextPiece() tetrimino.Tetrimino {
+	var nextPiece tetrimino.Tetrimino
+	if len(g.nextPieces) == 1 {
+		var (
+			boardWidth  = len(g.board.Blocks[0])
+			boardHeight = len(g.board.Blocks)
+		)
+		nextPiece = g.nextPieces[0]
+		g.nextPieces = g.newPieceSet(boardWidth, boardHeight)
+		return nextPiece
+	}
+	nextPiece, g.nextPieces = g.nextPieces[0], g.nextPieces[1:]
+	return nextPiece
 }
 
 func (g *Game) resolveRotation() bool {

@@ -31,8 +31,9 @@ func (t *testCanvas) Init() error                           { return nil }
 func (t *testCanvas) Render() error                         { return nil }
 func (t *testCanvas) UpdateCells(newCells [][]*canvas.Cell) { t.cells = newCells }
 
-func newTestGame(width, height, hiddenRows int, pieceConstructor tetrimino.PieceConstructor) *Game {
-	piece := pieceConstructor(width, height+hiddenRows)
+func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, height int) []tetrimino.Tetrimino) *Game {
+	initPieces := pieceSetConstructor(width, height+hiddenRows)
+	piece, pieceSet := initPieces[0], initPieces[1:]
 	return &Game{
 		board: board.New(
 			canvas.White,
@@ -40,10 +41,20 @@ func newTestGame(width, height, hiddenRows int, pieceConstructor tetrimino.Piece
 			hiddenRows,
 		),
 		currentPiece: piece,
+		nextPieces:   pieceSet,
 		canvas:       &testCanvas{cells: [][]*canvas.Cell{}},
-		newPiece:     pieceConstructor,
+		newPieceSet:  pieceSetConstructor,
 	}
+}
 
+func testNewSet(pieceConstructor tetrimino.PieceConstructor) func(width, height int) []tetrimino.Tetrimino {
+	return func(width, height int) []tetrimino.Tetrimino {
+		pieceSet := []tetrimino.Tetrimino{}
+		for i := 0; i < 7; i++ {
+			pieceSet = append(pieceSet, pieceConstructor(width, height))
+		}
+		return pieceSet
+	}
 }
 
 var addPieceToBoardTests = map[string]struct {
@@ -258,7 +269,7 @@ var addPieceToBoardTests = map[string]struct {
 
 func TestAddPieceToBoard(t *testing.T) {
 	for testName, test := range addPieceToBoardTests {
-		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, test.pieceConstructor)
+		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
 
 		// add piece to board
 		g.addPieceToBoard()
@@ -584,7 +595,7 @@ var handleInputTests = map[string]struct {
 
 func TestHandleInput(t *testing.T) {
 	for testName, test := range handleInputTests {
-		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, test.pieceConstructor)
+		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
 		// add piece to board
 		g.addPieceToBoard()
 
@@ -631,5 +642,33 @@ func TestHandleInput(t *testing.T) {
 			}
 		}
 
+	}
+}
+
+func TestNextPiece(t *testing.T) {
+	g := New(Config{
+		Term:  nil,
+		Width: 10, Height: 20,
+		HiddenRows: 4,
+	})
+
+	// verify correct number of pieces for new game (7 tetriminos - 1 currentPiece)
+	if len(g.nextPieces) != 6 {
+		t.Errorf("Unexpected number of next pieces for new game (expected = %d, actual = %d)", 6, len(g.nextPieces))
+	}
+
+	// go through all of the nextPieces slice
+	for i := 0; i < 5; i++ {
+		g.currentPiece = g.nextPiece()
+		if len(g.nextPieces) != 5-i {
+			t.Errorf("Unexpected number of next pieces after getting %d next piece(s) (expected = %d, actual = %d)", i, 5-i, len(g.nextPieces))
+		}
+	}
+
+	// verify that after the next call we create a new slice of next pieces
+	g.currentPiece = g.nextPiece()
+	// should be 7 since this time the next piece came from the previous slice
+	if len(g.nextPieces) != 7 {
+		t.Errorf("Unexpected number of next pieces after going through initial nextPieces slice (expected = %d, actual = %d)", 7, len(g.nextPieces))
 	}
 }

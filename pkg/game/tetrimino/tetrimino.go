@@ -46,14 +46,20 @@ type PieceConstructor func(boardWidth, boardHeight int) Tetrimino
 // TODO: figure out better way to enable testing
 var PieceConstructors = []PieceConstructor{newIPiece, newJPiece, newLPiece, newOPiece, newSPiece, newTPiece, newZPiece}
 
-// New generates a new tetrimino
-func New(boardWidth, boardHeight int) Tetrimino {
+// NewSet generates a new set of tetriminos
+// this set is a random permutation of all piece types: https://harddrop.com/wiki/Random_Generator
+func NewSet(boardWidth, boardHeight int) []Tetrimino {
 	var (
-		r = rand.New(rand.NewSource(time.Now().UnixNano()))
-		i = r.Intn(len(PieceConstructors))
+		r        = rand.New(rand.NewSource(time.Now().UnixNano()))
+		perm     = r.Perm(len(PieceConstructors))
+		pieceSet = []Tetrimino{}
 	)
 
-	return PieceConstructors[i](boardWidth, boardHeight)
+	for i := range perm {
+		pieceSet = append(pieceSet, PieceConstructors[perm[i]](boardWidth, boardHeight))
+	}
+
+	return pieceSet
 }
 
 // Box represents the box surrounding the current piece
