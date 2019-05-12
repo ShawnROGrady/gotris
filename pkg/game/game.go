@@ -2,6 +2,7 @@ package game
 
 import (
 	"os"
+	"time"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
 	"github.com/ShawnROGrady/gotris/pkg/game/board"
@@ -16,6 +17,7 @@ type Game struct {
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
 	newPiece     func(width, height int) tetrimino.Tetrimino
+	level        level
 }
 
 // New returns a new game with the specified specifications
@@ -35,6 +37,7 @@ func New(term *os.File, width, height, hiddenRows int) *Game {
 		),
 		currentPiece: piece,
 		newPiece:     tetrimino.New,
+		level:        1,
 	}
 }
 
@@ -65,12 +68,18 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 
 	go func() {
 		for {
+			gravity := time.After(g.level.gTime())
 			select {
 			case err := <-readErr:
 				runErr <- err
 				return
 			case <-done:
 				return
+			case <-gravity:
+				if err := g.handleInput(moveDown, endScore); err != nil {
+					runErr <- err
+					return
+				}
 			case in := <-input:
 				// TODO: print if in debug mode
 				//log.Printf("User input: %s", in)
