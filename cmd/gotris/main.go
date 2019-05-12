@@ -13,7 +13,8 @@ import (
 )
 
 func main() {
-	colorTest := flag.Bool("colors", false, "display the colors that will be used throughout the game")
+	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game")
+	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
 	flag.Parse()
 
 	if colorTest != nil && *colorTest {
@@ -40,12 +41,19 @@ func main() {
 	}
 	defer f.Close()
 
-	g := game.New(f, 8, 20, 4)
+	conf := game.Config{
+		Term:  f,
+		Width: 10, Height: 20,
+		HiddenRows: 4,
+		DebugMode:  *debugMode,
+	}
+
+	g := game.New(conf)
 
 	done := make(chan bool)
 	defer close(done)
 
-	endScore, runErr := g.RunDemo(done)
+	endScore, runErr := g.Run(done)
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -18,31 +19,44 @@ type Game struct {
 	currentPiece tetrimino.Tetrimino
 	newPiece     func(width, height int) tetrimino.Tetrimino
 	level        level
+	debugMode    bool
+}
+
+// Config represents the configuration for a game
+type Config struct {
+	Term       *os.File
+	Width      int
+	Height     int
+	HiddenRows int
+	DebugMode  bool
 }
 
 // New returns a new game with the specified specifications
-func New(term *os.File, width, height, hiddenRows int) *Game {
-	piece := tetrimino.New(width, height+hiddenRows)
+func New(c Config) *Game {
+	piece := tetrimino.New(c.Width, c.Height+c.HiddenRows)
 	return &Game{
-		inputreader: inputreader.NewTermReader(term),
-		canvas: canvas.New(
-			term,
-			canvas.White,
-			width, height,
-		),
+		inputreader: inputreader.NewTermReader(c.Term),
+		canvas: canvas.New(canvas.Config{
+			Term:       c.Term,
+			Width:      c.Width,
+			Height:     c.Height,
+			Background: canvas.White,
+			DebugMode:  c.DebugMode,
+		}),
 		board: board.New(
 			canvas.White,
-			width, height,
-			hiddenRows,
+			c.Width, c.Height,
+			c.HiddenRows,
 		),
 		currentPiece: piece,
 		newPiece:     tetrimino.New,
 		level:        1,
+		debugMode:    c.DebugMode,
 	}
 }
 
-// RunDemo is a placeholder function to test core functionality
-func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
+// Run takes care of the core game functionality
+func (g *Game) Run(done chan bool) (chan int, chan error) {
 	input, readErr := translateInput(done, g.inputreader)
 	var (
 		runErr   = make(chan error)
@@ -68,7 +82,10 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 
 	go func() {
 		for {
-			gravity := time.After(g.level.gTime())
+			var gravity <-chan time.Time
+			if !g.debugMode {
+				gravity = time.After(g.level.gTime())
+			}
 			select {
 			case err := <-readErr:
 				runErr <- err
@@ -81,8 +98,9 @@ func (g *Game) RunDemo(done chan bool) (chan int, chan error) {
 					return
 				}
 			case in := <-input:
-				// TODO: print if in debug mode
-				//log.Printf("User input: %s", in)
+				if g.debugMode {
+					fmt.Printf("User input: %s\n", in)
+				}
 
 				if err := g.handleInput(in, endScore); err != nil {
 					runErr <- err

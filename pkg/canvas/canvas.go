@@ -17,21 +17,32 @@ type TermCanvas struct {
 	dest       *os.File
 	Background Color
 	cells      [][]*Cell
+	debugMode  bool
+}
+
+// Config represents the configuration params for a terminal canvas
+type Config struct {
+	Term       *os.File
+	Width      int
+	Height     int
+	Background Color
+	DebugMode  bool
 }
 
 // New returns a new canvas
-func New(dest *os.File, background Color, width, height int) *TermCanvas {
+func New(c Config) *TermCanvas {
 	var cells = [][]*Cell{}
 
-	for i := 0; i < height; i++ {
-		row := make([]*Cell, width)
+	for i := 0; i < c.Height; i++ {
+		row := make([]*Cell, c.Width)
 		cells = append(cells, row)
 	}
 
 	return &TermCanvas{
-		dest:       dest,
-		Background: background,
+		dest:       c.Term,
+		Background: c.Background,
 		cells:      cells,
+		debugMode:  c.DebugMode,
 	}
 }
 
@@ -43,9 +54,11 @@ func (c *TermCanvas) Init() error {
 
 // Render renders the current canvas
 func (c *TermCanvas) Render() error {
-	// clear the canvas
-	if err := c.setCursor(0, 0); err != nil {
-		return err
+	if !c.debugMode {
+		// reset cursor
+		if err := c.setCursor(0, 0); err != nil {
+			return err
+		}
 	}
 
 	for _, row := range c.cells {
