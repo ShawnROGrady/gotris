@@ -6,34 +6,22 @@ import (
 )
 
 type sPiece struct {
-	box             Box
-	orientation     *orientation
-	prevOrientation orientation
+	*tetriminoBase
 }
 
 func newSPiece(boardWidth, boardHeight int) Tetrimino {
 	spawnOrientation := spawn
 
 	piece := &sPiece{
-		orientation:     &spawnOrientation,
-		prevOrientation: spawnOrientation,
+		tetriminoBase: &tetriminoBase{
+			orientation:     &spawnOrientation,
+			prevOrientation: spawnOrientation,
+		},
 	}
 
 	box := startingBox(boardWidth, boardHeight, piece)
 	piece.box = box
 	return piece
-}
-
-func (s sPiece) pieceOrientation() orientation {
-	return *s.orientation
-}
-
-func (s *sPiece) previousOrientation() orientation {
-	return s.prevOrientation
-}
-
-func (s *sPiece) ContainingBox() Box {
-	return s.box
 }
 
 func (s *sPiece) YMax() Coordinates {
@@ -148,36 +136,6 @@ func (s *sPiece) Blocks() [][]*board.Block {
 		}
 	}
 	return nil
-}
-
-func (s *sPiece) MoveUp() {
-	s.box.TopLeft.Y++
-	s.box.BottomRight.Y++
-}
-
-func (s *sPiece) MoveDown() {
-	s.box.BottomRight.Y--
-	s.box.TopLeft.Y--
-}
-
-func (s *sPiece) MoveLeft() {
-	s.box.TopLeft.X--
-	s.box.BottomRight.X--
-}
-
-func (s *sPiece) MoveRight() {
-	s.box.BottomRight.X++
-	s.box.TopLeft.X++
-}
-
-func (s *sPiece) RotateClockwise() {
-	s.prevOrientation = *s.orientation
-	s.orientation.rotateClockwise()
-}
-
-func (s *sPiece) RotateCounter() {
-	s.prevOrientation = *s.orientation
-	s.orientation.rotateCounter()
 }
 
 func (s *sPiece) RotationTests() []RotationTest {

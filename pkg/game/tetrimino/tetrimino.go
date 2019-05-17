@@ -62,6 +62,54 @@ func NewSet(boardWidth, boardHeight int) []Tetrimino {
 	return pieceSet
 }
 
+type tetriminoBase struct {
+	box             Box
+	orientation     *orientation
+	prevOrientation orientation
+}
+
+func (t *tetriminoBase) pieceOrientation() orientation {
+	return *t.orientation
+}
+
+func (t *tetriminoBase) previousOrientation() orientation {
+	return t.prevOrientation
+}
+
+func (t *tetriminoBase) ContainingBox() Box {
+	return t.box
+}
+
+func (t *tetriminoBase) MoveUp() {
+	t.box.TopLeft.Y++
+	t.box.BottomRight.Y++
+}
+
+func (t *tetriminoBase) MoveDown() {
+	t.box.BottomRight.Y--
+	t.box.TopLeft.Y--
+}
+
+func (t *tetriminoBase) MoveLeft() {
+	t.box.TopLeft.X--
+	t.box.BottomRight.X--
+}
+
+func (t *tetriminoBase) MoveRight() {
+	t.box.BottomRight.X++
+	t.box.TopLeft.X++
+}
+
+func (t *tetriminoBase) RotateClockwise() {
+	t.prevOrientation = *t.orientation
+	t.orientation.rotateClockwise()
+}
+
+func (t *tetriminoBase) RotateCounter() {
+	t.prevOrientation = *t.orientation
+	t.orientation.rotateCounter()
+}
+
 // Box represents the box surrounding the current piece
 // this way we don't have to track the coordinates of each block
 type Box struct {
