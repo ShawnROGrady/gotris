@@ -16,6 +16,7 @@ func newJPiece(boardWidth, boardHeight int) Tetrimino {
 		tetriminoBase: &tetriminoBase{
 			orientation:     &spawnOrientation,
 			prevOrientation: spawnOrientation,
+			color:           canvas.Blue,
 		},
 	}
 
@@ -74,47 +75,47 @@ func (j *jPiece) Blocks() [][]*board.Block {
 		return [][]*board.Block{
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
 			},
-			[]*board.Block{nil, &board.Block{Color: canvas.Blue}, nil},
-			[]*board.Block{nil, &board.Block{Color: canvas.Blue}, nil},
+			[]*board.Block{nil, &board.Block{Color: j.color}, nil},
+			[]*board.Block{nil, &board.Block{Color: j.color}, nil},
 		}
 	case opposite:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
 			},
 			[]*board.Block{
 				nil,
 				nil,
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
 			},
 		}
 	case counterclockwise:
 		return [][]*board.Block{
-			[]*board.Block{nil, &board.Block{Color: canvas.Blue}, nil},
-			[]*board.Block{nil, &board.Block{Color: canvas.Blue}, nil},
+			[]*board.Block{nil, &board.Block{Color: j.color}, nil},
+			[]*board.Block{nil, &board.Block{Color: j.color}, nil},
 			[]*board.Block{
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
 				nil,
 			},
 		}
 	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
 				nil,
 				nil,
 			},
 			[]*board.Block{
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
-				&board.Block{Color: canvas.Blue},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
+				&board.Block{Color: j.color},
 			},
 			[]*board.Block{nil, nil, nil},
 		}

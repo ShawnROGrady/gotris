@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/ShawnROGrady/gotris/pkg/canvas"
 	"github.com/ShawnROGrady/gotris/pkg/game/board"
 )
 
@@ -66,6 +67,7 @@ type tetriminoBase struct {
 	box             Box
 	orientation     *orientation
 	prevOrientation orientation
+	color           canvas.Color
 }
 
 func (t *tetriminoBase) pieceOrientation() orientation {

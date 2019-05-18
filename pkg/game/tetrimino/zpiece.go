@@ -16,6 +16,7 @@ func newZPiece(boardWidth, boardHeight int) Tetrimino {
 		tetriminoBase: &tetriminoBase{
 			orientation:     &spawnOrientation,
 			prevOrientation: spawnOrientation,
+			color:           canvas.Red,
 		},
 	}
 
@@ -75,16 +76,16 @@ func (z *zPiece) Blocks() [][]*board.Block {
 			[]*board.Block{
 				nil,
 				nil,
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
 			},
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 			},
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
 				nil,
 			},
 		}
@@ -92,30 +93,30 @@ func (z *zPiece) Blocks() [][]*board.Block {
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 				nil,
 			},
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 			},
 		}
 	case counterclockwise:
 		return [][]*board.Block{
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
 				nil,
 			},
 			[]*board.Block{
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 				nil,
 			},
 			[]*board.Block{
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
 				nil,
 				nil,
 			},
@@ -123,14 +124,14 @@ func (z *zPiece) Blocks() [][]*board.Block {
 	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 				nil,
 			},
 			[]*board.Block{
 				nil,
-				&board.Block{Color: canvas.Red},
-				&board.Block{Color: canvas.Red},
+				&board.Block{Color: z.color},
+				&board.Block{Color: z.color},
 			},
 			[]*board.Block{nil, nil, nil},
 		}

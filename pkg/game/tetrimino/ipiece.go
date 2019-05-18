@@ -18,6 +18,7 @@ func newIPiece(boardWidth, boardHeight int) Tetrimino {
 		tetriminoBase: &tetriminoBase{
 			orientation:     &spawnOrientation,
 			prevOrientation: spawnOrientation,
+			color:           canvas.Cyan,
 		},
 	}
 
@@ -74,38 +75,38 @@ func (i *iPiece) Blocks() [][]*board.Block {
 	switch *i.orientation {
 	case clockwise:
 		return [][]*board.Block{
-			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: canvas.Cyan}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
 		}
 	case opposite:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
 			},
 			[]*board.Block{nil, nil, nil, nil},
 		}
 	case counterclockwise:
 		return [][]*board.Block{
-			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: canvas.Cyan}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
 		}
 	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
-				&board.Block{Color: canvas.Cyan},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
+				&board.Block{Color: i.color},
 			},
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{nil, nil, nil, nil},
