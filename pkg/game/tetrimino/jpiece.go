@@ -123,6 +123,18 @@ func (j *jPiece) Blocks() [][]*board.Block {
 	return nil
 }
 
+func (j *jPiece) SpawnGhost() Tetrimino {
+	copy := jPiece{
+		tetriminoBase: &tetriminoBase{
+			orientation:     j.orientation,
+			prevOrientation: j.prevOrientation,
+			color:           j.color, // TODO: make different color to distinguish
+			box:             j.box,
+		},
+	}
+	return &copy
+}
+
 func (j *jPiece) RotationTests() []RotationTest {
 	return defaultRotationTests(j, j.prevOrientation, j.pieceOrientation())
 }

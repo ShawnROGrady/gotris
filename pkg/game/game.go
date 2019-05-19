@@ -17,6 +17,7 @@ type Game struct {
 	canvas       canvas.Canvas
 	board        *board.Board
 	currentPiece tetrimino.Tetrimino
+	ghostPiece   tetrimino.Tetrimino
 	newPieceSet  func(width, height int) []tetrimino.Tetrimino
 	nextPieces   []tetrimino.Tetrimino
 	level        level
@@ -67,7 +68,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 	)
 
 	// add initial piece to canvas
-	g.addPieceToBoard()
+	g.addPieceToBoard(g.currentPiece)
 
 	g.canvas.UpdateCells(g.board.Cells())
 
@@ -116,9 +117,8 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 	return endScore, runErr
 }
 
-func (g *Game) addPieceToBoard() {
+func (g *Game) addPieceToBoard(piece tetrimino.Tetrimino) {
 	var (
-		piece  = g.currentPiece
 		topL   = piece.ContainingBox().TopLeft
 		blocks = piece.Blocks()
 	)
@@ -210,14 +210,14 @@ func (g *Game) pieceAtTop() bool {
 
 // current piece is at minimum vertical position
 // either at bottom or on top of another piece
-func (g *Game) pieceAtBottom() bool {
+func (g *Game) pieceAtBottom(piece tetrimino.Tetrimino) bool {
 	var (
-		topL        = g.currentPiece.ContainingBox().TopLeft
-		blocks      = g.currentPiece.Blocks()
+		topL        = piece.ContainingBox().TopLeft
+		blocks      = piece.Blocks()
 		pieceCoords = make(map[tetrimino.Coordinates]bool)
 	)
 
-	if g.currentPiece.YMin().Y == 0 {
+	if piece.YMin().Y == 0 {
 		return true
 	}
 
@@ -256,6 +256,9 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	topL := g.currentPiece.ContainingBox().TopLeft
 	blocks := g.currentPiece.Blocks()
 
+	// TODO: render the ghost piece
+	g.ghostPiece = g.findGhostPiece()
+
 	g.movePiece(input)
 	// new space already occupied
 	if (input == moveLeft || input == moveRight || input == moveUp) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
@@ -293,10 +296,10 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	topL = newTopL
 
 	// update cell at pieces new position
-	g.addPieceToBoard()
+	g.addPieceToBoard(g.currentPiece)
 
 	// generate new current piece if at bottom or on top of another piece
-	if g.pieceAtBottom() {
+	if g.pieceAtBottom(g.currentPiece) {
 		// check if any rows can be cleared
 		// TODO: add scoring
 		g.board.ClearFullRows()
@@ -314,8 +317,8 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		g.currentPiece = g.nextPiece()
 
 		// add new piece to canvas
-		g.addPieceToBoard()
-		if g.pieceAtBottom() {
+		g.addPieceToBoard(g.currentPiece)
+		if g.pieceAtBottom(g.currentPiece) {
 			// new piece already at bottom -> game over
 			g.canvas.UpdateCells(g.board.Cells())
 			if err := g.canvas.Render(); err != nil {
@@ -342,7 +345,12 @@ func (g *Game) movePiece(input userInput) {
 	case moveDown:
 		piece.MoveDown()
 	case moveUp:
-		piece.MoveUp()
+		if g.debugMode {
+			piece.MoveUp()
+		} else {
+			// hard drop
+			g.currentPiece = g.ghostPiece
+		}
 	case moveRight:
 		piece.MoveRight()
 	case rotateLeft:
@@ -384,4 +392,16 @@ func (g *Game) resolveRotation() bool {
 	}
 
 	return false
+}
+
+func (g *Game) findGhostPiece() tetrimino.Tetrimino {
+	var (
+		ghost = g.currentPiece.SpawnGhost()
+	)
+
+	for !g.pieceAtBottom(ghost) {
+		ghost.MoveDown()
+	}
+
+	return ghost
 }

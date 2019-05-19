@@ -29,6 +29,7 @@ type Tetrimino interface {
 	previousOrientation() orientation
 	// for resolving rotation conflicts
 	RotationTests() []RotationTest
+	SpawnGhost() Tetrimino
 }
 
 // Coordinates represent a blocks position on the board

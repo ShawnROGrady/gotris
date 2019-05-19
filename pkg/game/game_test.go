@@ -272,7 +272,7 @@ func TestAddPieceToBoard(t *testing.T) {
 		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
 
 		// add piece to board
-		g.addPieceToBoard()
+		g.addPieceToBoard(g.currentPiece)
 
 		// verify piece coordinates
 		if err := testPieceCoords(g.currentPiece, testName, test.expectedPosition); err != nil {
@@ -289,7 +289,7 @@ func TestAddPieceToBoard(t *testing.T) {
 		}
 
 		// verify piece not at bottom
-		if g.pieceAtBottom() {
+		if g.pieceAtBottom(g.currentPiece) {
 			t.Errorf("New piece unexpectedly at bottom of board for test case '%s'", testName)
 		}
 	}
@@ -565,6 +565,15 @@ var handleInputTests = map[string]struct {
 		expectAtTop:      true,
 		expectGameOver:   true,
 	},
+	"hard drop t piece until end": {
+		pieceConstructor: tetrimino.PieceConstructors[5],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		inputSequence:    append(fillInputSequence(moveUp, 10)),
+		expectAtTop:      true,
+		expectGameOver:   true,
+	},
 	"new j piece move down then all the right": {
 		pieceConstructor: tetrimino.PieceConstructors[1],
 		boardWidth:       10,
@@ -597,7 +606,7 @@ func TestHandleInput(t *testing.T) {
 	for testName, test := range handleInputTests {
 		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
 		// add piece to board
-		g.addPieceToBoard()
+		g.addPieceToBoard(g.currentPiece)
 
 		var (
 			endScore  = make(chan int)

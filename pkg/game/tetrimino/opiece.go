@@ -98,6 +98,18 @@ func (o *oPiece) Blocks() [][]*board.Block {
 	return nil
 }
 
+func (o *oPiece) SpawnGhost() Tetrimino {
+	copy := oPiece{
+		tetriminoBase: &tetriminoBase{
+			orientation:     o.orientation,
+			prevOrientation: o.prevOrientation,
+			color:           o.color, // TODO: make different color to distinguish
+			box:             o.box,
+		},
+	}
+	return &copy
+}
+
 func (o *oPiece) RotationTests() []RotationTest {
 	// oPiece can't be resolved in case of conflicts
 	return []RotationTest{}
