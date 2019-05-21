@@ -69,6 +69,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 
 	// add initial piece to canvas
 	g.addPieceToBoard(g.currentPiece)
+	g.ghostPiece = g.findGhostPiece()
 
 	g.canvas.UpdateCells(g.board.Cells())
 
@@ -256,15 +257,14 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	topL := g.currentPiece.ContainingBox().TopLeft
 	blocks := g.currentPiece.Blocks()
 
-	// TODO: render the ghost piece
-	g.ghostPiece = g.findGhostPiece()
-
 	g.movePiece(input)
+
 	// new space already occupied
-	if (input == moveLeft || input == moveRight || input == moveUp) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
+	if (input == moveLeft || input == moveRight || (input == moveUp && g.debugMode)) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
 		// move back to original spot
 		if opposite := input.opposite(); opposite != ignore {
 			g.movePiece(opposite)
+			g.ghostPiece = g.findGhostPiece()
 			return nil
 		}
 	}
@@ -273,12 +273,12 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			// move back to original spot
 			if opposite := input.opposite(); opposite != ignore {
 				g.movePiece(opposite)
+				g.ghostPiece = g.findGhostPiece()
 				return nil
 			}
 		}
 	}
-
-	newTopL := g.currentPiece.ContainingBox().TopLeft
+	g.ghostPiece = g.findGhostPiece()
 
 	// clear cell where piece was
 	for i, row := range blocks {
@@ -293,10 +293,9 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		}
 	}
 
-	topL = newTopL
-
 	// update cell at pieces new position
 	g.addPieceToBoard(g.currentPiece)
+	g.ghostPiece = g.findGhostPiece()
 
 	// generate new current piece if at bottom or on top of another piece
 	if g.pieceAtBottom(g.currentPiece) {
@@ -315,6 +314,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		}
 
 		g.currentPiece = g.nextPiece()
+		g.ghostPiece = g.findGhostPiece()
 
 		// add new piece to canvas
 		g.addPieceToBoard(g.currentPiece)
@@ -329,7 +329,8 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		}
 	}
 
-	g.canvas.UpdateCells(g.board.Cells())
+	newBoard := g.boardWithGhost()
+	g.canvas.UpdateCells(newBoard.Cells())
 
 	return g.canvas.Render()
 }
@@ -350,6 +351,7 @@ func (g *Game) movePiece(input userInput) {
 		} else {
 			// hard drop
 			g.currentPiece = g.ghostPiece
+			g.ghostPiece = nil
 		}
 	case moveRight:
 		piece.MoveRight()
@@ -404,4 +406,39 @@ func (g *Game) findGhostPiece() tetrimino.Tetrimino {
 	}
 
 	return ghost
+}
+
+// the board with the ghost piece included
+// should NOT modify actual game board since ghost piece is irrelevant to game logic
+func (g *Game) boardWithGhost() *board.Board {
+	var (
+		ghost     = g.ghostPiece
+		topL      = ghost.ContainingBox().TopLeft
+		blocks    = ghost.Blocks()
+		g2        = *g
+		newBoard  = *g2.board
+		newBlocks [][]*board.Block
+	)
+
+	for i := range g.board.Blocks {
+		row := []*board.Block{}
+		for j := range g.board.Blocks[i] {
+			row = append(row, g.board.Blocks[i][j])
+		}
+		newBlocks = append(newBlocks, row)
+	}
+	newBoard.Blocks = newBlocks
+
+	for i := range blocks {
+		for j, block := range blocks[i] {
+			if block == nil {
+				continue
+			}
+			x := topL.X + j
+			y := topL.Y - i
+
+			newBoard.Blocks[y][x] = block
+		}
+	}
+	return &newBoard
 }

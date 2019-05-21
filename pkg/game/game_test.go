@@ -607,6 +607,8 @@ func TestHandleInput(t *testing.T) {
 		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
 		// add piece to board
 		g.addPieceToBoard(g.currentPiece)
+		// have to initialize ghost piece
+		g.ghostPiece = g.findGhostPiece()
 
 		var (
 			endScore  = make(chan int)

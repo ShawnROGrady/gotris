@@ -1,6 +1,8 @@
 package board
 
-import "github.com/ShawnROGrady/gotris/pkg/canvas"
+import (
+	"github.com/ShawnROGrady/gotris/pkg/canvas"
+)
 
 // Board represents the game board
 type Board struct {
