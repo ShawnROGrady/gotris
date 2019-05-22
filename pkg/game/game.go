@@ -22,15 +22,17 @@ type Game struct {
 	nextPieces   []tetrimino.Tetrimino
 	level        level
 	debugMode    bool
+	disableGhost bool
 }
 
 // Config represents the configuration for a game
 type Config struct {
-	Term       *os.File
-	Width      int
-	Height     int
-	HiddenRows int
-	DebugMode  bool
+	Term         *os.File
+	Width        int
+	Height       int
+	HiddenRows   int
+	DebugMode    bool
+	DisableGhost bool
 }
 
 // New returns a new game with the specified specifications
@@ -56,6 +58,7 @@ func New(c Config) *Game {
 		nextPieces:   pieceSet,
 		level:        1,
 		debugMode:    c.DebugMode,
+		disableGhost: c.DisableGhost,
 	}
 }
 
@@ -329,8 +332,12 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		}
 	}
 
-	newBoard := g.boardWithGhost()
-	g.canvas.UpdateCells(newBoard.Cells())
+	if !g.disableGhost {
+		newBoard := g.boardWithGhost()
+		g.canvas.UpdateCells(newBoard.Cells())
+	} else {
+		g.canvas.UpdateCells(g.board.Cells())
+	}
 
 	return g.canvas.Render()
 }

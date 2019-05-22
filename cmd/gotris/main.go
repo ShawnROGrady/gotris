@@ -15,6 +15,7 @@ import (
 func main() {
 	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game")
 	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
+	disableGhost := flag.Bool("disable-ghost", false, "Don't show the 'ghost' of the current piece")
 	flag.Parse()
 
 	if colorTest != nil && *colorTest {
@@ -44,8 +45,9 @@ func main() {
 	conf := game.Config{
 		Term:  f,
 		Width: 10, Height: 20,
-		HiddenRows: 4,
-		DebugMode:  *debugMode,
+		HiddenRows:   4,
+		DebugMode:    *debugMode,
+		DisableGhost: *disableGhost,
 	}
 
 	g := game.New(conf)

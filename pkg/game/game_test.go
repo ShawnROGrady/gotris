@@ -44,6 +44,7 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 		nextPieces:   pieceSet,
 		canvas:       &testCanvas{cells: [][]*canvas.Cell{}},
 		newPieceSet:  pieceSetConstructor,
+		disableGhost: true, // TODO: consider making this configurable after testing boardWithGhost in isolation
 	}
 }
 
