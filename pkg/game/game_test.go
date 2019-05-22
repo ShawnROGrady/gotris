@@ -44,7 +44,7 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 		nextPieces:   pieceSet,
 		canvas:       &testCanvas{cells: [][]*canvas.Cell{}},
 		newPieceSet:  pieceSetConstructor,
-		disableGhost: true, // TODO: consider making this configurable after testing boardWithGhost in isolation
+		disableGhost: false, // enabling ghost to catch potential nil-pointer/index-oob exceptions
 	}
 }
 
@@ -371,14 +371,15 @@ func combineInputSequences(sequences ...[]userInput) []userInput {
 }
 
 var handleInputTests = map[string]struct {
-	pieceConstructor tetrimino.PieceConstructor
-	boardWidth       int
-	boardHeight      int
-	hiddenRows       int
-	inputSequence    []userInput
-	expectAtTop      bool
-	expectedPosition tetriminoTestCase
-	expectGameOver   bool
+	pieceConstructor      tetrimino.PieceConstructor
+	boardWidth            int
+	boardHeight           int
+	hiddenRows            int
+	inputSequence         []userInput
+	expectAtTop           bool
+	expectedPosition      tetriminoTestCase
+	expectedGhostPosition tetriminoTestCase
+	expectGameOver        bool
 }{
 	"move i piece to bottom once": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
@@ -406,6 +407,25 @@ var handleInputTests = map[string]struct {
 				x: 3,
 			},
 		},
+		// Ghost will be on top of previous piece
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       1,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       1,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 1,
+				x: 6,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 1,
+				x: 3,
+			},
+		},
 	},
 	"move i piece to bottom then horizontal conflict": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
@@ -425,6 +445,24 @@ var handleInputTests = map[string]struct {
 			},
 			expectedMinY: tetriminoCoordTest{
 				y: 2,
+				x: 5,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				x:       5,
+				ignoreY: true,
+			},
+			expectedMinX: tetriminoCoordTest{
+				x:       5,
+				ignoreY: true,
+			},
+		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 3,
+				x: 5,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y: 0,
 				x: 5,
 			},
 			expectedMaxX: tetriminoCoordTest{
@@ -466,6 +504,24 @@ var handleInputTests = map[string]struct {
 				x: 6,
 			},
 		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 0,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 0,
+				x: 6,
+			},
+		},
 	},
 	"left rotate i piece, move to right then right rotate": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
@@ -493,6 +549,24 @@ var handleInputTests = map[string]struct {
 			},
 			expectedMinX: tetriminoCoordTest{
 				y: 22,
+				x: 6,
+			},
+		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 0,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 0,
 				x: 6,
 			},
 		},
@@ -526,6 +600,24 @@ var handleInputTests = map[string]struct {
 				x: 6,
 			},
 		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 0,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 0,
+				x: 6,
+			},
+		},
 	},
 	"right rotate i piece, move to right then left rotate": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
@@ -553,6 +645,24 @@ var handleInputTests = map[string]struct {
 			},
 			expectedMinX: tetriminoCoordTest{
 				y: 22,
+				x: 6,
+			},
+		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 0,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				y: 0,
 				x: 6,
 			},
 		},
@@ -593,6 +703,24 @@ var handleInputTests = map[string]struct {
 			},
 			expectedMaxX: tetriminoCoordTest{
 				y: 21,
+				x: 9,
+			},
+			expectedMinX: tetriminoCoordTest{
+				ignoreY: true,
+				x:       7,
+			},
+		},
+		expectedGhostPosition: tetriminoTestCase{
+			expectedMaxY: tetriminoCoordTest{
+				y: 1,
+				x: 7,
+			},
+			expectedMinY: tetriminoCoordTest{
+				y:       0,
+				ignoreX: true,
+			},
+			expectedMaxX: tetriminoCoordTest{
+				y: 0,
 				x: 9,
 			},
 			expectedMinX: tetriminoCoordTest{
@@ -643,9 +771,13 @@ func TestHandleInput(t *testing.T) {
 			if test.expectGameOver {
 				t.Fatalf("Game unexpectedly not over for test case '%s' (current piece maxY = %v, minY = %v)", testName, g.currentPiece.YMax(), g.currentPiece.YMin())
 			}
-			// verify piece coordinates
+			// verify current piece coordinates
 			if err := testPieceCoords(g.currentPiece, testName, test.expectedPosition); err != nil {
-				t.Errorf("%s", err)
+				t.Errorf("Current Piece: %s", err)
+			}
+			// verify ghost piece coordinates
+			if err := testPieceCoords(g.ghostPiece, testName, test.expectedGhostPosition); err != nil {
+				t.Errorf("Ghost Piece: %s", err)
 			}
 
 			// check if piece at top
@@ -653,7 +785,6 @@ func TestHandleInput(t *testing.T) {
 				t.Errorf("Piece unexpectedly not at top for test case '%s' (maxY = %v, minY = %v)", testName, g.currentPiece.YMax(), g.currentPiece.YMin())
 			}
 		}
-
 	}
 }
 
@@ -682,5 +813,113 @@ func TestNextPiece(t *testing.T) {
 	// should be 7 since this time the next piece came from the previous slice
 	if len(g.nextPieces) != 7 {
 		t.Errorf("Unexpected number of next pieces after going through initial nextPieces slice (expected = %d, actual = %d)", 7, len(g.nextPieces))
+	}
+}
+
+var boardWithGhostTests = map[string]struct {
+	pieceConstructor tetrimino.PieceConstructor
+	boardWidth       int
+	boardHeight      int
+	hiddenRows       int
+	inputSequence    []userInput
+}{
+	"new i piece no moves": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+	},
+}
+
+func TestBoardWithGhost(t *testing.T) {
+	for testName, test := range boardWithGhostTests {
+		g := newTestGame(test.boardWidth, test.boardHeight, test.hiddenRows, testNewSet(test.pieceConstructor))
+		// add piece to board
+		g.addPieceToBoard(g.currentPiece)
+		// have to initialize ghost piece
+		g.ghostPiece = g.findGhostPiece()
+
+		var (
+			endScore = make(chan int)
+		)
+
+		for _, input := range test.inputSequence {
+			if err := g.handleInput(input, endScore); err != nil {
+				t.Fatalf("Unexpected error handling input for test case '%s'", testName)
+			}
+		}
+
+		newBoard := g.boardWithGhost()
+		// check that board's height hasn't changed
+		if len(newBoard.Blocks) != len(g.board.Blocks) {
+			t.Fatalf("Board height modified by adding ghost piece for test case '%s' (original=%d, new=%d)", testName, len(g.board.Blocks), len(newBoard.Blocks))
+		}
+
+		diffBlocks := [][]*board.Block{}
+
+		// determine the blocks that are different
+		for i := range g.board.Blocks {
+			row := g.board.Blocks[i]
+			newRow := newBoard.Blocks[i]
+			// make sure width hasn't changed
+			if len(row) != len(newRow) {
+				t.Fatalf("Board width (row %d) modified by adding ghost piece for test case '%s' (original=%d, new=%d)", i, testName, len(row), len(newRow))
+			}
+			diffRow := make([]*board.Block, len(row))
+			for j := range row {
+				if row[j] == nil && newRow[j] == nil {
+					diffRow[j] = nil
+					continue
+				}
+				if row[j] == nil && newRow[j] != nil {
+					diffRow[j] = newRow[j]
+					continue
+				}
+				if row[j] != nil && newRow[j] == nil {
+					diffRow[j] = row[j]
+					continue
+				}
+
+				if *row[j] != *newRow[j] {
+					diffRow[j] = row[j]
+				} else {
+					diffRow[j] = nil
+				}
+			}
+			diffBlocks = append(diffBlocks, diffRow)
+		}
+
+		// create a brand new board and add the ghost piece
+		board2 := board.New(
+			canvas.White,
+			test.boardWidth, test.boardHeight,
+			test.hiddenRows,
+		)
+		g.board = board2
+		g.addPieceToBoard(g.ghostPiece)
+
+		// we expect the difference between the board w/ and w/o the ghost to be
+		// the same as a new board with just the ghost piece
+		for i := range board2.Blocks {
+			diffRow := diffBlocks[i]
+			newRow := board2.Blocks[i]
+			for j := range newRow {
+				if diffRow[j] == nil && newRow[j] == nil {
+					continue
+				}
+				if diffRow[j] == nil && newRow[j] != nil {
+					t.Errorf("Unexpected block at board.Blocks[%d][%d] for test case '%s' (expected = %v, actual = %v)", i, j, testName, newRow[j], diffRow[j])
+					continue
+				}
+				if diffRow[j] != nil && newRow[j] == nil {
+					t.Errorf("Unexpected block at board.Blocks[%d][%d] for test case '%s' (expected = %v, actual = %v)", i, j, testName, newRow[j], diffRow[j])
+					continue
+				}
+
+				if *diffRow[j] != *newRow[j] {
+					t.Errorf("Unexpected block at board.Blocks[%d][%d] for test case '%s' (expected = %v, actual = %v)", i, j, testName, newRow[j], diffRow[j])
+				}
+			}
+		}
 	}
 }
