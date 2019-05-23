@@ -28,6 +28,16 @@ const (
 	BrightCyan
 	BrightWhite
 
+	// background colors
+	BackgroundBlack
+	BackgroundRed
+	BackgroundGreen
+	BackgroundYellow
+	BackgroundBlue
+	BackgroundMagenta
+	BackgroundCyan
+	BackgroundWhite
+
 	// other colors
 	Orange Color = 208
 )
@@ -36,10 +46,12 @@ func (c Color) String() string {
 	switch c {
 	case BrightBlack, BrightRed, BrightGreen, BrightYellow, BrightBlue, BrightMagenta, BrightCyan, BrightWhite:
 		return fmt.Sprintf("\u001b[%d;1m", c-8)
-	case Orange:
-		return fmt.Sprintf("\u001b[38;5;%dm", c)
-	default:
+	case BackgroundBlack, BackgroundRed, BackgroundGreen, BackgroundYellow, BackgroundBlue, BackgroundMagenta, BackgroundCyan, BackgroundWhite:
+		return fmt.Sprintf("\u001b[%dm", c-6)
+	case Reset, Black, Red, Green, Yellow, Blue, Magenta, Cyan, White:
 		return fmt.Sprintf("\u001b[%dm", c)
+	default:
+		return fmt.Sprintf("\u001b[38;5;%dm", c)
 	}
 }
 
@@ -71,4 +83,27 @@ func (c Color) description() string {
 // decorate formats the provided input so it can be printed in color
 func (c Color) decorate(input string) string {
 	return fmt.Sprintf("%s%s", c, input)
+}
+
+func (c Color) background() Color {
+	switch c {
+	case Black:
+		return BackgroundBlack
+	case Red:
+		return BackgroundRed
+	case Green:
+		return BackgroundGreen
+	case Yellow:
+		return BackgroundYellow
+	case Blue:
+		return BackgroundBlue
+	case Magenta:
+		return BackgroundMagenta
+	case Cyan:
+		return BackgroundCyan
+	case White:
+		return BackgroundWhite
+	default:
+		return c
+	}
 }

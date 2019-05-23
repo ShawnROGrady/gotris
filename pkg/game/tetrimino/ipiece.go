@@ -75,38 +75,38 @@ func (i *iPiece) Blocks() [][]*board.Block {
 	switch *i.orientation {
 	case clockwise:
 		return [][]*board.Block{
-			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
-			[]*board.Block{nil, nil, &board.Block{Color: i.color}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil},
+			[]*board.Block{nil, nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil},
 		}
 	case opposite:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
 			},
 			[]*board.Block{nil, nil, nil, nil},
 		}
 	case counterclockwise:
 		return [][]*board.Block{
-			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
-			[]*board.Block{nil, &board.Block{Color: i.color}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil, nil},
+			[]*board.Block{nil, &board.Block{Color: i.color, Transparent: i.isGhost}, nil, nil},
 		}
 	case spawn:
 		return [][]*board.Block{
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
-				&board.Block{Color: i.color},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
+				&board.Block{Color: i.color, Transparent: i.isGhost},
 			},
 			[]*board.Block{nil, nil, nil, nil},
 			[]*board.Block{nil, nil, nil, nil},
@@ -123,6 +123,7 @@ func (i *iPiece) SpawnGhost() Tetrimino {
 			prevOrientation: i.prevOrientation,
 			color:           i.color, // TODO: make different color to distinguish
 			box:             i.box,
+			isGhost:         true,
 		},
 	}
 	return &copy

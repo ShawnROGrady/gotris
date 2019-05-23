@@ -29,12 +29,14 @@ func New(background canvas.Color, width, height, hiddenRows int) *Board {
 
 // Block represents a single block on the board
 type Block struct {
-	Color canvas.Color
+	Color       canvas.Color
+	Transparent bool
 }
 
 func (b *Block) cell() *canvas.Cell {
 	return &canvas.Cell{
-		Background: b.Color,
+		Color:       b.Color,
+		Transparent: b.Transparent,
 	}
 }
 
@@ -49,17 +51,19 @@ func (b *Board) Cells() [][]*canvas.Cell {
 			if block == nil {
 				row = append(row, []*canvas.Cell{
 					{
-						Background: b.background,
+						Color: b.background,
 					},
 					{
-						Background: b.background,
+						Color: b.background,
 					},
 				}...)
 				continue
 			}
+			blockCell := block.cell()
+			blockCell.Background = b.background
 			row = append(row, []*canvas.Cell{
-				block.cell(),
-				block.cell(),
+				blockCell,
+				blockCell,
 			}...)
 		}
 		cells = append(cells, row)

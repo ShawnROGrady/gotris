@@ -69,6 +69,7 @@ type tetriminoBase struct {
 	orientation     *orientation
 	prevOrientation orientation
 	color           canvas.Color
+	isGhost         bool
 }
 
 func (t *tetriminoBase) pieceOrientation() orientation {

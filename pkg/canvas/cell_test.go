@@ -2,71 +2,99 @@ package canvas
 
 import "testing"
 
-var cellColorTests = map[Color]struct {
+var cellColorTests = map[string]struct {
+	Color          Color
+	Background     Color
+	Transparent    bool
 	ExpectedString string
 }{
-	Black: {
+	"Black solid": {
+		Color:          Black,
 		ExpectedString: "\u001b[30m\u2588",
 	},
-	Red: {
+	"Red solid": {
+		Color:          Red,
 		ExpectedString: "\u001b[31m\u2588",
 	},
-	Green: {
+	"Green solid": {
+		Color:          Green,
 		ExpectedString: "\u001b[32m\u2588",
 	},
-	Yellow: {
+	"Yellow solid": {
+		Color:          Yellow,
 		ExpectedString: "\u001b[33m\u2588",
 	},
-	Blue: {
+	"Blue solid": {
+		Color:          Blue,
 		ExpectedString: "\u001b[34m\u2588",
 	},
-	Magenta: {
+	"Magenta solid": {
+		Color:          Magenta,
 		ExpectedString: "\u001b[35m\u2588",
 	},
-	Cyan: {
+	"Cyan solid": {
+		Color:          Cyan,
 		ExpectedString: "\u001b[36m\u2588",
 	},
-	White: {
+	"White solid": {
+		Color:          White,
 		ExpectedString: "\u001b[37m\u2588",
 	},
-	BrightBlack: {
+	"BrightBlack solid": {
+		Color:          BrightBlack,
 		ExpectedString: "\u001b[30;1m\u2588",
 	},
-	BrightRed: {
+	"BrightRed solid": {
+		Color:          BrightRed,
 		ExpectedString: "\u001b[31;1m\u2588",
 	},
-	BrightGreen: {
+	"BrightGreen solid": {
+		Color:          BrightGreen,
 		ExpectedString: "\u001b[32;1m\u2588",
 	},
-	BrightYellow: {
+	"BrightYellow solid": {
+		Color:          BrightYellow,
 		ExpectedString: "\u001b[33;1m\u2588",
 	},
-	BrightBlue: {
+	"BrightBlue solid": {
+		Color:          BrightBlue,
 		ExpectedString: "\u001b[34;1m\u2588",
 	},
-	BrightMagenta: {
+	"BrightMagenta solid": {
+		Color:          BrightMagenta,
 		ExpectedString: "\u001b[35;1m\u2588",
 	},
-	BrightCyan: {
+	"BrightCyan solid": {
+		Color:          BrightCyan,
 		ExpectedString: "\u001b[36;1m\u2588",
 	},
-	BrightWhite: {
+	"BrightWhite solid": {
+		Color:          BrightWhite,
 		ExpectedString: "\u001b[37;1m\u2588",
 	},
-	Orange: {
+	"Orange solid": {
+		Color:          Orange,
 		ExpectedString: "\u001b[38;5;208m\u2588",
+	},
+	"Cyan transparent white background": {
+		Color:          Cyan,
+		Transparent:    true,
+		Background:     White,
+		ExpectedString: "\u001b[47m\u001b[36m\u2592",
 	},
 }
 
 func TestCellColors(t *testing.T) {
-	for color, test := range cellColorTests {
+	for testName, test := range cellColorTests {
 		cell := &Cell{
-			Background: color,
+			Color:       test.Color,
+			Transparent: test.Transparent,
+			Background:  test.Background,
 		}
 
 		cellString := cell.String()
 		if cellString != test.ExpectedString {
-			t.Errorf("Unexpected string for cell with %s background [expected=%s, actual=%s", color.description(), test.ExpectedString, cellString)
+			t.Errorf("Unexpected string for cell with %s background [expected=%s, actual=%s", testName, test.ExpectedString, cellString)
 		}
 	}
 }
