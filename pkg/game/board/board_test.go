@@ -108,8 +108,8 @@ var clearRowsTests = map[string]struct {
 			},
 			[]*canvas.Cell{
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
 			},
 		},
@@ -164,8 +164,8 @@ var clearRowsTests = map[string]struct {
 			},
 			[]*canvas.Cell{
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
 			},
 		},
@@ -276,8 +276,8 @@ var clearRowsTests = map[string]struct {
 			},
 			[]*canvas.Cell{
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
 			},
 		},
@@ -329,15 +329,15 @@ var clearRowsTests = map[string]struct {
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
 			},
 			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 			},
 			[]*canvas.Cell{
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
-				&canvas.Cell{Color: canvas.Blue}, &canvas.Cell{Color: canvas.Blue},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
 				&canvas.Cell{Color: canvas.Green}, &canvas.Cell{Color: canvas.Green},
 			},
 		},
@@ -440,7 +440,7 @@ func TestClearFullRows(t *testing.T) {
 				}
 
 				if *cells[i][j] != *test.expectedNewCells[i][j] {
-					t.Fatalf("unexpected new cells[%d][%d] for test case '%s' [expected = %v, actual = %v]", i, j, testName, *test.expectedNewCells[i][j], *cells[i][j])
+					t.Fatalf("unexpected new cells[%d][%d] for test case '%s' [expected = %#v, actual = %#v]", i, j, testName, *test.expectedNewCells[i][j], *cells[i][j])
 					return
 				}
 			}
