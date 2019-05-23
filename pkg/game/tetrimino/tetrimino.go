@@ -30,6 +30,7 @@ type Tetrimino interface {
 	// for resolving rotation conflicts
 	RotationTests() []RotationTest
 	SpawnGhost() Tetrimino
+	ToggleGhost()
 }
 
 // Coordinates represent a blocks position on the board
@@ -112,6 +113,10 @@ func (t *tetriminoBase) RotateClockwise() {
 func (t *tetriminoBase) RotateCounter() {
 	t.prevOrientation = *t.orientation
 	t.orientation.rotateCounter()
+}
+
+func (t *tetriminoBase) ToggleGhost() {
+	t.isGhost = !t.isGhost
 }
 
 // Box represents the box surrounding the current piece

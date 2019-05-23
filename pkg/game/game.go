@@ -357,6 +357,7 @@ func (g *Game) movePiece(input userInput) {
 			piece.MoveUp()
 		} else {
 			// hard drop
+			g.ghostPiece.ToggleGhost()
 			g.currentPiece = g.ghostPiece
 			g.ghostPiece = nil
 		}
