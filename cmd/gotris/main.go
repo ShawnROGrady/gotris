@@ -16,11 +16,17 @@ func main() {
 	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game")
 	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
 	disableGhost := flag.Bool("disable-ghost", false, "Don't show the 'ghost' of the current piece")
+	useArrowKeys := flag.Bool("arrow-keys", false, "Use arrow keys control scheme instead of default home-row scheme")
 	flag.Parse()
 
 	if colorTest != nil && *colorTest {
 		printPotentialColors()
 		os.Exit(0)
+	}
+
+	scheme := game.HomeRow
+	if useArrowKeys != nil && *useArrowKeys {
+		scheme = game.ArrowKeys
 	}
 
 	// set min number of characters for reading to 1
@@ -45,9 +51,10 @@ func main() {
 	conf := game.Config{
 		Term:  f,
 		Width: 10, Height: 20,
-		HiddenRows:   4,
-		DebugMode:    *debugMode,
-		DisableGhost: *disableGhost,
+		HiddenRows:    4,
+		DebugMode:     *debugMode,
+		DisableGhost:  *disableGhost,
+		ControlScheme: scheme,
 	}
 
 	g := game.New(conf)

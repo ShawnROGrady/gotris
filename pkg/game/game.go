@@ -13,26 +13,28 @@ import (
 
 // Game is responsible for handling the game state
 type Game struct {
-	inputreader  inputreader.InputReader
-	canvas       canvas.Canvas
-	board        *board.Board
-	currentPiece tetrimino.Tetrimino
-	ghostPiece   tetrimino.Tetrimino
-	newPieceSet  func(width, height int) []tetrimino.Tetrimino
-	nextPieces   []tetrimino.Tetrimino
-	level        level
-	debugMode    bool
-	disableGhost bool
+	inputreader   inputreader.InputReader
+	canvas        canvas.Canvas
+	board         *board.Board
+	currentPiece  tetrimino.Tetrimino
+	ghostPiece    tetrimino.Tetrimino
+	newPieceSet   func(width, height int) []tetrimino.Tetrimino
+	nextPieces    []tetrimino.Tetrimino
+	level         level
+	debugMode     bool
+	disableGhost  bool
+	controlScheme ControlScheme
 }
 
 // Config represents the configuration for a game
 type Config struct {
-	Term         *os.File
-	Width        int
-	Height       int
-	HiddenRows   int
-	DebugMode    bool
-	DisableGhost bool
+	Term          *os.File
+	Width         int
+	Height        int
+	HiddenRows    int
+	DebugMode     bool
+	DisableGhost  bool
+	ControlScheme ControlScheme
 }
 
 // New returns a new game with the specified specifications
@@ -53,22 +55,28 @@ func New(c Config) *Game {
 			c.Width, c.Height,
 			c.HiddenRows,
 		),
-		currentPiece: piece,
-		newPieceSet:  tetrimino.NewSet,
-		nextPieces:   pieceSet,
-		level:        1,
-		debugMode:    c.DebugMode,
-		disableGhost: c.DisableGhost,
+		currentPiece:  piece,
+		newPieceSet:   tetrimino.NewSet,
+		nextPieces:    pieceSet,
+		level:         1,
+		debugMode:     c.DebugMode,
+		disableGhost:  c.DisableGhost,
+		controlScheme: c.ControlScheme,
 	}
 }
 
 // Run takes care of the core game functionality
 func (g *Game) Run(done chan bool) (chan int, chan error) {
-	input, readErr := translateInput(done, g.inputreader)
 	var (
 		runErr   = make(chan error)
 		endScore = make(chan int)
 	)
+	controlMap, err := g.controlScheme.controlMap()
+	if err != nil {
+		runErr <- err
+		return endScore, runErr
+	}
+	input, readErr := translateInput(done, g.inputreader, controlMap)
 
 	// add initial piece to canvas
 	g.addPieceToBoard(g.currentPiece)

@@ -1,6 +1,8 @@
 package game
 
-import "github.com/ShawnROGrady/gotris/pkg/inputreader"
+import (
+	"github.com/ShawnROGrady/gotris/pkg/inputreader"
+)
 
 type userInput int
 
@@ -44,20 +46,10 @@ func (u userInput) opposite() userInput {
 	return ignore
 }
 
-func translateInput(done chan bool, inputreader inputreader.InputReader) (chan userInput, chan error) {
+func translateInput(done chan bool, inputreader inputreader.InputReader, controlMap map[string]userInput) (chan userInput, chan error) {
 	rawInput, readErr := inputreader.ReadInput(done)
 
 	translatedInput := make(chan userInput)
-
-	// TODO allow this to be configurable
-	controlMap := map[string]userInput{
-		"h": moveLeft,
-		"j": moveDown,
-		"k": moveUp,
-		"l": moveRight,
-		"a": rotateLeft,
-		"d": rotateRight,
-	}
 
 	go func() {
 		for {
