@@ -416,17 +416,42 @@ func (g *Game) findGhostPiece() tetrimino.Tetrimino {
 	return ghost
 }
 
+func pieceCoords(piece tetrimino.Tetrimino, boardBlocks [][]*board.Block) map[tetrimino.Coordinates]bool {
+	var (
+		topL        = piece.ContainingBox().TopLeft
+		blocks      = piece.Blocks()
+		pieceCoords = make(map[tetrimino.Coordinates]bool)
+	)
+
+	for i, row := range blocks {
+		for j, block := range row {
+			if block == nil {
+				continue
+			}
+			x := topL.X + j
+			y := topL.Y - i
+			pieceCoords[tetrimino.Coordinates{
+				X: x,
+				Y: y,
+			}] = true
+		}
+	}
+	return pieceCoords
+}
+
 // the board with the ghost piece included
 // should NOT modify actual game board since ghost piece is irrelevant to game logic
 func (g *Game) boardWithGhost() *board.Board {
 	var (
-		ghost     = g.ghostPiece
-		topL      = ghost.ContainingBox().TopLeft
-		blocks    = ghost.Blocks()
-		g2        = *g
-		newBoard  = *g2.board
-		newBlocks [][]*board.Block
+		ghost       = g.ghostPiece
+		ghostTopL   = ghost.ContainingBox().TopLeft
+		ghostBlocks = ghost.Blocks()
+		g2          = *g
+		newBoard    = *g2.board
+		newBlocks   [][]*board.Block
 	)
+
+	currentPieceCoords := pieceCoords(g.currentPiece, g.board.Blocks)
 
 	for i := range g.board.Blocks {
 		row := []*board.Block{}
@@ -437,14 +462,18 @@ func (g *Game) boardWithGhost() *board.Board {
 	}
 	newBoard.Blocks = newBlocks
 
-	for i := range blocks {
-		for j, block := range blocks[i] {
+	for i := range ghostBlocks {
+		for j, block := range ghostBlocks[i] {
 			if block == nil {
 				continue
 			}
-			x := topL.X + j
-			y := topL.Y - i
+			x := ghostTopL.X + j
+			y := ghostTopL.Y - i
 
+			if currentPieceCoords[tetrimino.Coordinates{X: x, Y: y}] {
+				// active piece should be displayed in case of conflict with ghost
+				continue
+			}
 			newBoard.Blocks[y][x] = block
 		}
 	}

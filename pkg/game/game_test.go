@@ -822,12 +822,37 @@ var boardWithGhostTests = map[string]struct {
 	boardHeight      int
 	hiddenRows       int
 	inputSequence    []userInput
+	overrideDiff     func(row, column int, block *board.Block) *board.Block
 }{
 	"new i piece no moves": {
 		pieceConstructor: tetrimino.PieceConstructors[0],
 		boardWidth:       10,
 		boardHeight:      20,
 		hiddenRows:       4,
+		overrideDiff:     func(row, column int, block *board.Block) *board.Block { return block },
+	},
+	// the active and ghost piece will conflict on the board
+	"new i piece rotate left then down 17": {
+		pieceConstructor: tetrimino.PieceConstructors[0],
+		boardWidth:       10,
+		boardHeight:      20,
+		hiddenRows:       4,
+		inputSequence: combineInputSequences(
+			[]userInput{rotateLeft}, fillInputSequence(moveDown, 17),
+		),
+		overrideDiff: func(row, column int, block *board.Block) *board.Block {
+			// the third and fourth blocks in the fourth column will conflict
+			if column == 4 {
+				if row == 2 || row == 3 {
+					// replace with ghost piece
+					return &board.Block{
+						Color:       canvas.Cyan,
+						Transparent: true,
+					}
+				}
+			}
+			return block
+		},
 	},
 }
 
@@ -904,6 +929,8 @@ func TestBoardWithGhost(t *testing.T) {
 			diffRow := diffBlocks[i]
 			newRow := board2.Blocks[i]
 			for j := range newRow {
+				diffRow[j] = test.overrideDiff(i, j, diffRow[j])
+
 				if diffRow[j] == nil && newRow[j] == nil {
 					continue
 				}
@@ -917,7 +944,7 @@ func TestBoardWithGhost(t *testing.T) {
 				}
 
 				if *diffRow[j] != *newRow[j] {
-					t.Errorf("Unexpected block at board.Blocks[%d][%d] for test case '%s' (expected = %v, actual = %v)", i, j, testName, newRow[j], diffRow[j])
+					t.Errorf("Unexpected block at board.Blocks[%d][%d] for test case '%s' (expected = %+v, actual = %+v)", i, j, testName, *newRow[j], *diffRow[j])
 				}
 			}
 		}
