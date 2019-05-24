@@ -83,7 +83,9 @@ func (c *TermCanvas) Render() error {
 		}
 	}
 
-	return nil
+	// clear any potential formatting
+	_, err := c.dest.Write([]byte(Reset.String()))
+	return err
 }
 
 // UpdateCells updates the cells to be rendered
