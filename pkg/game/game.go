@@ -71,11 +71,8 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 		runErr   = make(chan error)
 		endScore = make(chan int)
 	)
-	controlMap, err := g.controlScheme.controlMap()
-	if err != nil {
-		runErr <- err
-		return endScore, runErr
-	}
+	controlMap := g.controlScheme.controlMap()
+
 	input, readErr := translateInput(done, g.inputreader, controlMap)
 
 	// add initial piece to canvas

@@ -24,9 +24,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	scheme := game.HomeRow
+	var scheme game.ControlScheme
 	if useArrowKeys != nil && *useArrowKeys {
-		scheme = game.ArrowKeys
+		scheme = game.ArrowKeys{}
+	} else {
+		scheme = game.HomeRow{}
 	}
 
 	// set min number of characters for reading to 1
