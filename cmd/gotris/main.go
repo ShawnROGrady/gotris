@@ -14,10 +14,11 @@ import (
 
 func main() {
 	schemeArgs := &stringArrayFlag{}
-	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game")
+	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game then exit")
 	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
 	disableGhost := flag.Bool("disable-ghost", false, "Don't show the 'ghost' of the current piece")
 	flag.Var(schemeArgs, "scheme", fmt.Sprintf("The control scheme to use, multiple may be specified (default: %s)", game.HomeRowName))
+	describeScheme := flag.Bool("describe-scheme", false, "Prints the specified control scheme then exits. If none specified then all available schemes are described")
 
 	flag.Parse()
 
@@ -28,10 +29,6 @@ func main() {
 
 	// set the specified control scheme
 	var scheme game.ControlSchemes
-	if schemeArgs == nil || len(*schemeArgs) == 0 {
-		// default to home row if no scheme provided
-		scheme = game.ControlSchemes{game.HomeRow()}
-	}
 	for _, arg := range *schemeArgs {
 		s, err := game.SchemeFromName(arg)
 		if err != nil {
@@ -39,6 +36,15 @@ func main() {
 			os.Exit(1)
 		}
 		scheme = append(scheme, s)
+	}
+	if describeScheme != nil && *describeScheme {
+		describeSchemes(scheme)
+		os.Exit(0)
+	}
+
+	if scheme == nil {
+		// default to home row if no scheme provided
+		scheme = game.ControlSchemes{game.HomeRow()}
 	}
 
 	// set min number of characters for reading to 1

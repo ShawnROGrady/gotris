@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -31,6 +32,11 @@ func SchemeFromName(name string) (ControlScheme, error) {
 	}
 }
 
+// AvailableSchemes represents the set of available control schemes
+func AvailableSchemes() []ControlScheme {
+	return []ControlScheme{HomeRow(), ArrowKeys()}
+}
+
 // this approach allows us to more easily change the actual value based on GOOS
 type key struct {
 	name  string
@@ -49,14 +55,14 @@ func upArrow() key {
 
 func downArrow() key {
 	return key{
-		name:  "\u2192",
+		name:  "\u2193",
 		value: "\u001b[B",
 	}
 }
 
 func rightArrow() key {
 	return key{
-		name:  "\u2193",
+		name:  "\u2192",
 		value: "\u001b[C",
 	}
 }
@@ -177,9 +183,20 @@ func schemeDescription(c ControlScheme) string {
 	var (
 		inputMap            = inputMap(c)
 		mappingDescriptions = []string{}
+		inputs              = []userInput{}
 	)
 
-	for input, mappings := range inputMap {
+	for input := range inputMap {
+		inputs = append(inputs, input)
+	}
+
+	// sort to allow consistent ordering
+	sort.Slice(inputs, func(i, j int) bool {
+		return inputs[i] < inputs[j]
+	})
+
+	for _, input := range inputs {
+		mappings := inputMap[input]
 		mappingDescriptions = append(
 			mappingDescriptions,
 			fmt.Sprintf("%s: %s", input, strings.Join(mappings, ", ")),
@@ -189,18 +206,18 @@ func schemeDescription(c ControlScheme) string {
 	return strings.Join(mappingDescriptions, "\n")
 }
 
-func inputMap(c ControlScheme) map[string][]string {
+func inputMap(c ControlScheme) map[userInput][]string {
 	var (
 		keyMap   = c.keyMap()
-		mappings = make(map[string][]string)
+		mappings = make(map[userInput][]string)
 	)
 
 	for key, input := range keyMap {
-		if synonyms, ok := mappings[input.String()]; ok {
+		if synonyms, ok := mappings[input]; ok {
 			synonyms = append(synonyms, key.displayKey())
-			mappings[input.String()] = synonyms
+			mappings[input] = synonyms
 		} else {
-			mappings[input.String()] = []string{key.displayKey()}
+			mappings[input] = []string{key.displayKey()}
 		}
 	}
 

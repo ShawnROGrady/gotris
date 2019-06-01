@@ -8,9 +8,9 @@ type userInput int
 
 const (
 	moveLeft userInput = iota
+	moveRight
 	moveDown
 	moveUp
-	moveRight
 	rotateLeft
 	rotateRight
 	ignore
