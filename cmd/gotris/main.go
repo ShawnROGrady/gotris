@@ -13,10 +13,12 @@ import (
 )
 
 func main() {
+	schemeArgs := &stringArrayFlag{}
 	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game")
 	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
 	disableGhost := flag.Bool("disable-ghost", false, "Don't show the 'ghost' of the current piece")
-	useArrowKeys := flag.Bool("arrow-keys", false, "Use arrow keys control scheme instead of default home-row scheme")
+	flag.Var(schemeArgs, "scheme", fmt.Sprintf("The control scheme to use, multiple may be specified (default: %s)", game.HomeRowName))
+
 	flag.Parse()
 
 	if colorTest != nil && *colorTest {
@@ -24,11 +26,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	var scheme game.ControlScheme
-	if useArrowKeys != nil && *useArrowKeys {
-		scheme = game.ArrowKeys{}
-	} else {
-		scheme = game.HomeRow{}
+	// set the specified control scheme
+	var scheme game.ControlSchemes
+	if schemeArgs == nil || len(*schemeArgs) == 0 {
+		// default to home row if no scheme provided
+		scheme = game.ControlSchemes{game.HomeRow()}
+	}
+	for _, arg := range *schemeArgs {
+		s, err := game.SchemeFromName(arg)
+		if err != nil {
+			log.Fatalf("%s", err)
+			os.Exit(1)
+		}
+		scheme = append(scheme, s)
 	}
 
 	// set min number of characters for reading to 1

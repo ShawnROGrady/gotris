@@ -5,10 +5,30 @@ import (
 	"strings"
 )
 
+// the available schemes
+const (
+	HomeRowName   = "home-row"
+	ArrowKeysName = "arrow-keys"
+)
+
 // ControlScheme represents a mapping of keys to user input
 type ControlScheme interface {
 	controlMap() map[string]userInput
 	keyMap() map[key]userInput
+	Description() string
+	String() string
+}
+
+// SchemeFromName retrieves the scheme associated with the specified name
+func SchemeFromName(name string) (ControlScheme, error) {
+	switch name {
+	case HomeRowName:
+		return HomeRow(), nil
+	case ArrowKeysName:
+		return ArrowKeys(), nil
+	default:
+		return nil, fmt.Errorf("Unrecognized control scheme '%s'", name)
+	}
 }
 
 // this approach allows us to more easily change the actual value based on GOOS
@@ -48,66 +68,77 @@ func leftArrow() key {
 	}
 }
 
+type keyMapping struct {
+	name    string
+	mapping func() map[key]userInput
+}
+
+func (k keyMapping) keyMap() map[key]userInput {
+	return k.mapping()
+}
+
+func (k keyMapping) controlMap() map[string]userInput {
+	return ctrlMap(k)
+}
+
+func (k keyMapping) Description() string {
+	return schemeDescription(k)
+}
+
+func (k keyMapping) String() string {
+	return k.name
+}
+
 // HomeRow represents the control scheme which focuses on the home row
-type HomeRow struct{}
+func HomeRow() ControlScheme {
+	return keyMapping{
+		name: HomeRowName,
+		mapping: func() map[key]userInput {
+			var (
+				upKey          = key{name: "k", value: "k"}
+				downKey        = key{name: "j", value: "j"}
+				rightKey       = key{name: "l", value: "l"}
+				leftKey        = key{name: "h", value: "h"}
+				rotateLeftKey  = key{name: "a", value: "a"}
+				rotateRightKey = key{name: "d", value: "d"}
+			)
 
-func (h HomeRow) keyMap() map[key]userInput {
-	var (
-		upKey          = key{name: "k", value: "k"}
-		downKey        = key{name: "j", value: "j"}
-		rightKey       = key{name: "l", value: "l"}
-		leftKey        = key{name: "h", value: "h"}
-		rotateLeftKey  = key{name: "a", value: "a"}
-		rotateRightKey = key{name: "d", value: "d"}
-	)
-
-	return map[key]userInput{
-		upKey:          moveUp,
-		downKey:        moveDown,
-		rightKey:       moveRight,
-		leftKey:        moveLeft,
-		rotateLeftKey:  rotateLeft,
-		rotateRightKey: rotateRight,
+			return map[key]userInput{
+				upKey:          moveUp,
+				downKey:        moveDown,
+				rightKey:       moveRight,
+				leftKey:        moveLeft,
+				rotateLeftKey:  rotateLeft,
+				rotateRightKey: rotateRight,
+			}
+		},
 	}
-}
-
-func (h HomeRow) controlMap() map[string]userInput {
-	return ctrlMap(h)
-}
-
-func (h HomeRow) String() string {
-	return schemeDescription(h)
 }
 
 // ArrowKeys represents the control scheme which utilizes the arrow keys
-type ArrowKeys struct{}
+func ArrowKeys() ControlScheme {
+	return keyMapping{
+		name: ArrowKeysName,
+		mapping: func() map[key]userInput {
+			var (
+				upKey          = upArrow()
+				downKey        = downArrow()
+				rightKey       = rightArrow()
+				leftKey        = leftArrow()
+				rotateLeftKey  = key{name: "z", value: "z"}
+				rotateRightKey = key{name: "x", value: "x"}
+			)
 
-func (a ArrowKeys) keyMap() map[key]userInput {
-	var (
-		upKey          = upArrow()
-		downKey        = downArrow()
-		rightKey       = rightArrow()
-		leftKey        = leftArrow()
-		rotateLeftKey  = key{name: "z", value: "z"}
-		rotateRightKey = key{name: "x", value: "x"}
-	)
-
-	return map[key]userInput{
-		upKey:          moveUp,
-		downKey:        moveDown,
-		rightKey:       moveRight,
-		leftKey:        moveLeft,
-		rotateLeftKey:  rotateLeft,
-		rotateRightKey: rotateRight,
+			return map[key]userInput{
+				upKey:          moveUp,
+				downKey:        moveDown,
+				rightKey:       moveRight,
+				leftKey:        moveLeft,
+				rotateLeftKey:  rotateLeft,
+				rotateRightKey: rotateRight,
+			}
+		},
 	}
-}
-
-func (a ArrowKeys) controlMap() map[string]userInput {
-	return ctrlMap(a)
-}
-
-func (a ArrowKeys) String() string {
-	return schemeDescription(a)
 }
 
 // ControlSchemes is a union of one or more mappings of keys to user input
@@ -129,8 +160,17 @@ func (c ControlSchemes) controlMap() map[string]userInput {
 	return ctrlMap(c)
 }
 
-func (c ControlSchemes) String() string {
+// Description is the combined descriptions of multiple schemes
+func (c ControlSchemes) Description() string {
 	return schemeDescription(c)
+}
+
+func (c ControlSchemes) String() string {
+	names := []string{}
+	for _, scheme := range c {
+		names = append(names, scheme.String())
+	}
+	return strings.Join(names, ", ")
 }
 
 func schemeDescription(c ControlScheme) string {
