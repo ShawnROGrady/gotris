@@ -21,6 +21,7 @@ type Game struct {
 	newPieceSet   func(width, height int) []tetrimino.Tetrimino
 	nextPieces    []tetrimino.Tetrimino
 	level         level
+	currentScore  int
 	debugMode     bool
 	disableGhost  bool
 	controlScheme ControlScheme
@@ -58,7 +59,8 @@ func New(c Config) *Game {
 		currentPiece:  piece,
 		newPieceSet:   tetrimino.NewSet,
 		nextPieces:    pieceSet,
-		level:         1,
+		level:         0,
+		currentScore:  0,
 		debugMode:     c.DebugMode,
 		disableGhost:  c.DisableGhost,
 		controlScheme: c.ControlScheme,
@@ -308,8 +310,8 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	// generate new current piece if at bottom or on top of another piece
 	if g.pieceAtBottom(g.currentPiece) {
 		// check if any rows can be cleared
-		// TODO: add scoring
-		g.board.ClearFullRows()
+		linesCleared := g.board.ClearFullRows()
+		g.currentScore += g.level.linePoints(linesCleared)
 
 		if g.pieceAtTop() {
 			// still render game-over state
@@ -317,7 +319,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			if err := g.canvas.Render(); err != nil {
 				return err
 			}
-			endScore <- 0
+			endScore <- g.currentScore
 			return nil
 		}
 
@@ -332,7 +334,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			if err := g.canvas.Render(); err != nil {
 				return err
 			}
-			endScore <- 0
+			endScore <- g.currentScore
 			return nil
 		}
 	}

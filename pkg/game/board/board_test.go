@@ -373,7 +373,10 @@ func TestClearFullRows(t *testing.T) {
 			Blocks:     test.initialBlocks,
 		}
 
-		b.ClearFullRows()
+		clearedRows := b.ClearFullRows()
+		if clearedRows != len(test.expectedFullRows) {
+			t.Fatalf("Unexpected number of cleared rows for test case '%s' [expected = %v, actual = %v", testName, len(test.expectedFullRows), clearedRows)
+		}
 
 		if len(b.Blocks) != len(test.initialBlocks) {
 			t.Fatalf("checking rows resulted in new row count for test case '%s' [expected = %d, actual = %d]", testName, len(test.initialBlocks), len(b.Blocks))

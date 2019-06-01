@@ -72,8 +72,7 @@ func (b *Board) Cells() [][]*canvas.Cell {
 }
 
 // ClearFullRows checks if any rows are full and clears them if so
-func (b *Board) ClearFullRows() {
-	// TODO this should return a score
+func (b *Board) ClearFullRows() int {
 	fullRows := b.CheckRows()
 
 	blocksPerRow := len(b.Blocks[0])
@@ -88,6 +87,7 @@ func (b *Board) ClearFullRows() {
 		// insert empty row at top
 		b.Blocks = append(b.Blocks, [][]*Block{make([]*Block, blocksPerRow)}...)
 	}
+	return len(fullRows)
 }
 
 // CheckRows checks if there are any full rows
