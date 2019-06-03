@@ -22,6 +22,7 @@ type Game struct {
 	nextPieces    []tetrimino.Tetrimino
 	level         level
 	currentScore  int
+	linesCleared  int
 	debugMode     bool
 	disableGhost  bool
 	controlScheme ControlScheme
@@ -61,6 +62,7 @@ func New(c Config) *Game {
 		nextPieces:    pieceSet,
 		level:         0,
 		currentScore:  0,
+		linesCleared:  0,
 		debugMode:     c.DebugMode,
 		disableGhost:  c.DisableGhost,
 		controlScheme: c.ControlScheme,
@@ -311,7 +313,10 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	if g.pieceAtBottom(g.currentPiece) {
 		// check if any rows can be cleared
 		linesCleared := g.board.ClearFullRows()
+		g.linesCleared += linesCleared
 		g.currentScore += g.level.linePoints(linesCleared)
+		newLevel := g.level.updatedLevel(g.linesCleared)
+		g.level = newLevel
 
 		if g.pieceAtTop() {
 			// still render game-over state
