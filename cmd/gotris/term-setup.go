@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"runtime"
@@ -13,19 +14,20 @@ func setupTerm() (func() error, error) {
 		undoRemoveEchoCmd *exec.Cmd
 	)
 
+	fmt.Println(runtime.GOOS)
 	switch runtime.GOOS {
 	case "linux":
 		limitCmd = exec.Command("stty", "-F", "/dev/tty", "-icanon", "min", "1")
 		removeEchoCmd = exec.Command("stty", "-F", "/dev/tty", "-echo")
 		undoRemoveEchoCmd = exec.Command("stty", "-F", "/dev/tty", "echo")
 	case "darwin":
-		limitCmd = exec.Command("stty", "--file", "/dev/tty", "-icanon", "min", "1")
-		removeEchoCmd = exec.Command("stty", "--file", "/dev/tty", "-echo")
-		undoRemoveEchoCmd = exec.Command("stty", "--file", "/dev/tty", "echo")
+		limitCmd = exec.Command("stty", "-f", "/dev/tty", "-icanon", "min", "1")
+		removeEchoCmd = exec.Command("stty", "-f", "/dev/tty", "-echo")
+		undoRemoveEchoCmd = exec.Command("stty", "-f", "/dev/tty", "echo")
 	default:
-		limitCmd = exec.Command("stty", "--file", "/dev/tty", "-icanon", "min", "1")
-		removeEchoCmd = exec.Command("stty", "--file", "/dev/tty", "-echo")
-		undoRemoveEchoCmd = exec.Command("stty", "--file", "/dev/tty", "echo")
+		limitCmd = exec.Command("stty", "-f", "/dev/tty", "-icanon", "min", "1")
+		removeEchoCmd = exec.Command("stty", "-f", "/dev/tty", "-echo")
+		undoRemoveEchoCmd = exec.Command("stty", "-f", "/dev/tty", "echo")
 	}
 
 	// set min number of characters for reading to 1
