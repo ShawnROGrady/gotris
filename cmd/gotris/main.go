@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"os/signal"
 	"syscall"
 
@@ -47,18 +46,12 @@ func main() {
 		scheme = game.ControlSchemes{game.HomeRow()}
 	}
 
-	// set min number of characters for reading to 1
-	if err := exec.Command("stty", "-f", "/dev/tty", "-icanon", "min", "1").Run(); err != nil {
-		log.Fatalf("error limiting input minimum: %s", err)
+	undoSetup, err := setupTerm()
+	if err != nil {
+		log.Fatalf("error setting up terminal: %s", err)
 		os.Exit(1)
 	}
-	// do not echo user input
-	if err := exec.Command("stty", "-f", "/dev/tty", "-echo").Run(); err != nil {
-		log.Fatalf("error disabling user input echoing: %s", err)
-		os.Exit(1)
-	}
-	// re-enable echoing user input
-	defer exec.Command("stty", "-f", "echo")
+	defer undoSetup()
 
 	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0755)
 	if err != nil {

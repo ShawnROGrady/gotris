@@ -3,6 +3,7 @@ package canvas
 import (
 	"fmt"
 	"os"
+	"runtime"
 )
 
 // Canvas represents a way to render to game to the user
@@ -61,7 +62,7 @@ func (c *TermCanvas) Render() error {
 		}
 	}
 
-	for _, row := range c.cells {
+	for i, row := range c.cells {
 		var buf = []byte{}
 		for _, cell := range row {
 			if cell == nil {
@@ -72,13 +73,16 @@ func (c *TermCanvas) Render() error {
 			}
 			buf = append(buf, []byte(cell.String())...)
 		}
-		buf = append(buf, '\n')
 
 		_, err := c.dest.Write(buf)
 		if err != nil {
 			return err
 		}
-		if err := c.dest.Sync(); err != nil {
+		_, err = c.dest.Write([]byte(Reset.String()))
+		if err != nil {
+			return err
+		}
+		if err := c.setCursor(i, 0); err != nil {
 			return err
 		}
 	}
@@ -93,8 +97,19 @@ func (c *TermCanvas) UpdateCells(newCells [][]*Cell) {
 	c.cells = newCells
 }
 
+func resetString() string {
+	switch runtime.GOOS {
+	case "linux":
+		return "\033c"
+	case "darwin":
+		return "\033[2J"
+	default:
+		return "\033[2J"
+	}
+}
+
 func (c *TermCanvas) clear() error {
-	_, err := c.dest.WriteString("\033[2J")
+	_, err := c.dest.WriteString(resetString())
 	if err != nil {
 		return err
 	}
