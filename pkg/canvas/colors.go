@@ -39,7 +39,8 @@ const (
 	BackgroundWhite
 
 	// other colors
-	Orange Color = 208
+	Orange           Color = 208
+	BackgroundOrange Color = -208
 )
 
 func (c Color) String() string {
@@ -50,6 +51,8 @@ func (c Color) String() string {
 		return fmt.Sprintf("\u001b[%dm", c-6)
 	case Reset, Black, Red, Green, Yellow, Blue, Magenta, Cyan, White:
 		return fmt.Sprintf("\u001b[%dm", c)
+	case BackgroundOrange:
+		return fmt.Sprintf("\u001b[48;5;%dm", c*-1)
 	default:
 		return fmt.Sprintf("\u001b[38;5;%dm", c)
 	}
@@ -95,22 +98,24 @@ func (c Color) decorate(input string) string {
 
 func (c Color) background() Color {
 	switch c {
-	case Black:
+	case Black, BrightBlack:
 		return BackgroundBlack
-	case Red:
+	case Red, BrightRed:
 		return BackgroundRed
-	case Green:
+	case Green, BrightGreen:
 		return BackgroundGreen
-	case Yellow:
+	case Yellow, BrightYellow:
 		return BackgroundYellow
-	case Blue:
+	case Blue, BrightBlue:
 		return BackgroundBlue
-	case Magenta:
+	case Magenta, BrightMagenta:
 		return BackgroundMagenta
-	case Cyan:
+	case Cyan, BrightCyan:
 		return BackgroundCyan
-	case White:
+	case White, BrightWhite:
 		return BackgroundWhite
+	case Orange:
+		return BackgroundOrange
 	default:
 		return c
 	}

@@ -62,7 +62,7 @@ func (c *TermCanvas) Render() error {
 		}
 	}
 
-	for i, row := range c.cells {
+	for _, row := range c.cells {
 		var buf = []byte{}
 		for _, cell := range row {
 			if cell == nil {
@@ -73,6 +73,7 @@ func (c *TermCanvas) Render() error {
 			}
 			buf = append(buf, []byte(cell.String())...)
 		}
+		buf = append(buf, '\n')
 
 		_, err := c.dest.Write(buf)
 		if err != nil {
@@ -80,9 +81,6 @@ func (c *TermCanvas) Render() error {
 		}
 		_, err = c.dest.Write([]byte(Reset.String()))
 		if err != nil {
-			return err
-		}
-		if err := c.setCursor(i, 0); err != nil {
 			return err
 		}
 	}

@@ -21,5 +21,7 @@ func (c *Cell) String() string {
 			c.Color.decorate(mediumTransparentBlock),
 		)
 	}
-	return c.Color.decorate(block)
+	return c.Color.background().decorate(
+		c.Color.decorate(block),
+	)
 }

@@ -51,10 +51,12 @@ func (b *Board) Cells() [][]*canvas.Cell {
 			if block == nil {
 				row = append(row, []*canvas.Cell{
 					{
-						Color: b.background,
+						Color:      b.background,
+						Background: b.background,
 					},
 					{
-						Color: b.background,
+						Color:      b.background,
+						Background: b.background,
 					},
 				}...)
 				continue

@@ -60,49 +60,49 @@ var colorTests = map[Color]struct {
 		ExpectedDescription:    "bright black",
 		ExpectedString:         "\u001b[30;1m",
 		ExpectedDecoratedInput: "\u001b[30;1minput",
-		ExpectedBackground:     BrightBlack,
+		ExpectedBackground:     BackgroundBlack,
 	},
 	BrightRed: {
 		ExpectedDescription:    "bright red",
 		ExpectedString:         "\u001b[31;1m",
 		ExpectedDecoratedInput: "\u001b[31;1minput",
-		ExpectedBackground:     BrightRed,
+		ExpectedBackground:     BackgroundRed,
 	},
 	BrightGreen: {
 		ExpectedDescription:    "bright green",
 		ExpectedString:         "\u001b[32;1m",
 		ExpectedDecoratedInput: "\u001b[32;1minput",
-		ExpectedBackground:     BrightGreen,
+		ExpectedBackground:     BackgroundGreen,
 	},
 	BrightYellow: {
 		ExpectedDescription:    "bright yellow",
 		ExpectedString:         "\u001b[33;1m",
 		ExpectedDecoratedInput: "\u001b[33;1minput",
-		ExpectedBackground:     BrightYellow,
+		ExpectedBackground:     BackgroundYellow,
 	},
 	BrightBlue: {
 		ExpectedDescription:    "bright blue",
 		ExpectedString:         "\u001b[34;1m",
 		ExpectedDecoratedInput: "\u001b[34;1minput",
-		ExpectedBackground:     BrightBlue,
+		ExpectedBackground:     BackgroundBlue,
 	},
 	BrightMagenta: {
 		ExpectedDescription:    "bright magenta",
 		ExpectedString:         "\u001b[35;1m",
 		ExpectedDecoratedInput: "\u001b[35;1minput",
-		ExpectedBackground:     BrightMagenta,
+		ExpectedBackground:     BackgroundMagenta,
 	},
 	BrightCyan: {
 		ExpectedDescription:    "bright cyan",
 		ExpectedString:         "\u001b[36;1m",
 		ExpectedDecoratedInput: "\u001b[36;1minput",
-		ExpectedBackground:     BrightCyan,
+		ExpectedBackground:     BackgroundCyan,
 	},
 	BrightWhite: {
 		ExpectedDescription:    "bright white",
 		ExpectedString:         "\u001b[37;1m",
 		ExpectedDecoratedInput: "\u001b[37;1minput",
-		ExpectedBackground:     BrightWhite,
+		ExpectedBackground:     BackgroundWhite,
 	},
 	BackgroundBlack: {
 		ExpectedDescription:    "background black",
@@ -173,7 +173,7 @@ func TestColors(t *testing.T) {
 
 		background := color.background()
 		if background != test.ExpectedBackground {
-			t.Errorf("Unexpected background for color '%s' [expected=%s, actual=%s]", color, test.ExpectedBackground, background)
+			t.Errorf("Unexpected background for color '%s' [expected=%s,%s actual=%s]%s", color, Reset, test.ExpectedBackground, background, Reset)
 		}
 	}
 }
