@@ -66,6 +66,7 @@ func main() {
 		DebugMode:     *debugMode,
 		DisableGhost:  *disableGhost,
 		ControlScheme: scheme,
+		WidthScale:    2,
 	}
 
 	g := game.New(conf)

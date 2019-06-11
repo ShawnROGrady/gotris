@@ -39,6 +39,7 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 			canvas.White,
 			width, height,
 			hiddenRows,
+			2, // widthScale
 		),
 		currentPiece: piece,
 		nextPieces:   pieceSet,
@@ -919,6 +920,7 @@ func TestBoardWithGhost(t *testing.T) {
 			canvas.White,
 			test.boardWidth, test.boardHeight,
 			test.hiddenRows,
+			2,
 		)
 		g.board = board2
 		g.addPieceToBoard(g.ghostPiece)

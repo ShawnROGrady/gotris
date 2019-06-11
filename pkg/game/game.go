@@ -26,6 +26,7 @@ type Game struct {
 	debugMode     bool
 	disableGhost  bool
 	controlScheme ControlScheme
+	widthScale    int
 }
 
 // Config represents the configuration for a game
@@ -37,6 +38,7 @@ type Config struct {
 	DebugMode     bool
 	DisableGhost  bool
 	ControlScheme ControlScheme
+	WidthScale    int
 }
 
 // New returns a new game with the specified specifications
@@ -56,6 +58,7 @@ func New(c Config) *Game {
 			canvas.White,
 			c.Width, c.Height,
 			c.HiddenRows,
+			c.WidthScale,
 		),
 		currentPiece:  piece,
 		newPieceSet:   tetrimino.NewSet,
@@ -66,6 +69,7 @@ func New(c Config) *Game {
 		debugMode:     c.DebugMode,
 		disableGhost:  c.DisableGhost,
 		controlScheme: c.ControlScheme,
+		widthScale:    c.WidthScale,
 	}
 }
 
@@ -496,8 +500,8 @@ func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 	gameCells := b.Cells()
 
 	nextPiece := g.nextPieces[0]
-	// TODO: pass the correct background
-	nextPieceCells := canvas.Box(board.BlockGridCells(nextPiece.Blocks(), canvas.White))
+	formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
+	nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale))
 	for i := range nextPieceCells {
 		gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
 	}

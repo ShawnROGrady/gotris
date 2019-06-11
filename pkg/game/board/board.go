@@ -6,13 +6,14 @@ import (
 
 // Board represents the game board
 type Board struct {
-	background canvas.Color
+	Background canvas.Color
 	Blocks     [][]*Block
 	HiddenRows int
+	widthScale int
 }
 
 // New creates a new board
-func New(background canvas.Color, width, height, hiddenRows int) *Board {
+func New(background canvas.Color, width, height, hiddenRows, widthScale int) *Board {
 	var blocks = [][]*Block{}
 
 	for i := 0; i < height+hiddenRows; i++ {
@@ -21,9 +22,10 @@ func New(background canvas.Color, width, height, hiddenRows int) *Board {
 	}
 
 	return &Board{
-		background: background,
+		Background: background,
 		Blocks:     blocks,
 		HiddenRows: hiddenRows,
+		widthScale: widthScale,
 	}
 }
 
@@ -41,7 +43,7 @@ func (b *Block) cell() *canvas.BlockCell {
 }
 
 // BlockGridCells generates the visual representation of a grid of cells
-func BlockGridCells(b [][]*Block, background canvas.Color) [][]canvas.Cell {
+func BlockGridCells(b [][]*Block, background canvas.Color, widthScale int) [][]canvas.Cell {
 	cells := [][]canvas.Cell{}
 
 	// reverse the rows
@@ -49,24 +51,19 @@ func BlockGridCells(b [][]*Block, background canvas.Color) [][]canvas.Cell {
 		row := []canvas.Cell{}
 		for _, block := range b[i] {
 			if block == nil {
-				row = append(row, []canvas.Cell{
-					&canvas.BlockCell{
+				for i := 0; i < widthScale; i++ {
+					row = append(row, &canvas.BlockCell{
 						Color:      background,
 						Background: background,
-					},
-					&canvas.BlockCell{
-						Color:      background,
-						Background: background,
-					},
-				}...)
+					})
+				}
 				continue
 			}
 			blockCell := block.cell()
 			blockCell.Background = background
-			row = append(row, []canvas.Cell{
-				blockCell,
-				blockCell,
-			}...)
+			for i := 0; i < widthScale; i++ {
+				row = append(row, blockCell)
+			}
 		}
 		cells = append(cells, row)
 	}
@@ -76,7 +73,7 @@ func BlockGridCells(b [][]*Block, background canvas.Color) [][]canvas.Cell {
 // Cells generates a visual representation of the board
 func (b *Board) Cells() [][]canvas.Cell {
 	activeBlocks := b.Blocks[:len(b.Blocks)-b.HiddenRows]
-	return BlockGridCells(activeBlocks, b.background)
+	return BlockGridCells(activeBlocks, b.Background, b.widthScale)
 }
 
 // ClearFullRows checks if any rows are full and clears them if so

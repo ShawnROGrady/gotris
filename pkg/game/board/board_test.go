@@ -347,8 +347,9 @@ var clearRowsTests = map[string]struct {
 func TestCheckRows(t *testing.T) {
 	for testName, test := range clearRowsTests {
 		b := &Board{
-			background: canvas.Green,
+			Background: canvas.Green,
 			Blocks:     test.initialBlocks,
+			widthScale: 2,
 		}
 
 		fullRows := b.CheckRows()
@@ -369,8 +370,9 @@ func TestCheckRows(t *testing.T) {
 func TestClearFullRows(t *testing.T) {
 	for testName, test := range clearRowsTests {
 		b := &Board{
-			background: canvas.Green,
+			Background: canvas.Green,
 			Blocks:     test.initialBlocks,
+			widthScale: 2,
 		}
 
 		clearedRows := b.ClearFullRows()

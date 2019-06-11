@@ -9,6 +9,12 @@ import (
 	"github.com/ShawnROGrady/gotris/pkg/game/board"
 )
 
+// the maximum size of a tetrimino
+const (
+	MaxWidth  = 4
+	MaxHeight = 4
+)
+
 // Tetrimino represents an active game piece
 type Tetrimino interface {
 	Blocks() [][]*board.Block
