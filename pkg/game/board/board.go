@@ -33,37 +33,37 @@ type Block struct {
 	Transparent bool
 }
 
-func (b *Block) cell() *canvas.Cell {
-	return &canvas.Cell{
+func (b *Block) cell() *canvas.BlockCell {
+	return &canvas.BlockCell{
 		Color:       b.Color,
 		Transparent: b.Transparent,
 	}
 }
 
-// Cells generates a visual representation of the board
-func (b *Board) Cells() [][]*canvas.Cell {
-	cells := [][]*canvas.Cell{}
+// BlockGridCells generates the visual representation of a grid of cells
+func BlockGridCells(b [][]*Block, background canvas.Color) [][]canvas.Cell {
+	cells := [][]canvas.Cell{}
 
 	// reverse the rows
-	for i := len(b.Blocks) - b.HiddenRows - 1; i >= 0; i-- {
-		row := []*canvas.Cell{}
-		for _, block := range b.Blocks[i] {
+	for i := len(b) - 1; i >= 0; i-- {
+		row := []canvas.Cell{}
+		for _, block := range b[i] {
 			if block == nil {
-				row = append(row, []*canvas.Cell{
-					{
-						Color:      b.background,
-						Background: b.background,
+				row = append(row, []canvas.Cell{
+					&canvas.BlockCell{
+						Color:      background,
+						Background: background,
 					},
-					{
-						Color:      b.background,
-						Background: b.background,
+					&canvas.BlockCell{
+						Color:      background,
+						Background: background,
 					},
 				}...)
 				continue
 			}
 			blockCell := block.cell()
-			blockCell.Background = b.background
-			row = append(row, []*canvas.Cell{
+			blockCell.Background = background
+			row = append(row, []canvas.Cell{
 				blockCell,
 				blockCell,
 			}...)
@@ -71,6 +71,12 @@ func (b *Board) Cells() [][]*canvas.Cell {
 		cells = append(cells, row)
 	}
 	return cells
+}
+
+// Cells generates a visual representation of the board
+func (b *Board) Cells() [][]canvas.Cell {
+	activeBlocks := b.Blocks[:len(b.Blocks)-b.HiddenRows]
+	return BlockGridCells(activeBlocks, b.background)
 }
 
 // ClearFullRows checks if any rows are full and clears them if so

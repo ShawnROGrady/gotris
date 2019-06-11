@@ -24,12 +24,12 @@ type tetriminoCoordTest struct {
 }
 
 type testCanvas struct {
-	cells [][]*canvas.Cell
+	cells [][]canvas.Cell
 }
 
-func (t *testCanvas) Init() error                           { return nil }
-func (t *testCanvas) Render() error                         { return nil }
-func (t *testCanvas) UpdateCells(newCells [][]*canvas.Cell) { t.cells = newCells }
+func (t *testCanvas) Init() error                          { return nil }
+func (t *testCanvas) Render() error                        { return nil }
+func (t *testCanvas) UpdateCells(newCells [][]canvas.Cell) { t.cells = newCells }
 
 func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, height int) []tetrimino.Tetrimino) *Game {
 	initPieces := pieceSetConstructor(width, height+hiddenRows)
@@ -42,7 +42,7 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 		),
 		currentPiece: piece,
 		nextPieces:   pieceSet,
-		canvas:       &testCanvas{cells: [][]*canvas.Cell{}},
+		canvas:       &testCanvas{cells: [][]canvas.Cell{}},
 		newPieceSet:  pieceSetConstructor,
 		disableGhost: false, // enabling ghost to catch potential nil-pointer/index-oob exceptions
 	}

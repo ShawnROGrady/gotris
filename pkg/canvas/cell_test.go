@@ -86,7 +86,7 @@ var cellColorTests = map[string]struct {
 
 func TestCellColors(t *testing.T) {
 	for testName, test := range cellColorTests {
-		cell := &Cell{
+		cell := &BlockCell{
 			Color:       test.Color,
 			Transparent: test.Transparent,
 			Background:  test.Background,

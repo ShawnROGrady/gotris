@@ -10,14 +10,14 @@ import (
 type Canvas interface {
 	Init() error
 	Render() error
-	UpdateCells(newCells [][]*Cell)
+	UpdateCells(newCells [][]Cell)
 }
 
 // TermCanvas represents what is actually rendered to the user via the terminal
 type TermCanvas struct {
 	dest       *os.File
 	Background Color
-	cells      [][]*Cell
+	cells      [][]Cell
 	debugMode  bool
 }
 
@@ -32,10 +32,10 @@ type Config struct {
 
 // New returns a new canvas
 func New(c Config) *TermCanvas {
-	var cells = [][]*Cell{}
+	var cells = [][]Cell{}
 
 	for i := 0; i < c.Height; i++ {
-		row := make([]*Cell, c.Width)
+		row := make([]Cell, c.Width)
 		cells = append(cells, row)
 	}
 
@@ -91,7 +91,7 @@ func (c *TermCanvas) Render() error {
 }
 
 // UpdateCells updates the cells to be rendered
-func (c *TermCanvas) UpdateCells(newCells [][]*Cell) {
+func (c *TermCanvas) UpdateCells(newCells [][]Cell) {
 	c.cells = newCells
 }
 

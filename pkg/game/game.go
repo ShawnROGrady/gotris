@@ -83,7 +83,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 	g.addPieceToBoard(g.currentPiece)
 	g.ghostPiece = g.findGhostPiece()
 
-	g.canvas.UpdateCells(g.board.Cells())
+	g.canvas.UpdateCells(g.cells(g.board))
 
 	// initialize the canvas
 	if err := g.canvas.Init(); err != nil {
@@ -320,7 +320,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 		if g.pieceAtTop() {
 			// still render game-over state
-			g.canvas.UpdateCells(g.board.Cells())
+			g.canvas.UpdateCells(g.cells(g.board))
 			if err := g.canvas.Render(); err != nil {
 				return err
 			}
@@ -335,7 +335,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		g.addPieceToBoard(g.currentPiece)
 		if g.pieceAtBottom(g.currentPiece) {
 			// new piece already at bottom -> game over
-			g.canvas.UpdateCells(g.board.Cells())
+			g.canvas.UpdateCells(g.cells(g.board))
 			if err := g.canvas.Render(); err != nil {
 				return err
 			}
@@ -346,9 +346,9 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 	if !g.disableGhost {
 		newBoard := g.boardWithGhost()
-		g.canvas.UpdateCells(newBoard.Cells())
+		g.canvas.UpdateCells(g.cells(newBoard))
 	} else {
-		g.canvas.UpdateCells(g.board.Cells())
+		g.canvas.UpdateCells(g.cells(g.board))
 	}
 
 	return g.canvas.Render()
@@ -490,4 +490,16 @@ func (g *Game) boardWithGhost() *board.Board {
 		}
 	}
 	return &newBoard
+}
+
+func (g *Game) cells(b *board.Board) [][]canvas.Cell {
+	gameCells := b.Cells()
+
+	nextPiece := g.nextPieces[0]
+	// TODO: pass the correct background
+	nextPieceCells := canvas.Box(board.BlockGridCells(nextPiece.Blocks(), canvas.White))
+	for i := range nextPieceCells {
+		gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
+	}
+	return gameCells
 }

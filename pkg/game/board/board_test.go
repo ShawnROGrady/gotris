@@ -10,7 +10,7 @@ var clearRowsTests = map[string]struct {
 	initialBlocks     [][]*Block
 	expectedNewBlocks [][]*Block
 	expectedFullRows  []int
-	expectedNewCells  [][]*canvas.Cell
+	expectedNewCells  [][]*canvas.BlockCell
 }{
 	"only bottom row": {
 		initialBlocks: [][]*Block{
@@ -31,30 +31,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 		},
 		expectedFullRows: []int{0},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -87,30 +87,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 		},
 		expectedFullRows: []int{0},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -143,30 +143,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 		},
 		expectedFullRows: []int{1},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -194,30 +194,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 		},
 		expectedFullRows: []int{0, 1},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -255,30 +255,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 		},
 		expectedFullRows: []int{0, 1},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -315,30 +315,30 @@ var clearRowsTests = map[string]struct {
 			[]*Block{nil, nil, nil, nil},
 			[]*Block{nil, nil, nil, nil},
 		},
-		expectedNewCells: [][]*canvas.Cell{
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+		expectedNewCells: [][]*canvas.BlockCell{
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
 			},
-			[]*canvas.Cell{
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Blue, Background: canvas.Green}, &canvas.Cell{Color: canvas.Blue, Background: canvas.Green},
-				&canvas.Cell{Color: canvas.Green, Background: canvas.Green}, &canvas.Cell{Color: canvas.Green, Background: canvas.Green},
+			[]*canvas.BlockCell{
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Blue, Background: canvas.Green},
+				&canvas.BlockCell{Color: canvas.Green, Background: canvas.Green}, &canvas.BlockCell{Color: canvas.Green, Background: canvas.Green},
 			},
 		},
 	},
@@ -442,8 +442,8 @@ func TestClearFullRows(t *testing.T) {
 					return
 				}
 
-				if *cells[i][j] != *test.expectedNewCells[i][j] {
-					t.Fatalf("unexpected new cells[%d][%d] for test case '%s' [expected = %#v, actual = %#v]", i, j, testName, *test.expectedNewCells[i][j], *cells[i][j])
+				if cells[i][j].String() != test.expectedNewCells[i][j].String() {
+					t.Fatalf("unexpected new cells[%d][%d] for test case '%s' [expected = %#v, actual = %#v]", i, j, testName, test.expectedNewCells[i][j], cells[i][j])
 					return
 				}
 			}
