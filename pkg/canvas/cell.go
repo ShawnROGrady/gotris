@@ -1,5 +1,9 @@
 package canvas
 
+import (
+	"strings"
+)
+
 const (
 	// block elements
 	block                  = "\u2588"
@@ -105,4 +109,50 @@ func Box(inner [][]Cell) [][]Cell {
 	}
 	boxedCells = append(boxedCells, bottomRow)
 	return boxedCells
+}
+
+// TextCell is a piece of text to be displayed
+type TextCell struct {
+	Text  string
+	Color Color
+}
+
+func (t *TextCell) String() string {
+	return t.Color.decorate(t.Text)
+}
+
+// CellsFromString constructs a grid of TextCells from a provided string
+func CellsFromString(s string, color Color) [][]Cell {
+	var (
+		maxLine int
+		lines   = strings.Split(s, "\n")
+	)
+	for _, line := range lines {
+		if len(line) > maxLine {
+			maxLine = len(line)
+		}
+	}
+
+	cells := make([][]Cell, len(lines))
+
+	for i, line := range lines {
+		row := make([]Cell, maxLine)
+		chars := strings.Split(line, "")
+		for j := 0; j < maxLine; j++ {
+			if j >= len(chars) {
+				row[j] = &TextCell{
+					Text:  " ",
+					Color: Reset,
+				}
+				continue
+			}
+			row[j] = &TextCell{
+				Text:  chars[j],
+				Color: color,
+			}
+		}
+		cells[i] = row
+	}
+
+	return cells
 }

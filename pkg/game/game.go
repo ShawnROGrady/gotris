@@ -505,5 +505,13 @@ func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 	for i := range nextPieceCells {
 		gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
 	}
+
+	currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
+	scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background))
+
+	for i := range scoreCells {
+		gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
+	}
+
 	return gameCells
 }

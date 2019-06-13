@@ -98,3 +98,75 @@ func TestCellColors(t *testing.T) {
 		}
 	}
 }
+
+var cellFromStringTests = map[string]struct {
+	inputText     string
+	inputColor    Color
+	expectedCells [][]Cell
+}{
+	"3 lines equal length": {
+		inputText:  "A: 1\nB: 2\nC: 3",
+		inputColor: White,
+		expectedCells: [][]Cell{
+			{&TextCell{Text: "A", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "1", Color: White}},
+			{&TextCell{Text: "B", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "2", Color: White}},
+			{&TextCell{Text: "C", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "3", Color: White}},
+		},
+	},
+	"3 lines un-equal length": {
+		inputText:  "A:1\nB: 2\nC: 3",
+		inputColor: White,
+		expectedCells: [][]Cell{
+			{&TextCell{Text: "A", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: "1", Color: White}, &TextCell{Text: " ", Color: Reset}},
+			{&TextCell{Text: "B", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "2", Color: White}},
+			{&TextCell{Text: "C", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "3", Color: White}},
+		},
+	},
+	"1 line": {
+		inputText:  "A: 1",
+		inputColor: White,
+		expectedCells: [][]Cell{
+			{&TextCell{Text: "A", Color: White}, &TextCell{Text: ":", Color: White}, &TextCell{Text: " ", Color: White}, &TextCell{Text: "1", Color: White}},
+		},
+	},
+	"no text": {
+		inputText:     "",
+		inputColor:    White,
+		expectedCells: [][]Cell{{}},
+	},
+}
+
+func TestCellFromString(t *testing.T) {
+	for testName, test := range cellFromStringTests {
+		cells := CellsFromString(test.inputText, test.inputColor)
+
+		if len(cells) != len(test.expectedCells) {
+			t.Fatalf("Unexpected number of rows for test case '%s' [expected=%d, actual=%d]", testName, len(test.expectedCells), len(cells))
+		}
+
+		for i := range cells {
+			newRow := cells[i]
+			expectedRow := test.expectedCells[i]
+			if len(newRow) != len(expectedRow) {
+				t.Fatalf("Unexpected number of cells in row %d for test case '%s' [expected=%d, actual=%d]", i, testName, len(expectedRow), len(newRow))
+			}
+
+			for j := range newRow {
+				if newRow[j] == nil && expectedRow[j] == nil {
+					continue
+				}
+				if newRow[j] == nil && expectedRow[j] != nil {
+					t.Errorf("cells[%d][%d] unexpectedly nil for test case '%s'", i, j, testName)
+					continue
+				}
+				if newRow[j] != nil && expectedRow[j] == nil {
+					t.Errorf("cells[%d][%d] unexpectedly non-nil for test case '%s'", i, j, testName)
+					continue
+				}
+				if newRow[j].String() != expectedRow[j].String() {
+					t.Errorf("Unexpected cells[%d][%d] value for test case '%s' [expected=%#v, actual=%#v]", i, j, testName, expectedRow[j], newRow[j])
+				}
+			}
+		}
+	}
+}
