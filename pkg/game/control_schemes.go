@@ -215,6 +215,9 @@ func inputMap(c ControlScheme) map[userInput][]string {
 	for key, input := range keyMap {
 		if synonyms, ok := mappings[input]; ok {
 			synonyms = append(synonyms, key.displayKey())
+			sort.Slice(synonyms, func(i, j int) bool {
+				return synonyms[i] < synonyms[j]
+			})
 			mappings[input] = synonyms
 		} else {
 			mappings[input] = []string{key.displayKey()}

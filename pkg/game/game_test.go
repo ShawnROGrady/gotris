@@ -41,11 +41,12 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 			hiddenRows,
 			2, // widthScale
 		),
-		currentPiece: piece,
-		nextPieces:   pieceSet,
-		canvas:       &testCanvas{cells: [][]canvas.Cell{}},
-		newPieceSet:  pieceSetConstructor,
-		disableGhost: false, // enabling ghost to catch potential nil-pointer/index-oob exceptions
+		currentPiece:  piece,
+		nextPieces:    pieceSet,
+		canvas:        &testCanvas{cells: [][]canvas.Cell{}},
+		newPieceSet:   pieceSetConstructor,
+		disableGhost:  false, // enabling ghost to catch potential nil-pointer/index-oob exceptions
+		controlScheme: HomeRow(),
 	}
 }
 

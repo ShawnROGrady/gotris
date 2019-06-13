@@ -513,5 +513,10 @@ func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 		gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
 	}
 
+	schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background))
+	for i := range schemeCells {
+		gameCells[i+len(nextPieceCells)+len(scoreCells)] = append(gameCells[i+len(nextPieceCells)+len(scoreCells)], schemeCells[i]...)
+	}
+
 	return gameCells
 }
