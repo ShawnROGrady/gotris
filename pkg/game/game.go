@@ -25,6 +25,7 @@ type Game struct {
 	linesCleared  int
 	debugMode     bool
 	disableGhost  bool
+	disableSide   bool
 	controlScheme ControlScheme
 	widthScale    int
 }
@@ -37,6 +38,7 @@ type Config struct {
 	HiddenRows    int
 	DebugMode     bool
 	DisableGhost  bool
+	DisableSide   bool
 	ControlScheme ControlScheme
 	WidthScale    int
 }
@@ -68,6 +70,7 @@ func New(c Config) *Game {
 		linesCleared:  0,
 		debugMode:     c.DebugMode,
 		disableGhost:  c.DisableGhost,
+		disableSide:   c.DisableSide,
 		controlScheme: c.ControlScheme,
 		widthScale:    c.WidthScale,
 	}
@@ -499,23 +502,25 @@ func (g *Game) boardWithGhost() *board.Board {
 func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 	gameCells := b.Cells()
 
-	nextPiece := g.nextPieces[0]
-	formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
-	nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale))
-	for i := range nextPieceCells {
-		gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
-	}
+	if !g.disableSide {
+		nextPiece := g.nextPieces[0]
+		formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
+		nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale))
+		for i := range nextPieceCells {
+			gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
+		}
 
-	currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
-	scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background))
+		currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
+		scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background))
 
-	for i := range scoreCells {
-		gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
-	}
+		for i := range scoreCells {
+			gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
+		}
 
-	schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background))
-	for i := range schemeCells {
-		gameCells[i+len(nextPieceCells)+len(scoreCells)] = append(gameCells[i+len(nextPieceCells)+len(scoreCells)], schemeCells[i]...)
+		schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background))
+		for i := range schemeCells {
+			gameCells[i+len(nextPieceCells)+len(scoreCells)] = append(gameCells[i+len(nextPieceCells)+len(scoreCells)], schemeCells[i]...)
+		}
 	}
 
 	return gameCells

@@ -16,6 +16,7 @@ func main() {
 	colorTest := flag.Bool("colors", false, "Display the colors that will be used throughout the game then exit")
 	debugMode := flag.Bool("debug", false, "Run the game in debug mode. This disables gravity as well as canvas clearing")
 	disableGhost := flag.Bool("disable-ghost", false, "Don't show the 'ghost' of the current piece")
+	disableSide := flag.Bool("disable-side", false, "Don't show the side bar (next piece, current score, and controls)")
 	flag.Var(schemeArgs, "scheme", fmt.Sprintf("The control scheme to use, multiple may be specified (default: %s)", game.HomeRowName))
 	describeScheme := flag.Bool("describe-scheme", false, "Prints the specified control scheme then exits. If none specified then all available schemes are described")
 
@@ -65,6 +66,7 @@ func main() {
 		HiddenRows:    4,
 		DebugMode:     *debugMode,
 		DisableGhost:  *disableGhost,
+		DisableSide:   *disableSide,
 		ControlScheme: scheme,
 		WidthScale:    2,
 	}
