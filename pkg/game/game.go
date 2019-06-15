@@ -42,6 +42,7 @@ type Config struct {
 	DisableSide   bool
 	ControlScheme ControlScheme
 	WidthScale    int
+	Background    canvas.Color
 }
 
 type gameCells struct {
@@ -60,11 +61,11 @@ func New(c Config) *Game {
 			Term:       c.Term,
 			Width:      c.Width,
 			Height:     c.Height,
-			Background: canvas.White,
+			Background: c.Background,
 			DebugMode:  c.DebugMode,
 		}),
 		board: board.New(
-			canvas.White,
+			c.Background,
 			c.Width, c.Height,
 			c.HiddenRows,
 			c.WidthScale,

@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/ShawnROGrady/gotris/pkg/canvas"
 	"github.com/ShawnROGrady/gotris/pkg/game"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	disableSide := flag.Bool("disable-side", false, "Don't show the side bar (next piece, current score, and controls)")
 	flag.Var(schemeArgs, "scheme", fmt.Sprintf("The control scheme to use, multiple may be specified (default: %s)", game.HomeRowName))
 	describeScheme := flag.Bool("describe-scheme", false, "Prints the specified control scheme then exits. If none specified then all available schemes are described")
+	lightMode := flag.Bool("light-mode", false, "Update colors to work for light color schemes")
 
 	flag.Parse()
 
@@ -37,6 +39,12 @@ func main() {
 		}
 		scheme = append(scheme, s)
 	}
+
+	background := canvas.White
+	if lightMode != nil && *lightMode {
+		background = canvas.Black
+	}
+
 	if describeScheme != nil && *describeScheme {
 		describeSchemes(scheme)
 		os.Exit(0)
@@ -69,6 +77,7 @@ func main() {
 		DisableSide:   *disableSide,
 		ControlScheme: scheme,
 		WidthScale:    2,
+		Background:    background,
 	}
 
 	g := game.New(conf)
