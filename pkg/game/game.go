@@ -533,7 +533,7 @@ func (g *Game) updateCells(b *board.Board) {
 }
 
 func (g *Game) cells(b *board.Board) [][]canvas.Cell {
-	gameCells := b.Cells()
+	gameCells := canvas.Box(b.Cells(), "GAME")
 
 	if !g.disableSide {
 		nextPieceCells := g.gameCells.nextPiece
