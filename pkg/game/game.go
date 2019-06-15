@@ -28,6 +28,7 @@ type Game struct {
 	disableSide   bool
 	controlScheme ControlScheme
 	widthScale    int
+	gameCells     gameCells
 }
 
 // Config represents the configuration for a game
@@ -41,6 +42,12 @@ type Config struct {
 	DisableSide   bool
 	ControlScheme ControlScheme
 	WidthScale    int
+}
+
+type gameCells struct {
+	nextPiece [][]canvas.Cell
+	score     [][]canvas.Cell
+	controls  [][]canvas.Cell
 }
 
 // New returns a new game with the specified specifications
@@ -90,6 +97,10 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 	g.addPieceToBoard(g.currentPiece)
 	g.ghostPiece = g.findGhostPiece()
 
+	if !g.disableSide {
+		// add initial sidebar cells
+		g.updateCells(g.board)
+	}
 	g.canvas.UpdateCells(g.cells(g.board))
 
 	// initialize the canvas
@@ -338,6 +349,11 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		g.currentPiece = g.nextPiece()
 		g.ghostPiece = g.findGhostPiece()
 
+		if !g.disableSide {
+			// update cells to include new next + updated score
+			g.updateCells(g.board)
+		}
+
 		// add new piece to canvas
 		g.addPieceToBoard(g.currentPiece)
 		if g.pieceAtBottom(g.currentPiece) {
@@ -499,25 +515,38 @@ func (g *Game) boardWithGhost() *board.Board {
 	return &newBoard
 }
 
+func (g *Game) updateCells(b *board.Board) {
+	nextPiece := g.nextPieces[0]
+	formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
+	nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale), "NEXT")
+
+	currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
+	scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background), "")
+
+	schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background), "CONTROLS")
+
+	g.gameCells = gameCells{
+		nextPiece: nextPieceCells,
+		score:     scoreCells,
+		controls:  schemeCells,
+	}
+}
+
 func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 	gameCells := b.Cells()
 
 	if !g.disableSide {
-		nextPiece := g.nextPieces[0]
-		formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
-		nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale), "NEXT")
+		nextPieceCells := g.gameCells.nextPiece
 		for i := range nextPieceCells {
 			gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
 		}
 
-		currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
-		scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background), "")
-
+		scoreCells := g.gameCells.score
 		for i := range scoreCells {
 			gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
 		}
 
-		schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background), "CONTROLS")
+		schemeCells := g.gameCells.controls
 		for i := range schemeCells {
 			gameCells[i+len(nextPieceCells)+len(scoreCells)] = append(gameCells[i+len(nextPieceCells)+len(scoreCells)], schemeCells[i]...)
 		}
