@@ -29,6 +29,7 @@ type Game struct {
 	controlScheme ControlScheme
 	widthScale    int
 	gameCells     gameCells
+	rotateCount   int
 }
 
 // Config represents the configuration for a game
@@ -120,7 +121,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 		for {
 			var gravity <-chan time.Time
 			if !g.debugMode {
-				gravity = time.After(g.level.gTime())
+				gravity = time.After((g.level.gTime() * (time.Millisecond) / (time.Millisecond * time.Duration(g.rotateCount+1))))
 			}
 			select {
 			case err := <-readErr:
@@ -290,6 +291,22 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 	g.movePiece(input)
 
+	if input == rotateLeft || input == rotateRight {
+		g.rotateCount = g.rotateCount + 1
+		if g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks) {
+			if !g.resolveRotation() {
+				// move back to original spot
+				if opposite := input.opposite(); opposite != ignore {
+					g.movePiece(opposite)
+					g.ghostPiece = g.findGhostPiece()
+					return nil
+				}
+			}
+		}
+	} else {
+		g.rotateCount = 0
+	}
+
 	// new space already occupied
 	if (input == moveLeft || input == moveRight || (input == moveUp && g.debugMode)) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
 		// move back to original spot
@@ -297,16 +314,6 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			g.movePiece(opposite)
 			g.ghostPiece = g.findGhostPiece()
 			return nil
-		}
-	}
-	if (input == rotateLeft || input == rotateRight) && (g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks)) {
-		if !g.resolveRotation() {
-			// move back to original spot
-			if opposite := input.opposite(); opposite != ignore {
-				g.movePiece(opposite)
-				g.ghostPiece = g.findGhostPiece()
-				return nil
-			}
 		}
 	}
 	g.ghostPiece = g.findGhostPiece()
