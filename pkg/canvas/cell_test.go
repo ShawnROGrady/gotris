@@ -99,6 +99,149 @@ func TestCellColors(t *testing.T) {
 	}
 }
 
+var boxTests = map[string]struct {
+	inner         [][]Cell
+	caption       string
+	expectedCells [][]Cell
+}{
+	"4x4 blocks no caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+	"4x4 blocks 2 letter caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "HI",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &PipeCell{Type: HorizontalBar}, &TextCell{Text: "H"}, &TextCell{Text: "I"}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+	"4x4 blocks 3 letter caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "HEY",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &TextCell{Text: "H"}, &TextCell{Text: "E"}, &TextCell{Text: "Y"}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+	"4x4 blocks 4 letter caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "TEST",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &TextCell{Text: "T"}, &TextCell{Text: "E"}, &TextCell{Text: "S"}, &TextCell{Text: "T"}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+	"4x4 blocks 5 letter caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "TEST2",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &TextCell{Text: "T"}, &TextCell{Text: "E"}, &TextCell{Text: "S"}, &TextCell{Text: "T"}, &TextCell{Text: "2"}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+	"4x4 blocks 6 letter caption": {
+		inner: [][]Cell{
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+			{&BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}},
+		},
+		caption: "TEST00",
+		expectedCells: [][]Cell{
+			{&PipeCell{Type: TopLeft}, &TextCell{Text: "T"}, &TextCell{Text: "E"}, &TextCell{Text: "S"}, &TextCell{Text: "T"}, &TextCell{Text: "0"}, &TextCell{Text: "0"}, &PipeCell{Type: TopRight}},
+			{&PipeCell{Type: VerticalBar}, &TextCell{Text: " ", Color: Reset}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &TextCell{Text: " ", Color: Reset}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &TextCell{Text: " ", Color: Reset}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: VerticalBar}, &TextCell{Text: " ", Color: Reset}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &BlockCell{Color: Blue, Background: Blue}, &TextCell{Text: " ", Color: Reset}, &PipeCell{Type: VerticalBar}},
+			{&PipeCell{Type: BottomLeft}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: HorizontalBar}, &PipeCell{Type: BottomRight}},
+		},
+	},
+}
+
+func TestBox(t *testing.T) {
+	for testName, test := range boxTests {
+		boxedCells := Box(test.inner, test.caption)
+		if len(boxedCells) != len(test.expectedCells) {
+			t.Fatalf("Unexpected number of rows for test case '%s' [expected=%d, actual=%d]", testName, len(test.expectedCells), len(boxedCells))
+		}
+
+		for i := range boxedCells {
+			newRow := boxedCells[i]
+			expectedRow := test.expectedCells[i]
+			if len(newRow) != len(expectedRow) {
+				t.Fatalf("Unexpected number of cells in row %d for test case '%s' [expected=%d, actual=%d]", i, testName, len(expectedRow), len(newRow))
+			}
+
+			for j := range newRow {
+				if newRow[j] == nil && expectedRow[j] == nil {
+					continue
+				}
+				if newRow[j] == nil && expectedRow[j] != nil {
+					t.Errorf("cells[%d][%d] unexpectedly nil for test case '%s'", i, j, testName)
+					continue
+				}
+				if newRow[j] != nil && expectedRow[j] == nil {
+					t.Errorf("cells[%d][%d] unexpectedly non-nil for test case '%s'", i, j, testName)
+					continue
+				}
+				if newRow[j].String() != expectedRow[j].String() {
+					t.Errorf("Unexpected cells[%d][%d] value for test case '%s' [expected=%#v, actual=%#v]", i, j, testName, expectedRow[j], newRow[j])
+				}
+			}
+		}
+	}
+}
+
 var cellFromStringTests = map[string]struct {
 	inputText     string
 	inputColor    Color

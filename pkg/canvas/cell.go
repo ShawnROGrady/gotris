@@ -59,9 +59,8 @@ const (
 
 // PipeCell represents a single pipe element on the canvas
 type PipeCell struct {
-	Type       PipeType
-	Color      Color
-	Background Color
+	Type  PipeType
+	Color Color
 }
 
 func (p *PipeCell) String() string {
@@ -84,27 +83,61 @@ func (p *PipeCell) String() string {
 }
 
 // Box wraps a block of cells in a piped box
-func Box(inner [][]Cell) [][]Cell {
+func Box(inner [][]Cell, caption string) [][]Cell {
 	boxedCells := [][]Cell{}
+
 	topRow := []Cell{&PipeCell{Type: TopLeft}}
 	bottomRow := []Cell{&PipeCell{Type: BottomLeft}}
-	bar := []Cell{}
-	for range inner[0] {
-		bar = append(bar, &PipeCell{Type: HorizontalBar})
+
+	var bar []Cell
+	if len(caption) > len(inner[0]) {
+		bar = make([]Cell, len(caption))
+	} else {
+		bar = make([]Cell, len(inner[0]))
+	}
+	for i := range bar {
+		bar[i] = &PipeCell{Type: HorizontalBar}
+	}
+
+	bottomRow = append(bottomRow, bar...)
+	bottomRow = append(bottomRow, &PipeCell{Type: BottomRight})
+
+	// center the text on the top bar
+	if caption != "" {
+		var (
+			textStart = (len(bar) - len(caption)) / 2
+		)
+		for i := 0; i < len(caption); i++ {
+			bar[i+textStart] = &TextCell{
+				Text: string(caption[i]),
+			}
+		}
 	}
 
 	topRow = append(topRow, bar...)
 	topRow = append(topRow, &PipeCell{Type: TopRight})
 
-	bottomRow = append(bottomRow, bar...)
-	bottomRow = append(bottomRow, &PipeCell{Type: BottomRight})
-
 	boxedCells = append(boxedCells, topRow)
 
+	// add vertical bars on either side of the inner cells
 	for i := range inner {
-		row := inner[i]
-		row = append([]Cell{&PipeCell{Type: VerticalBar}}, row...)
-		row = append(row, &PipeCell{Type: VerticalBar})
+		var (
+			innerRow   = inner[i]
+			innerStart = (len(bar) + 2 - len(innerRow)) / 2
+			row        = make([]Cell, len(bar)+2)
+		)
+		row[0] = &PipeCell{Type: VerticalBar}
+		row[len(row)-1] = &PipeCell{Type: VerticalBar}
+		for j := 1; j < len(row)-1; j++ {
+			if j < innerStart || j > len(innerRow)+innerStart-1 {
+				row[j] = &TextCell{
+					Color: Reset,
+					Text:  " ",
+				}
+				continue
+			}
+			row[j] = innerRow[j-innerStart]
+		}
 		boxedCells = append(boxedCells, row)
 	}
 	boxedCells = append(boxedCells, bottomRow)

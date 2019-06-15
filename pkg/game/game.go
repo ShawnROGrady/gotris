@@ -505,19 +505,19 @@ func (g *Game) cells(b *board.Board) [][]canvas.Cell {
 	if !g.disableSide {
 		nextPiece := g.nextPieces[0]
 		formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
-		nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale))
+		nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale), "NEXT")
 		for i := range nextPieceCells {
 			gameCells[i] = append(gameCells[i], nextPieceCells[i]...)
 		}
 
 		currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
-		scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background))
+		scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background), "")
 
 		for i := range scoreCells {
 			gameCells[i+len(nextPieceCells)] = append(gameCells[i+len(nextPieceCells)], scoreCells[i]...)
 		}
 
-		schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background))
+		schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background), "CONTROLS")
 		for i := range schemeCells {
 			gameCells[i+len(nextPieceCells)+len(scoreCells)] = append(gameCells[i+len(nextPieceCells)+len(scoreCells)], schemeCells[i]...)
 		}
