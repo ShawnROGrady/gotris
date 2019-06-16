@@ -46,8 +46,7 @@ func (b *Block) cell() *canvas.BlockCell {
 func BlockGridCells(b [][]*Block, background canvas.Color, widthScale int) [][]canvas.Cell {
 	cells := [][]canvas.Cell{}
 
-	// reverse the rows
-	for i := len(b) - 1; i >= 0; i-- {
+	for i := 0; i < len(b); i++ {
 		row := []canvas.Cell{}
 		for _, block := range b[i] {
 			if block == nil {
@@ -73,7 +72,29 @@ func BlockGridCells(b [][]*Block, background canvas.Color, widthScale int) [][]c
 // Cells generates a visual representation of the board
 func (b *Board) Cells() [][]canvas.Cell {
 	activeBlocks := b.Blocks[:len(b.Blocks)-b.HiddenRows]
-	return BlockGridCells(activeBlocks, b.Background, b.widthScale)
+	cells := [][]canvas.Cell{}
+	// reverse the rows
+	for i := len(activeBlocks) - 1; i >= 0; i-- {
+		row := []canvas.Cell{}
+		for _, block := range activeBlocks[i] {
+			if block == nil {
+				for i := 0; i < b.widthScale; i++ {
+					row = append(row, &canvas.BlockCell{
+						Color:      b.Background,
+						Background: b.Background,
+					})
+				}
+				continue
+			}
+			blockCell := block.cell()
+			blockCell.Background = b.Background
+			for i := 0; i < b.widthScale; i++ {
+				row = append(row, blockCell)
+			}
+		}
+		cells = append(cells, row)
+	}
+	return cells
 }
 
 // ClearFullRows checks if any rows are full and clears them if so
