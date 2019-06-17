@@ -29,7 +29,6 @@ type Game struct {
 	controlScheme ControlScheme
 	widthScale    int
 	gameCells     gameCells
-	rotateCount   int
 	color         canvas.Color
 }
 
@@ -121,11 +120,12 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 	}
 
 	go func() {
+		var gravity <-chan time.Time
+		if !g.debugMode {
+			// set initial gravity
+			gravity = time.After(g.level.gTime())
+		}
 		for {
-			var gravity <-chan time.Time
-			if !g.debugMode {
-				gravity = time.After((g.level.gTime() * (time.Millisecond) / (time.Millisecond * time.Duration(g.rotateCount+1))))
-			}
 			select {
 			case err := <-readErr:
 				runErr <- err
@@ -136,6 +136,9 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 				if err := g.handleInput(moveDown, endScore); err != nil {
 					runErr <- err
 					return
+				}
+				if !g.debugMode {
+					gravity = time.After(g.level.gTime())
 				}
 			case in := <-input:
 				if g.debugMode {
@@ -295,7 +298,6 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	g.movePiece(input)
 
 	if input == rotateLeft || input == rotateRight {
-		g.rotateCount = g.rotateCount + 1
 		if g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks) {
 			if !g.resolveRotation() {
 				// move back to original spot
@@ -306,8 +308,6 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 				}
 			}
 		}
-	} else {
-		g.rotateCount = 0
 	}
 
 	// new space already occupied
