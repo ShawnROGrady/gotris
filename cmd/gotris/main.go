@@ -21,6 +21,7 @@ func main() {
 	flag.Var(schemeArgs, "scheme", fmt.Sprintf("The control scheme to use, multiple may be specified (default: %s)", game.HomeRowName))
 	describeScheme := flag.Bool("describe-scheme", false, "Prints the specified control scheme then exits. If none specified then all available schemes are described")
 	lightMode := flag.Bool("light-mode", false, "Update colors to work for light color schemes")
+	lowContrastMode := flag.Bool("low-contrast", false, "Update colors to use lower contrast (updates background to white for 'light-mode', black otherwise)")
 
 	flag.Parse()
 
@@ -41,8 +42,17 @@ func main() {
 	}
 
 	background := canvas.White
+	color := canvas.White
 	if lightMode != nil && *lightMode {
 		background = canvas.Black
+		if lowContrastMode != nil && *lowContrastMode {
+			background = canvas.White
+		}
+		color = canvas.Black
+	} else {
+		if lowContrastMode != nil && *lowContrastMode {
+			background = canvas.Black
+		}
 	}
 
 	if describeScheme != nil && *describeScheme {
@@ -78,6 +88,7 @@ func main() {
 		ControlScheme: scheme,
 		WidthScale:    2,
 		Background:    background,
+		Color:         color,
 	}
 
 	g := game.New(conf)

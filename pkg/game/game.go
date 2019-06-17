@@ -30,6 +30,7 @@ type Game struct {
 	widthScale    int
 	gameCells     gameCells
 	rotateCount   int
+	color         canvas.Color
 }
 
 // Config represents the configuration for a game
@@ -44,6 +45,7 @@ type Config struct {
 	ControlScheme ControlScheme
 	WidthScale    int
 	Background    canvas.Color
+	Color         canvas.Color
 }
 
 type gameCells struct {
@@ -82,6 +84,7 @@ func New(c Config) *Game {
 		disableSide:   c.DisableSide,
 		controlScheme: c.ControlScheme,
 		widthScale:    c.WidthScale,
+		color:         c.Color,
 	}
 }
 
@@ -101,7 +104,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 
 	if !g.disableSide {
 		// add initial sidebar cells
-		g.updateCells(g.board)
+		g.updateCells(g.board.Background)
 	}
 	g.canvas.UpdateCells(g.cells(g.board))
 
@@ -359,7 +362,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 		if !g.disableSide {
 			// update cells to include new next + updated score
-			g.updateCells(g.board)
+			g.updateCells(g.board.Background)
 		}
 
 		// add new piece to canvas
@@ -523,15 +526,15 @@ func (g *Game) boardWithGhost() *board.Board {
 	return &newBoard
 }
 
-func (g *Game) updateCells(b *board.Board) {
+func (g *Game) updateCells(background canvas.Color) {
 	nextPiece := g.nextPieces[0]
 	formattedBlocks := centerBlocks(nextPiece.Blocks(), tetrimino.MaxWidth, tetrimino.MaxHeight)
-	nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, b.Background, g.widthScale), "NEXT")
+	nextPieceCells := canvas.Box(board.BlockGridCells(formattedBlocks, background, g.widthScale), "NEXT")
 
 	currentScore := fmt.Sprintf("Score: %d\nLevel: %d", g.currentScore, g.level)
-	scoreCells := canvas.Box(canvas.CellsFromString(currentScore, b.Background), "")
+	scoreCells := canvas.Box(canvas.CellsFromString(currentScore, g.color), "")
 
-	schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), b.Background), "CONTROLS")
+	schemeCells := canvas.Box(canvas.CellsFromString(g.controlScheme.Description(), g.color), "CONTROLS")
 
 	g.gameCells = gameCells{
 		nextPiece: nextPieceCells,
