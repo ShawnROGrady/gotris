@@ -389,7 +389,7 @@ var handleInputTests = map[string]struct {
 		boardHeight:      20,
 		hiddenRows:       4,
 		expectAtTop:      true,
-		inputSequence:    fillInputSequence(moveDown, 21),
+		inputSequence:    fillInputSequence(moveDown, 22), // 21 to get to bottom, one to lock in place
 		// new piece will also be an "I" piece
 		expectedPosition: tetriminoTestCase{
 			expectedMaxY: tetriminoCoordTest{
@@ -436,7 +436,7 @@ var handleInputTests = map[string]struct {
 		hiddenRows:       4,
 		expectAtTop:      false,
 		inputSequence: combineInputSequences(
-			[]userInput{rotateLeft}, fillInputSequence(moveDown, 19), // rotate then move to bottom
+			[]userInput{rotateLeft}, fillInputSequence(moveDown, 20), // rotate then move to bottom
 			[]userInput{rotateLeft, moveRight}, fillInputSequence(moveDown, 17), []userInput{moveLeft}, // rotate, move right, move down then attempt to move left
 		),
 		// final move should fail
@@ -674,7 +674,7 @@ var handleInputTests = map[string]struct {
 		boardWidth:       10,
 		boardHeight:      20,
 		hiddenRows:       4,
-		inputSequence:    append(fillInputSequence(moveDown, 252)), // sum(x, 2, 22)
+		inputSequence:    append(fillInputSequence(moveDown, 273)), // sum(x, 3, 23)
 		expectAtTop:      true,
 		expectGameOver:   true,
 	},

@@ -256,7 +256,7 @@ func (g *Game) pieceAtBottom(piece tetrimino.Tetrimino) bool {
 		pieceCoords = make(map[tetrimino.Coordinates]bool)
 	)
 
-	if piece.YMin().Y == 0 {
+	if piece.YMin().Y <= 0 {
 		return true
 	}
 
@@ -292,8 +292,11 @@ func (g *Game) pieceAtBottom(piece tetrimino.Tetrimino) bool {
 }
 
 func (g *Game) handleInput(input userInput, endScore chan int) error {
-	topL := g.currentPiece.ContainingBox().TopLeft
-	blocks := g.currentPiece.Blocks()
+	var (
+		topL     = g.currentPiece.ContainingBox().TopLeft
+		blocks   = g.currentPiece.Blocks()
+		canSlide = true
+	)
 
 	g.movePiece(input)
 
@@ -319,6 +322,17 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 			return nil
 		}
 	}
+
+	// piece was already at the bottom
+	if (!g.debugMode && input == moveUp) || g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks) {
+		canSlide = false
+		if g.pieceOutOfBounds() || g.pieceConflicts(topL, blocks) {
+			if opposite := input.opposite(); opposite != ignore {
+				g.movePiece(opposite)
+				g.ghostPiece = g.findGhostPiece()
+			}
+		}
+	}
 	g.ghostPiece = g.findGhostPiece()
 
 	// clear cell where piece was
@@ -339,7 +353,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	g.ghostPiece = g.findGhostPiece()
 
 	// generate new current piece if at bottom or on top of another piece
-	if g.pieceAtBottom(g.currentPiece) {
+	if g.pieceAtBottom(g.currentPiece) && !canSlide {
 		// check if any rows can be cleared
 		linesCleared := g.board.ClearFullRows()
 		g.linesCleared += linesCleared
