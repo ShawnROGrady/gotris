@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime/pprof"
 	"syscall"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
@@ -22,6 +23,7 @@ func main() {
 	describeScheme := flag.Bool("describe-scheme", false, "Prints the specified control scheme then exits. If none specified then all available schemes are described")
 	lightMode := flag.Bool("light-mode", false, "Update colors to work for light color schemes")
 	lowContrastMode := flag.Bool("low-contrast", false, "Update colors to use lower contrast (updates background to white for 'light-mode', black otherwise)")
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to specified file")
 
 	flag.Parse()
 
@@ -63,6 +65,18 @@ func main() {
 	if scheme == nil {
 		// default to home row if no scheme provided
 		scheme = game.ControlSchemes{game.HomeRow()}
+	}
+
+	if cpuprofile != nil && *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal("could not create CPU profile: ", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			log.Fatal("could not start CPU profile: ", err)
+		}
+		defer pprof.StopCPUProfile()
 	}
 
 	undoSetup, err := setupTerm()
