@@ -2,7 +2,7 @@ package canvas
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"runtime"
 )
 
@@ -15,7 +15,7 @@ type Canvas interface {
 
 // TermCanvas represents what is actually rendered to the user via the terminal
 type TermCanvas struct {
-	dest       *os.File
+	dest       io.Writer
 	Background Color
 	cells      [][]Cell
 	debugMode  bool
@@ -23,7 +23,7 @@ type TermCanvas struct {
 
 // Config represents the configuration params for a terminal canvas
 type Config struct {
-	Term       *os.File
+	Term       io.Writer
 	Width      int
 	Height     int
 	Background Color
@@ -107,7 +107,7 @@ func resetString() string {
 }
 
 func (c *TermCanvas) clear() error {
-	_, err := c.dest.WriteString(resetString())
+	_, err := c.dest.Write([]byte(resetString()))
 	if err != nil {
 		return err
 	}
@@ -115,7 +115,7 @@ func (c *TermCanvas) clear() error {
 }
 
 func (c *TermCanvas) setCursor(x, y int) error {
-	_, err := c.dest.WriteString(fmt.Sprintf("\033[%d;%dH", x, y))
+	_, err := c.dest.Write([]byte(fmt.Sprintf("\033[%d;%dH", x, y)))
 	if err != nil {
 		return err
 	}
