@@ -1,9 +1,10 @@
 package canvas
 
 import (
-	"fmt"
+	"bytes"
 	"io"
 	"runtime"
+	"strconv"
 )
 
 // Canvas represents a way to render to game to the user
@@ -55,38 +56,28 @@ func (c *TermCanvas) Init() error {
 
 // Render renders the current canvas
 func (c *TermCanvas) Render() error {
+	var b bytes.Buffer
 	if !c.debugMode {
 		// reset cursor
-		if err := c.setCursor(0, 0); err != nil {
-			return err
-		}
+		b.Write(c.setCursor(0, 0))
 	}
 
 	for _, row := range c.cells {
-		var buf = []byte{}
 		for _, cell := range row {
 			if cell == nil {
-				buf = append(buf,
-					[]byte(fmt.Sprintf("%s%s", c.Background, block))...,
-				)
+				b.WriteString(c.Background.String())
+				b.WriteString(block)
 				continue
 			}
-			buf = append(buf, []byte(cell.String())...)
+			b.WriteString(cell.String())
 		}
-		buf = append(buf, '\n')
-
-		_, err := c.dest.Write(buf)
-		if err != nil {
-			return err
-		}
-		_, err = c.dest.Write([]byte(Reset.String()))
-		if err != nil {
-			return err
-		}
+		b.WriteString("\n")
+		b.WriteString(Reset.String())
 	}
+	b.WriteString(Reset.String())
 
 	// clear any potential formatting
-	_, err := c.dest.Write([]byte(Reset.String()))
+	_, err := c.dest.Write(b.Bytes())
 	return err
 }
 
@@ -114,10 +105,13 @@ func (c *TermCanvas) clear() error {
 	return nil
 }
 
-func (c *TermCanvas) setCursor(x, y int) error {
-	_, err := c.dest.Write([]byte(fmt.Sprintf("\033[%d;%dH", x, y)))
-	if err != nil {
-		return err
-	}
-	return nil
+func (c *TermCanvas) setCursor(x, y int) []byte {
+	var b bytes.Buffer
+	b.WriteString("\033[")
+	b.WriteString(strconv.Itoa(x))
+	b.WriteString(";")
+	b.WriteString(strconv.Itoa(y))
+	b.WriteString("H")
+
+	return b.Bytes()
 }
