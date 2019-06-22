@@ -1,6 +1,9 @@
 package canvas
 
-import "fmt"
+import (
+	"strconv"
+	"strings"
+)
 
 // Color is used to alter the color of cells on the canvas
 type Color int
@@ -43,19 +46,32 @@ const (
 	BackgroundOrange Color = -208
 )
 
+var resetControl = []byte{'\u001b', '[', '0', 'm'}
+
 func (c Color) String() string {
+	var b strings.Builder
+	b.Grow(5)
+	b.WriteString("\u001b[")
 	switch c {
 	case BrightBlack, BrightRed, BrightGreen, BrightYellow, BrightBlue, BrightMagenta, BrightCyan, BrightWhite:
-		return fmt.Sprintf("\u001b[%d;1m", c-8)
+		b.WriteString(strconv.Itoa(int(c) - 8))
+		b.WriteString(";1m")
 	case BackgroundBlack, BackgroundRed, BackgroundGreen, BackgroundYellow, BackgroundBlue, BackgroundMagenta, BackgroundCyan, BackgroundWhite:
-		return fmt.Sprintf("\u001b[%dm", c-6)
+		b.WriteString(strconv.Itoa(int(c) - 6))
+		b.WriteString("m")
 	case Reset, Black, Red, Green, Yellow, Blue, Magenta, Cyan, White:
-		return fmt.Sprintf("\u001b[%dm", c)
+		b.WriteString(strconv.Itoa(int(c)))
+		b.WriteString("m")
 	case BackgroundOrange:
-		return fmt.Sprintf("\u001b[48;5;%dm", c*-1)
+		b.WriteString("48;5;")
+		b.WriteString(strconv.Itoa(-1 * int(c)))
+		b.WriteString("m")
 	default:
-		return fmt.Sprintf("\u001b[38;5;%dm", c)
+		b.WriteString("38;5;")
+		b.WriteString(strconv.Itoa(int(c)))
+		b.WriteString("m")
 	}
+	return b.String()
 }
 
 func (c Color) description() string {
@@ -93,7 +109,11 @@ func (c Color) description() string {
 
 // decorate formats the provided input so it can be printed in color
 func (c Color) decorate(input string) string {
-	return fmt.Sprintf("%s%s", c, input)
+	var b strings.Builder
+	b.Grow(13)
+	b.WriteString(c.String())
+	b.WriteString(input)
+	return b.String()
 }
 
 func (c Color) background() Color {
