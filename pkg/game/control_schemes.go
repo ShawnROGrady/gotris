@@ -10,6 +10,7 @@ import (
 const (
 	HomeRowName   = "home-row"
 	ArrowKeysName = "arrow-keys"
+	StandardName  = "standard"
 )
 
 // ControlScheme represents a mapping of keys to user input
@@ -27,6 +28,8 @@ func SchemeFromName(name string) (ControlScheme, error) {
 		return HomeRow(), nil
 	case ArrowKeysName:
 		return ArrowKeys(), nil
+	case StandardName:
+		return Standard(), nil
 	default:
 		return nil, fmt.Errorf("Unrecognized control scheme '%s'", name)
 	}
@@ -34,7 +37,7 @@ func SchemeFromName(name string) (ControlScheme, error) {
 
 // AvailableSchemes represents the set of available control schemes
 func AvailableSchemes() []ControlScheme {
-	return []ControlScheme{HomeRow(), ArrowKeys()}
+	return []ControlScheme{HomeRow(), ArrowKeys(), Standard()}
 }
 
 // this approach allows us to more easily change the actual value based on GOOS
@@ -71,6 +74,13 @@ func leftArrow() key {
 	return key{
 		name:  "\u2190",
 		value: "\u001b[D",
+	}
+}
+
+func spaceBar() key {
+	return key{
+		name:  "SPACE",
+		value: " ",
 	}
 }
 
@@ -142,6 +152,30 @@ func ArrowKeys() ControlScheme {
 				leftKey:        moveLeft,
 				rotateLeftKey:  rotateLeft,
 				rotateRightKey: rotateRight,
+			}
+		},
+	}
+}
+
+// Standard represents a control scheme similar to the standard tetrix keyboard controls
+func Standard() ControlScheme {
+	return keyMapping{
+		name: StandardName,
+		mapping: func() map[key]userInput {
+			var (
+				upKey    = upArrow()
+				downKey  = downArrow()
+				rightKey = rightArrow()
+				leftKey  = leftArrow()
+				spaceBar = spaceBar()
+			)
+
+			return map[key]userInput{
+				upKey:    rotateLeft,
+				downKey:  moveDown,
+				rightKey: moveRight,
+				leftKey:  moveLeft,
+				spaceBar: moveUp,
 			}
 		},
 	}
