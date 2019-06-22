@@ -59,7 +59,7 @@ func (c *TermCanvas) Render() error {
 	var b bytes.Buffer
 	if !c.debugMode {
 		// reset cursor
-		b.Write(c.setCursor(0, 0))
+		b.Write(resetTermCursor)
 	}
 
 	for _, row := range c.cells {
@@ -71,10 +71,10 @@ func (c *TermCanvas) Render() error {
 			}
 			b.WriteString(cell.String())
 		}
-		b.WriteString("\n")
-		b.WriteString(Reset.String())
+		b.WriteByte('\n')
+		b.Write(resetControl)
 	}
-	b.WriteString(Reset.String())
+	b.Write(resetControl)
 
 	// clear any potential formatting
 	_, err := c.dest.Write(b.Bytes())
@@ -104,6 +104,8 @@ func (c *TermCanvas) clear() error {
 	}
 	return nil
 }
+
+var resetTermCursor = []byte{'\x1b', '[', '0', ';', '0', 'H'}
 
 func (c *TermCanvas) setCursor(x, y int) []byte {
 	var b bytes.Buffer

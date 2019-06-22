@@ -46,8 +46,11 @@ const (
 	BackgroundOrange Color = -208
 )
 
+var resetControl = []byte{'\u001b', '[', '0', 'm'}
+
 func (c Color) String() string {
 	var b strings.Builder
+	b.Grow(5)
 	b.WriteString("\u001b[")
 	switch c {
 	case BrightBlack, BrightRed, BrightGreen, BrightYellow, BrightBlue, BrightMagenta, BrightCyan, BrightWhite:
@@ -107,6 +110,7 @@ func (c Color) description() string {
 // decorate formats the provided input so it can be printed in color
 func (c Color) decorate(input string) string {
 	var b strings.Builder
+	b.Grow(13)
 	b.WriteString(c.String())
 	b.WriteString(input)
 	return b.String()
