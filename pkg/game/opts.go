@@ -44,7 +44,7 @@ type withBackground canvas.Color
 func (w withBackground) Apply(g *Game) {}
 
 func (w withBackground) ApplyToBoard(b *board.Board) {
-	b.Background = canvas.Color(w)
+	board.WithBackground(canvas.Color(w)).ApplyToBoard(b)
 }
 
 func (w withBackground) ApplyToCanvas(c *canvas.TermCanvas) {

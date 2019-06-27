@@ -1,8 +1,21 @@
 package board
 
+import "github.com/ShawnROGrady/gotris/pkg/canvas"
+
 // Option represents a configuration option for the board
 type Option interface {
 	ApplyToBoard(b *Board)
+}
+
+// WithBackground returns an option specifies the background for the canvas and board
+func WithBackground(c canvas.Color) Option {
+	return withBackground(c)
+}
+
+type withBackground canvas.Color
+
+func (w withBackground) ApplyToBoard(b *Board) {
+	b.background = canvas.Color(w)
 }
 
 // WithWidthScale returns an option that specifies how blocks should be scaled to cells
@@ -24,7 +37,7 @@ func WithHiddenRows(rows int) Option {
 type withHiddenRows int
 
 func (w withHiddenRows) ApplyToBoard(b *Board) {
-	b.HiddenRows = int(w)
+	b.hiddenRows = int(w)
 }
 
 // WithWidth returns an option the specifies the width of the board
@@ -35,7 +48,7 @@ func WithWidth(width int) Option {
 type withWidth int
 
 func (w withWidth) ApplyToBoard(b *Board) {
-	b.Width = int(w)
+	b.width = int(w)
 }
 
 // WithHeight returns an option the specifies the height of the board
@@ -46,5 +59,5 @@ func WithHeight(height int) Option {
 type withHeight int
 
 func (w withHeight) ApplyToBoard(b *Board) {
-	b.Height = int(w)
+	b.height = int(w)
 }

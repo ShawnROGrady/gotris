@@ -12,12 +12,12 @@ const (
 
 // Board represents the game board
 type Board struct {
-	Background canvas.Color
+	background canvas.Color
 	Blocks     [][]*Block
-	HiddenRows int
+	hiddenRows int
 	widthScale int
-	Width      int
-	Height     int
+	width      int
+	height     int
 }
 
 // New creates a new board
@@ -25,25 +25,35 @@ func New(opts ...Option) *Board {
 	var blocks = [][]*Block{}
 
 	b := &Board{
-		Background: canvas.DefaultBackground,
-		HiddenRows: defaultHiddenRows,
+		background: canvas.DefaultBackground,
+		hiddenRows: defaultHiddenRows,
 		widthScale: DefaultWidthScale,
-		Width:      canvas.DefaultWidth / DefaultWidthScale,
-		Height:     canvas.DefaultHeight,
+		width:      canvas.DefaultWidth / DefaultWidthScale,
+		height:     canvas.DefaultHeight,
 	}
 
 	for i := range opts {
 		opts[i].ApplyToBoard(b)
 	}
 
-	for i := 0; i < b.Height+b.HiddenRows; i++ {
-		row := make([]*Block, b.Width)
+	for i := 0; i < b.height+b.hiddenRows; i++ {
+		row := make([]*Block, b.width)
 		blocks = append(blocks, row)
 	}
 
 	b.Blocks = blocks
 
 	return b
+}
+
+// Background returns the boards background color
+func (b *Board) Background() canvas.Color {
+	return b.background
+}
+
+// HiddenRows returns the number of rows that will be excluded when rendering
+func (b *Board) HiddenRows() int {
+	return b.hiddenRows
 }
 
 // Block represents a single block on the board
@@ -88,7 +98,7 @@ func BlockGridCells(b [][]*Block, background canvas.Color, widthScale int) [][]c
 
 // Cells generates a visual representation of the board
 func (b *Board) Cells() [][]canvas.Cell {
-	activeBlocks := b.Blocks[:len(b.Blocks)-b.HiddenRows]
+	activeBlocks := b.Blocks[:len(b.Blocks)-b.hiddenRows]
 	cells := [][]canvas.Cell{}
 	// reverse the rows
 	for i := len(activeBlocks) - 1; i >= 0; i-- {
@@ -97,14 +107,14 @@ func (b *Board) Cells() [][]canvas.Cell {
 			if block == nil {
 				for i := 0; i < b.widthScale; i++ {
 					row = append(row, &canvas.BlockCell{
-						Color:      b.Background,
-						Background: b.Background,
+						Color:      b.background,
+						Background: b.background,
 					})
 				}
 				continue
 			}
 			blockCell := block.cell()
-			blockCell.Background = b.Background
+			blockCell.Background = b.background
 			for i := 0; i < b.widthScale; i++ {
 				row = append(row, blockCell)
 			}

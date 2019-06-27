@@ -78,8 +78,13 @@ func New(term *os.File, opts ...Option) *Game {
 	board := board.New(boardOpts...)
 	g.board = board
 
+	var (
+		boardWidth  = len(g.board.Blocks[0])
+		boardHeight = len(g.board.Blocks)
+	)
+
 	// initialize first pieces
-	initPieces := tetrimino.NewSet(board.Width, board.Height+board.HiddenRows)
+	initPieces := tetrimino.NewSet(boardWidth, boardHeight)
 	piece, pieceSet := initPieces[0], initPieces[1:]
 	g.currentPiece = piece
 	g.nextPieces = pieceSet
@@ -103,7 +108,7 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 
 	if !g.disableSide {
 		// add initial sidebar cells
-		g.updateCells(g.board.Background)
+		g.updateCells(g.board.Background())
 	}
 	g.canvas.UpdateCells(g.cells(g.board))
 
@@ -244,7 +249,7 @@ func (g *Game) pieceOutOfBounds() bool {
 
 // checks if the current piece is in the hidden row(s)
 func (g *Game) pieceAtTop() bool {
-	return g.currentPiece.YMax().Y > len(g.board.Blocks)-g.board.HiddenRows-1
+	return g.currentPiece.YMax().Y > len(g.board.Blocks)-g.board.HiddenRows()-1
 }
 
 // current piece is at minimum vertical position
@@ -376,7 +381,7 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 
 		if !g.disableSide {
 			// update cells to include new next + updated score
-			g.updateCells(g.board.Background)
+			g.updateCells(g.board.Background())
 		}
 
 		// add new piece to canvas
