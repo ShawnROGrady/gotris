@@ -13,7 +13,7 @@ type Option interface {
 type withBackground Color
 
 func (w withBackground) ApplyToCanvas(c *TermCanvas) {
-	c.Background = Color(w)
+	c.background = Color(w)
 }
 
 // WithDebugMode specifies that the canvas should render in debug mode

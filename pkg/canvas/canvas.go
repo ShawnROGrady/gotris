@@ -24,18 +24,11 @@ type Canvas interface {
 // TermCanvas represents what is actually rendered to the user via the terminal
 type TermCanvas struct {
 	dest       io.Writer
-	Background Color
+	background Color
 	cells      [][]Cell
 	debugMode  bool
 	width      int
 	height     int
-}
-
-// Config represents the configuration params for a terminal canvas
-type Config struct {
-	Term   io.Writer
-	Width  int
-	Height int
 }
 
 // New returns a new canvas
@@ -44,7 +37,7 @@ func New(term io.Writer, opts ...Option) *TermCanvas {
 
 	t := &TermCanvas{
 		dest:       term,
-		Background: DefaultBackground,
+		background: DefaultBackground,
 	}
 
 	for i := range opts {
@@ -77,7 +70,7 @@ func (c *TermCanvas) Render() error {
 	for _, row := range c.cells {
 		for _, cell := range row {
 			if cell == nil {
-				b.WriteString(c.Background.String())
+				b.WriteString(c.background.String())
 				b.WriteString(block)
 				continue
 			}
