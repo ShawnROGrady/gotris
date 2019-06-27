@@ -34,13 +34,9 @@ func (t *testCanvas) UpdateCells(newCells [][]canvas.Cell) { t.cells = newCells 
 func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, height int) []tetrimino.Tetrimino) *Game {
 	initPieces := pieceSetConstructor(width, height+hiddenRows)
 	piece, pieceSet := initPieces[0], initPieces[1:]
+	opts := []board.Option{board.WithWidth(width), board.WithHeight(height), board.WithHiddenRows(hiddenRows)}
 	return &Game{
-		board: board.New(
-			canvas.White,
-			width, height,
-			hiddenRows,
-			2, // widthScale
-		),
+		board:         board.New(opts...),
 		currentPiece:  piece,
 		nextPieces:    pieceSet,
 		canvas:        &testCanvas{cells: [][]canvas.Cell{}},
@@ -791,11 +787,7 @@ func TestHandleInput(t *testing.T) {
 }
 
 func TestNextPiece(t *testing.T) {
-	g := New(Config{
-		Term:  nil,
-		Width: 10, Height: 20,
-		HiddenRows: 4,
-	})
+	g := New(nil)
 
 	// verify correct number of pieces for new game (7 tetriminos - 1 currentPiece)
 	if len(g.nextPieces) != 6 {
@@ -917,12 +909,8 @@ func TestBoardWithGhost(t *testing.T) {
 		}
 
 		// create a brand new board and add the ghost piece
-		board2 := board.New(
-			canvas.White,
-			test.boardWidth, test.boardHeight,
-			test.hiddenRows,
-			2,
-		)
+		opts := []board.Option{board.WithWidth(test.boardWidth), board.WithHeight(test.boardHeight), board.WithHiddenRows(test.hiddenRows)}
+		board2 := board.New(opts...)
 		g.board = board2
 		g.addPieceToBoard(g.ghostPiece)
 

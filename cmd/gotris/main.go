@@ -43,18 +43,31 @@ func main() {
 		scheme = append(scheme, s)
 	}
 
-	background := canvas.White
-	color := canvas.White
+	opts := []game.Option{}
+
 	if lightMode != nil && *lightMode {
-		background = canvas.Black
+		background := canvas.Black
 		if lowContrastMode != nil && *lowContrastMode {
 			background = canvas.White
 		}
-		color = canvas.Black
+		opts = append(opts, game.WithBackground(background))
+		opts = append(opts, game.WithColor(canvas.Black))
 	} else {
 		if lowContrastMode != nil && *lowContrastMode {
-			background = canvas.Black
+			opts = append(opts, game.WithBackground(canvas.Black))
 		}
+	}
+
+	if disableGhost != nil && *disableGhost {
+		opts = append(opts, game.WithoutGhost())
+	}
+
+	if debugMode != nil && *debugMode {
+		opts = append(opts, game.WithDebugMode())
+	}
+
+	if disableSide != nil && *disableSide {
+		opts = append(opts, game.WithoutSide())
 	}
 
 	if describeScheme != nil && *describeScheme {
@@ -66,6 +79,7 @@ func main() {
 		// default to home row if no scheme provided
 		scheme = game.ControlSchemes{game.HomeRow()}
 	}
+	opts = append(opts, game.WithControlScheme(scheme))
 
 	if cpuprofile != nil && *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -92,20 +106,7 @@ func main() {
 	}
 	defer f.Close()
 
-	conf := game.Config{
-		Term:  f,
-		Width: 10, Height: 20,
-		HiddenRows:    4,
-		DebugMode:     *debugMode,
-		DisableGhost:  *disableGhost,
-		DisableSide:   *disableSide,
-		ControlScheme: scheme,
-		WidthScale:    2,
-		Background:    background,
-		Color:         color,
-	}
-
-	g := game.New(conf)
+	g := game.New(f, opts...)
 
 	done := make(chan bool)
 	defer close(done)

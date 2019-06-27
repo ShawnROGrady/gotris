@@ -7,6 +7,13 @@ import (
 	"strconv"
 )
 
+// Defaults for canvas
+const (
+	DefaultBackground = White
+	DefaultWidth      = 20
+	DefaultHeight     = 20
+)
+
 // Canvas represents a way to render to game to the user
 type Canvas interface {
 	Init() error
@@ -20,32 +27,37 @@ type TermCanvas struct {
 	Background Color
 	cells      [][]Cell
 	debugMode  bool
+	width      int
+	height     int
 }
 
 // Config represents the configuration params for a terminal canvas
 type Config struct {
-	Term       io.Writer
-	Width      int
-	Height     int
-	Background Color
-	DebugMode  bool
+	Term   io.Writer
+	Width  int
+	Height int
 }
 
 // New returns a new canvas
-func New(c Config) *TermCanvas {
+func New(term io.Writer, opts ...Option) *TermCanvas {
 	var cells = [][]Cell{}
 
-	for i := 0; i < c.Height; i++ {
-		row := make([]Cell, c.Width)
-		cells = append(cells, row)
+	t := &TermCanvas{
+		dest:       term,
+		Background: DefaultBackground,
 	}
 
-	return &TermCanvas{
-		dest:       c.Term,
-		Background: c.Background,
-		cells:      cells,
-		debugMode:  c.DebugMode,
+	for i := range opts {
+		opts[i].ApplyToCanvas(t)
 	}
+
+	for i := 0; i < t.height; i++ {
+		row := make([]Cell, t.width)
+		cells = append(cells, row)
+	}
+	t.cells = cells
+
+	return t
 }
 
 // Init sets up the canvas in order to be written to

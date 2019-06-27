@@ -4,29 +4,46 @@ import (
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
 )
 
+// Defaults for board
+const (
+	DefaultWidthScale = 2
+	defaultHiddenRows = 4
+)
+
 // Board represents the game board
 type Board struct {
 	Background canvas.Color
 	Blocks     [][]*Block
 	HiddenRows int
 	widthScale int
+	Width      int
+	Height     int
 }
 
 // New creates a new board
-func New(background canvas.Color, width, height, hiddenRows, widthScale int) *Board {
+func New(opts ...Option) *Board {
 	var blocks = [][]*Block{}
 
-	for i := 0; i < height+hiddenRows; i++ {
-		row := make([]*Block, width)
+	b := &Board{
+		Background: canvas.DefaultBackground,
+		HiddenRows: defaultHiddenRows,
+		widthScale: DefaultWidthScale,
+		Width:      canvas.DefaultWidth / DefaultWidthScale,
+		Height:     canvas.DefaultHeight,
+	}
+
+	for i := range opts {
+		opts[i].ApplyToBoard(b)
+	}
+
+	for i := 0; i < b.Height+b.HiddenRows; i++ {
+		row := make([]*Block, b.Width)
 		blocks = append(blocks, row)
 	}
 
-	return &Board{
-		Background: background,
-		Blocks:     blocks,
-		HiddenRows: hiddenRows,
-		widthScale: widthScale,
-	}
+	b.Blocks = blocks
+
+	return b
 }
 
 // Block represents a single block on the board

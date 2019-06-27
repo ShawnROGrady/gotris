@@ -11,6 +11,11 @@ import (
 	"github.com/ShawnROGrady/gotris/pkg/inputreader"
 )
 
+// Defaults for the game
+const (
+	defaultColor = canvas.White
+)
+
 // Game is responsible for handling the game state
 type Game struct {
 	inputreader   inputreader.InputReader
@@ -32,21 +37,6 @@ type Game struct {
 	color         canvas.Color
 }
 
-// Config represents the configuration for a game
-type Config struct {
-	Term          *os.File
-	Width         int
-	Height        int
-	HiddenRows    int
-	DebugMode     bool
-	DisableGhost  bool
-	DisableSide   bool
-	ControlScheme ControlScheme
-	WidthScale    int
-	Background    canvas.Color
-	Color         canvas.Color
-}
-
 type gameCells struct {
 	nextPiece [][]canvas.Cell
 	score     [][]canvas.Cell
@@ -54,37 +44,47 @@ type gameCells struct {
 }
 
 // New returns a new game with the specified specifications
-func New(c Config) *Game {
-	initPieces := tetrimino.NewSet(c.Width, c.Height+c.HiddenRows)
-	piece, pieceSet := initPieces[0], initPieces[1:]
-	return &Game{
-		inputreader: inputreader.NewTermReader(c.Term),
-		canvas: canvas.New(canvas.Config{
-			Term:       c.Term,
-			Width:      c.Width,
-			Height:     c.Height,
-			Background: c.Background,
-			DebugMode:  c.DebugMode,
-		}),
-		board: board.New(
-			c.Background,
-			c.Width, c.Height,
-			c.HiddenRows,
-			c.WidthScale,
-		),
-		currentPiece:  piece,
-		newPieceSet:   tetrimino.NewSet,
-		nextPieces:    pieceSet,
-		level:         0,
-		currentScore:  0,
-		linesCleared:  0,
-		debugMode:     c.DebugMode,
-		disableGhost:  c.DisableGhost,
-		disableSide:   c.DisableSide,
-		controlScheme: c.ControlScheme,
-		widthScale:    c.WidthScale,
-		color:         c.Color,
+func New(term *os.File, opts ...Option) *Game {
+	g := &Game{
+		inputreader:  inputreader.NewTermReader(term),
+		newPieceSet:  tetrimino.NewSet,
+		level:        0,
+		currentScore: 0,
+		linesCleared: 0,
+		widthScale:   board.DefaultWidthScale,
+		color:        defaultColor,
 	}
+
+	var (
+		boardOpts  = []board.Option{}
+		canvasOpts = []canvas.Option{}
+	)
+
+	for i := range opts {
+		opts[i].Apply(g)
+		if boardOpt, ok := opts[i].(board.Option); ok {
+			boardOpts = append(boardOpts, boardOpt)
+		}
+		if canvasOpt, ok := opts[i].(canvas.Option); ok {
+			canvasOpts = append(canvasOpts, canvasOpt)
+		}
+	}
+
+	// initialize the games canvas (what's rendered)
+	canvas := canvas.New(term, canvasOpts...)
+	g.canvas = canvas
+
+	// initialize the games board (used for game logic)
+	board := board.New(boardOpts...)
+	g.board = board
+
+	// initialize first pieces
+	initPieces := tetrimino.NewSet(board.Width, board.Height+board.HiddenRows)
+	piece, pieceSet := initPieces[0], initPieces[1:]
+	g.currentPiece = piece
+	g.nextPieces = pieceSet
+
+	return g
 }
 
 // Run takes care of the core game functionality

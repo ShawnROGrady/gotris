@@ -35,13 +35,11 @@ var renderTests = map[string]struct {
 func TestRender(t *testing.T) {
 	for testName, test := range renderTests {
 		var b bytes.Buffer
-		c := New(Config{
-			Term:       &b,
-			Width:      test.width,
-			Height:     test.height,
-			Background: test.background,
-			DebugMode:  test.debugMode,
-		})
+		opts := []Option{WithBackground(test.background), WithWidth(test.width), WithHeight(test.height)}
+		if test.debugMode {
+			opts = append(opts, WithDebugMode())
+		}
+		c := New(&b, opts...)
 
 		if len(test.cells) != 0 {
 			c.UpdateCells(test.cells)
@@ -110,13 +108,8 @@ func BenchmarkRender(b *testing.B) {
 			cells = benchmark.cells
 			name  = benchmark.name
 		)
-		c := New(Config{
-			Term:       &buf,
-			Width:      size,
-			Height:     size,
-			Background: White,
-			DebugMode:  false,
-		})
+		opts := []Option{WithWidth(size), WithHeight(size)}
+		c := New(&buf, opts...)
 		if len(cells) != 0 {
 			c.UpdateCells(cells)
 		}
