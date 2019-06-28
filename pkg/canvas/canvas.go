@@ -38,6 +38,8 @@ func New(term io.Writer, opts ...Option) *TermCanvas {
 	t := &TermCanvas{
 		dest:       term,
 		background: DefaultBackground,
+		width:      DefaultWidth,
+		height:     DefaultHeight,
 	}
 
 	for i := range opts {
