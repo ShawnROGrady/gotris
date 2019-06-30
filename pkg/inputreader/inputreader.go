@@ -1,7 +1,7 @@
 package inputreader
 
 import (
-	"os"
+	"io"
 )
 
 // InputReader represents a way to read user input
@@ -11,11 +11,11 @@ type InputReader interface {
 
 // TermReader reads user input from the supplied terminal
 type TermReader struct {
-	term *os.File
+	term io.Reader
 }
 
 // NewTermReader returns a new terminal reader
-func NewTermReader(term *os.File) *TermReader {
+func NewTermReader(term io.Reader) *TermReader {
 	return &TermReader{
 		term: term,
 	}

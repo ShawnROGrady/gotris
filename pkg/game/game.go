@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"time"
 
 	"github.com/ShawnROGrady/gotris/pkg/canvas"
@@ -44,15 +44,16 @@ type gameCells struct {
 }
 
 // New returns a new game with the specified specifications
-func New(term *os.File, opts ...Option) *Game {
+func New(term io.ReadWriter, opts ...Option) *Game {
 	g := &Game{
-		inputreader:  inputreader.NewTermReader(term),
-		newPieceSet:  tetrimino.NewSet,
-		level:        0,
-		currentScore: 0,
-		linesCleared: 0,
-		widthScale:   board.DefaultWidthScale,
-		color:        defaultColor,
+		inputreader:   inputreader.NewTermReader(term),
+		newPieceSet:   tetrimino.NewSet,
+		level:         0,
+		currentScore:  0,
+		linesCleared:  0,
+		widthScale:    board.DefaultWidthScale,
+		color:         defaultColor,
+		controlScheme: HomeRow(),
 	}
 
 	var (
@@ -78,13 +79,8 @@ func New(term *os.File, opts ...Option) *Game {
 	board := board.New(boardOpts...)
 	g.board = board
 
-	var (
-		boardWidth  = len(g.board.Blocks[0])
-		boardHeight = len(g.board.Blocks)
-	)
-
 	// initialize first pieces
-	initPieces := tetrimino.NewSet(boardWidth, boardHeight)
+	initPieces := tetrimino.NewSet(boardWidth(board), boardHeight(board))
 	piece, pieceSet := initPieces[0], initPieces[1:]
 	g.currentPiece = piece
 	g.nextPieces = pieceSet
@@ -235,11 +231,11 @@ func (g *Game) pieceOutOfBounds() bool {
 			y := topL.Y - i
 
 			// can't rotate due to horizontal constraints
-			if x < 0 || x > len(g.board.Blocks[0])-1 {
+			if x < 0 || x > boardWidth(g.board)-1 {
 				return true
 			}
 
-			if y < 0 || y > len(g.board.Blocks)-1 {
+			if y < 0 || y > boardHeight(g.board)-1 {
 				return true
 			}
 		}
@@ -439,8 +435,8 @@ func (g *Game) nextPiece() tetrimino.Tetrimino {
 	var nextPiece tetrimino.Tetrimino
 	if len(g.nextPieces) == 1 {
 		var (
-			boardWidth  = len(g.board.Blocks[0])
-			boardHeight = len(g.board.Blocks)
+			boardWidth  = boardWidth(g.board)
+			boardHeight = boardHeight(g.board)
 		)
 		nextPiece = g.nextPieces[0]
 		g.nextPieces = g.newPieceSet(boardWidth, boardHeight)

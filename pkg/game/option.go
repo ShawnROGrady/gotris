@@ -102,7 +102,7 @@ type dimensions struct {
 //type withDimensions dimensions
 
 func (w dimensions) Apply(g *Game) {
-	g.widthScale = int(w.width)
+	g.widthScale = int(w.widthScale)
 }
 
 func (w dimensions) ApplyToBoard(b *board.Board) {

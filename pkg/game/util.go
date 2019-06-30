@@ -24,3 +24,11 @@ func centerBlocks(blocks [][]*board.Block, width, height int) [][]*board.Block {
 	}
 	return newBlocks
 }
+
+func boardHeight(b *board.Board) int {
+	return len(b.Blocks)
+}
+
+func boardWidth(b *board.Board) int {
+	return len(b.Blocks[0])
+}
