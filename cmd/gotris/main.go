@@ -98,7 +98,11 @@ func main() {
 		log.Fatalf("error setting up terminal: %s", err)
 		os.Exit(1)
 	}
-	defer undoSetup()
+	defer func() {
+		if err := undoSetup(); err != nil {
+			log.Fatalf("Error undoing set up: %s", err)
+		}
+	}()
 
 	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0755)
 	if err != nil {
