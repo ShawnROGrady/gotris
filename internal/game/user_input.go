@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/ShawnROGrady/gotris/pkg/inputreader"
+	"github.com/ShawnROGrady/gotris/internal/inputreader"
 )
 
 type userInput int

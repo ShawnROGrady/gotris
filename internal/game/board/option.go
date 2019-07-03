@@ -1,6 +1,6 @@
 package board
 
-import "github.com/ShawnROGrady/gotris/pkg/canvas"
+import "github.com/ShawnROGrady/gotris/internal/canvas"
 
 // Option represents a configuration option for the board
 type Option interface {

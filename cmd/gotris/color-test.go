@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
 )
 
 func printPotentialColors() {

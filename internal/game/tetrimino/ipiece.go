@@ -3,8 +3,8 @@ package tetrimino
 import (
 	"fmt"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
-	"github.com/ShawnROGrady/gotris/pkg/game/board"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
+	"github.com/ShawnROGrady/gotris/internal/game/board"
 )
 
 type iPiece struct {

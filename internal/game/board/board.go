@@ -1,7 +1,7 @@
 package board
 
 import (
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
 )
 
 // Defaults for board

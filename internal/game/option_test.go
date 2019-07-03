@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
 )
 
 var optionTests = map[string]struct {

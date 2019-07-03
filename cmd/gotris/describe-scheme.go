@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ShawnROGrady/gotris/pkg/game"
+	"github.com/ShawnROGrady/gotris/internal/game"
 )
 
 func describeSchemes(scheme game.ControlSchemes) {

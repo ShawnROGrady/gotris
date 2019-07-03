@@ -9,8 +9,8 @@ import (
 	"runtime/pprof"
 	"syscall"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
-	"github.com/ShawnROGrady/gotris/pkg/game"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
+	"github.com/ShawnROGrady/gotris/internal/game"
 )
 
 func main() {

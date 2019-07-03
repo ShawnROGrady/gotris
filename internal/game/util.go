@@ -1,6 +1,6 @@
 package game
 
-import "github.com/ShawnROGrady/gotris/pkg/game/board"
+import "github.com/ShawnROGrady/gotris/internal/game/board"
 
 // centerBlocks places the provided blocks in a grid of specified width and height
 func centerBlocks(blocks [][]*board.Block, width, height int) [][]*board.Block {

@@ -3,7 +3,7 @@ package board
 import (
 	"testing"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
 )
 
 var clearRowsTests = map[string]struct {

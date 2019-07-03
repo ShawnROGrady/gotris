@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
-	"github.com/ShawnROGrady/gotris/pkg/game/board"
-	"github.com/ShawnROGrady/gotris/pkg/game/tetrimino"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
+	"github.com/ShawnROGrady/gotris/internal/game/board"
+	"github.com/ShawnROGrady/gotris/internal/game/tetrimino"
 )
 
 type tetriminoTestCase struct {

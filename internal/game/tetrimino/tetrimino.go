@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/ShawnROGrady/gotris/pkg/canvas"
-	"github.com/ShawnROGrady/gotris/pkg/game/board"
+	"github.com/ShawnROGrady/gotris/internal/canvas"
+	"github.com/ShawnROGrady/gotris/internal/game/board"
 )
 
 // the maximum size of a tetrimino
