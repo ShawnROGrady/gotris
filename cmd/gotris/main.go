@@ -27,11 +27,6 @@ func main() {
 
 	flag.Parse()
 
-	if colorTest != nil && *colorTest {
-		printPotentialColors()
-		os.Exit(0)
-	}
-
 	// set the specified control scheme
 	var scheme game.ControlSchemes
 	for _, arg := range *schemeArgs {
@@ -62,12 +57,17 @@ func main() {
 		opts = append(opts, game.WithoutGhost())
 	}
 
-	if debugMode != nil && *debugMode {
-		opts = append(opts, game.WithDebugMode())
-	}
-
 	if disableSide != nil && *disableSide {
 		opts = append(opts, game.WithoutSide())
+	}
+
+	if colorTest != nil && *colorTest {
+		printPotentialColors(opts...)
+		os.Exit(0)
+	}
+
+	if debugMode != nil && *debugMode {
+		opts = append(opts, game.WithDebugMode())
 	}
 
 	if describeScheme != nil && *describeScheme {
