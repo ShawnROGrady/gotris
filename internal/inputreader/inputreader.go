@@ -38,6 +38,7 @@ func (t *TermReader) ReadInput(done chan bool) (chan []byte, chan error) {
 				n, err := t.term.Read(buf)
 				if err != nil {
 					readErr <- err
+					continue
 				}
 				if len(buf) != 0 {
 					input <- buf[:n]
