@@ -6,7 +6,7 @@ import (
 
 // InputReader represents a way to read user input
 type InputReader interface {
-	ReadInput(done chan bool) (chan []byte, chan error)
+	ReadInput(done <-chan bool) (<-chan []byte, <-chan error)
 }
 
 // TermReader reads user input from the supplied terminal
@@ -22,7 +22,7 @@ func NewTermReader(term io.Reader) *TermReader {
 }
 
 // ReadInput reads the user input from the supplied terminal
-func (t *TermReader) ReadInput(done chan bool) (chan []byte, chan error) {
+func (t *TermReader) ReadInput(done <-chan bool) (<-chan []byte, <-chan error) {
 	var (
 		input   = make(chan []byte)
 		readErr = make(chan error)
@@ -36,9 +36,9 @@ func (t *TermReader) ReadInput(done chan bool) (chan []byte, chan error) {
 			default:
 				buf := make([]byte, 128)
 				n, err := t.term.Read(buf)
-				if err != nil {
+				if err != nil && err != io.EOF {
 					readErr <- err
-					continue
+					return
 				}
 				if len(buf) != 0 {
 					input <- buf[:n]

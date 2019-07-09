@@ -46,7 +46,7 @@ func (u userInput) opposite() userInput {
 	return ignore
 }
 
-func translateInput(done chan bool, inputreader inputreader.InputReader, controlMap map[string]userInput) (chan userInput, chan error) {
+func translateInput(done <-chan bool, inputreader inputreader.InputReader, controlMap map[string]userInput) (<-chan userInput, <-chan error) {
 	rawInput, readErr := inputreader.ReadInput(done)
 
 	translatedInput := make(chan userInput)

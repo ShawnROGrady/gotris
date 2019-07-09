@@ -1,7 +1,6 @@
 package inputreader
 
 import (
-	"bytes"
 	"io"
 	"testing"
 	"time"
@@ -9,26 +8,34 @@ import (
 
 func TestInputReader(t *testing.T) {
 	var (
-		term     bytes.Buffer
 		done     = make(chan bool)
 		writeErr = make(chan error)
 		recieved = []byte{}
 	)
 
-	reader := NewTermReader(&term)
+	tReader, tWriter := io.Pipe()
+
+	reader := NewTermReader(tReader)
 
 	testInputs := "hjkllkjh"
 
 	inputs, readErr := reader.ReadInput(done)
 	go func() {
+		defer func() {
+			tWriter.Close()
+			time.Sleep(10 * time.Millisecond) // give ReadInput go routine enough time to read last input following 'done'
+			close(done)
+		}()
 		for _, b := range []byte(testInputs) {
-			if err := term.WriteByte(b); err != nil {
+			_, err := tWriter.Write([]byte{b})
+			if err != nil {
 				writeErr <- err
+				return
 			}
-			time.Sleep(10 * time.Millisecond) // 10 ms = 1/2 the gravity time at the fastest speed
+			time.Sleep(1 * time.Millisecond) // 1 ms = 1/20 the gravity time at the fastest speed
 		}
-		close(done)
 	}()
+
 	for {
 		select {
 		case input := <-inputs:
@@ -40,7 +47,6 @@ func TestInputReader(t *testing.T) {
 				t.Fatalf("Unexpected error reading input: %s", err)
 			}
 		case <-done:
-			time.Sleep(10 * time.Millisecond) // give ReadInput go routine enough time to read last input following 'done'
 			if string(recieved) != testInputs {
 				t.Errorf("Unexpected input read [expected = %s, actual = %s]", testInputs, string(recieved))
 			}
