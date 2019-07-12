@@ -231,9 +231,13 @@ func schemeDescription(c ControlScheme) string {
 
 	for _, input := range inputs {
 		mappings := inputMap[input]
+		var b strings.Builder
+		b.WriteString(input.String())
+		b.WriteString(": ")
+		b.WriteString(strings.Join(mappings, ", "))
 		mappingDescriptions = append(
 			mappingDescriptions,
-			fmt.Sprintf("%s: %s", input, strings.Join(mappings, ", ")),
+			b.String(),
 		)
 	}
 
