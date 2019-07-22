@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/ShawnROGrady/gotris/internal/canvas"
@@ -35,6 +36,7 @@ type Game struct {
 	widthScale    int
 	gameCells     gameCells
 	color         canvas.Color
+	mutex         *sync.Mutex
 }
 
 type gameCells struct {
@@ -54,6 +56,7 @@ func New(termReader io.Reader, termWriter io.Writer, opts ...Option) *Game {
 		widthScale:    board.DefaultWidthScale,
 		color:         defaultColor,
 		controlScheme: HomeRow(),
+		mutex:         &sync.Mutex{},
 	}
 
 	var (
@@ -298,6 +301,10 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 		blocks   = g.currentPiece.Blocks()
 		canSlide = true
 	)
+
+	// should expect exclusive access when handling input
+	g.mutex.Lock()
+	defer g.mutex.Unlock()
 
 	g.movePiece(input)
 

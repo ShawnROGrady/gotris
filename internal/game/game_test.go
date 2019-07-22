@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sync"
 	"testing"
 	"time"
 
@@ -46,6 +47,7 @@ func newTestGame(width, height, hiddenRows int, pieceSetConstructor func(width, 
 		newPieceSet:   pieceSetConstructor,
 		disableGhost:  false, // enabling ghost to catch potential nil-pointer/index-oob exceptions
 		controlScheme: HomeRow(),
+		mutex:         &sync.Mutex{},
 	}
 }
 
@@ -1049,8 +1051,12 @@ func TestRun(t *testing.T) {
 			if test.expectGameOver {
 				t.Errorf("Game unexpectedly not over after handling inputs for test case '%s'", testName)
 			}
-			if g.currentScore != test.expectedScore {
-				t.Errorf("Unexpected current score for test case '%s' [expected = %d, actual = %d]", testName, test.expectedScore, g.currentScore)
+			g.mutex.Lock()
+			score := g.currentScore
+			g.mutex.Unlock()
+
+			if score != test.expectedScore {
+				t.Errorf("Unexpected current score for test case '%s' [expected = %d, actual = %d]", testName, test.expectedScore, score)
 			}
 		case err := <-runErr:
 			t.Errorf("Unexpected error running game for test case '%s: %s'", testName, err)
