@@ -8,7 +8,7 @@ import (
 )
 
 func printPotentialColors(opts ...game.Option) {
-	demo := game.New(os.Stdout, opts...)
+	demo := game.New(nil, os.Stdout, opts...)
 	if err := demo.DisplayPotentialColors(); err != nil {
 		log.Fatalf("Error displaying potential colors: %s", err)
 	}

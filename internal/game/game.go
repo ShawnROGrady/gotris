@@ -44,9 +44,9 @@ type gameCells struct {
 }
 
 // New returns a new game with the specified specifications
-func New(term io.ReadWriter, opts ...Option) *Game {
+func New(termReader io.Reader, termWriter io.Writer, opts ...Option) *Game {
 	g := &Game{
-		inputreader:   inputreader.NewTermReader(term),
+		inputreader:   inputreader.NewTermReader(termReader),
 		newPieceSet:   tetrimino.NewSet,
 		level:         0,
 		currentScore:  0,
@@ -72,7 +72,7 @@ func New(term io.ReadWriter, opts ...Option) *Game {
 	}
 
 	// initialize the games canvas (what's rendered)
-	canvas := canvas.New(term, canvasOpts...)
+	canvas := canvas.New(termWriter, canvasOpts...)
 	g.canvas = canvas
 
 	// initialize the games board (used for game logic)
@@ -357,10 +357,12 @@ func (g *Game) handleInput(input userInput, endScore chan int) error {
 	if g.pieceAtBottom(g.currentPiece) && !canSlide {
 		// check if any rows can be cleared
 		linesCleared := g.board.ClearFullRows()
-		g.linesCleared += linesCleared
-		g.currentScore += g.level.linePoints(linesCleared)
-		newLevel := g.level.updatedLevel(g.linesCleared)
-		g.level = newLevel
+		if linesCleared != 0 {
+			g.linesCleared += linesCleared
+			g.currentScore += g.level.linePoints(linesCleared)
+			newLevel := g.level.updatedLevel(g.linesCleared)
+			g.level = newLevel
+		}
 
 		if g.pieceAtTop() {
 			// still render game-over state

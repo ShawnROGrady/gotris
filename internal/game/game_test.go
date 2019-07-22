@@ -2,7 +2,10 @@ package game
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"testing"
+	"time"
 
 	"github.com/ShawnROGrady/gotris/internal/canvas"
 	"github.com/ShawnROGrady/gotris/internal/game/board"
@@ -787,7 +790,7 @@ func TestHandleInput(t *testing.T) {
 }
 
 func TestNextPiece(t *testing.T) {
-	g := New(nil)
+	g := New(nil, nil)
 
 	// verify correct number of pieces for new game (7 tetriminos - 1 currentPiece)
 	if len(g.nextPieces) != 6 {
@@ -940,4 +943,140 @@ func TestBoardWithGhost(t *testing.T) {
 			}
 		}
 	}
+}
+
+var runTests = map[string]struct {
+	currentLevel   level
+	inputs         []string
+	inputDelay     time.Duration
+	expectedScore  int
+	expectGameOver bool
+}{
+	"hard drop until end": {
+		inputs:         fillStringSlice("k", 20),
+		expectGameOver: true,
+		inputDelay:     1 * time.Millisecond,
+	},
+	"max level, unhandled input until end": {
+		currentLevel:   29,
+		inputs:         fillStringSlice("r", 2*273), // 2 * sum(x, 3, 23), need to double to account for 'sliding' piece
+		expectGameOver: true,
+		inputDelay:     22 * time.Millisecond,
+	},
+	"clear one line, lvl 0": {
+		currentLevel: 0,
+		inputs: combineStringSlice(
+			append(fillStringSlice("l", 4), "k"),
+			append(fillStringSlice("h", 4), "k"),
+			[]string{"a", "k"},
+			[]string{"a", "l", "k"},
+			[]string{" "},
+		),
+		expectGameOver: false,
+		expectedScore:  40,
+		inputDelay:     1 * time.Millisecond,
+	},
+}
+
+func TestRun(t *testing.T) {
+	for testName, test := range runTests {
+		var (
+			done                 = make(chan bool)
+			inReader, inWriter   = io.Pipe()
+			outReader, outWriter = io.Pipe()
+		)
+
+		// Need to read output written otherwise writes block
+		go func() {
+			defer outReader.Close()
+			for {
+				select {
+				case <-done:
+					return
+				default:
+					// TODO: verify written output matches what we expect
+					buf := make([]byte, 128)
+					_, err := outReader.Read(buf)
+					if err != nil && err != io.EOF {
+						log.Panicf("Error reading from out for test case '%s': %s", testName, err)
+						return
+					}
+				}
+			}
+		}()
+
+		g := New(inReader, outWriter, WithControlScheme(HomeRow()))
+		g.level = test.currentLevel
+
+		// Using exclusively 'I' pieces for easy testing
+		pieceSetConstructor := testNewSet(tetrimino.PieceConstructors[0])
+		initPieces := pieceSetConstructor(boardWidth(g.board), boardHeight(g.board))
+		piece, pieceSet := initPieces[0], initPieces[1:]
+
+		g.currentPiece, g.nextPieces = piece, pieceSet
+		g.newPieceSet = pieceSetConstructor
+
+		finalScore, runErr := g.Run(done)
+
+		go func() {
+			defer func() {
+				inWriter.Close()
+				time.Sleep(10 * time.Millisecond) // give ReadInput go routine enough time to read last input following 'done'
+				close(done)
+			}()
+			for _, in := range test.inputs {
+				_, err := inWriter.Write([]byte(in))
+				if err != nil {
+					log.Panicf("Error writing input for test case '%s': %s", testName, err)
+					return
+				}
+				time.Sleep(test.inputDelay)
+			}
+		}()
+
+		select {
+		case score := <-finalScore:
+			if !test.expectGameOver {
+				t.Errorf("Game unexpectedly over after handling inputs for test case '%s'", testName)
+			}
+			if score != test.expectedScore {
+				t.Errorf("Unexpected final score for test case '%s' [expected = %d, actual = %d]", testName, test.expectedScore, score)
+			}
+
+			// wait for goroutine writing inputs to complete (might still be running due to input delay)
+			<-done
+		case <-done:
+			if test.expectGameOver {
+				t.Errorf("Game unexpectedly not over after handling inputs for test case '%s'", testName)
+			}
+			if g.currentScore != test.expectedScore {
+				t.Errorf("Unexpected current score for test case '%s' [expected = %d, actual = %d]", testName, test.expectedScore, g.currentScore)
+			}
+		case err := <-runErr:
+			t.Errorf("Unexpected error running game for test case '%s: %s'", testName, err)
+		}
+		// NOTE: uncomment the below to print the state of the game at the end of the test
+		/*
+			g.canvas = canvas.New(os.Stdout)
+			g.canvas.UpdateCells(g.cells(g.board))
+			g.canvas.Render()
+		*/
+
+	}
+}
+
+func fillStringSlice(input string, count int) []string {
+	sequence := []string{}
+	for i := 0; i <= count; i++ {
+		sequence = append(sequence, input)
+	}
+	return sequence
+}
+
+func combineStringSlice(sequences ...[]string) []string {
+	inputSequence := []string{}
+	for _, sequence := range sequences {
+		inputSequence = append(inputSequence, sequence...)
+	}
+	return inputSequence
 }

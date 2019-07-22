@@ -104,13 +104,19 @@ func main() {
 		}
 	}()
 
-	f, err := os.OpenFile("/dev/tty", os.O_RDWR, 0755)
+	fRead, err := os.OpenFile("/dev/tty", os.O_RDONLY, 0755)
 	if err != nil {
-		log.Fatalf("Error opening controlling terminal: %s", err)
+		log.Fatalf("Error opening controlling terminal to read from: %s", err)
 	}
-	defer f.Close()
+	defer fRead.Close()
 
-	g := game.New(f, opts...)
+	fWrite, err := os.OpenFile("/dev/tty", os.O_WRONLY, 0755)
+	if err != nil {
+		log.Fatalf("Error opening controlling terminal to write to: %s", err)
+	}
+	defer fWrite.Close()
+
+	g := game.New(fRead, fWrite, opts...)
 
 	done := make(chan bool)
 	defer close(done)

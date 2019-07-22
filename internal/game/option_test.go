@@ -140,7 +140,7 @@ func TestOptions(t *testing.T) {
 	for testName, test := range optionTests {
 		var b bytes.Buffer
 
-		g := New(&b, test.options...)
+		g := New(&b, &b, test.options...)
 		for i := range test.pass {
 			if err := test.pass[i](g); err != nil {
 				t.Errorf("Test case '%s', Error: %s", testName, err)
