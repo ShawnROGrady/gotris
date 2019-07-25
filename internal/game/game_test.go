@@ -1071,6 +1071,78 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func BenchmarkRun(b *testing.B) {
+	var (
+		done                 = make(chan bool)
+		inReader, inWriter   = io.Pipe()
+		outReader, outWriter = io.Pipe()
+	)
+
+	// Need to read output written otherwise writes block
+	go func() {
+		defer outReader.Close()
+		for {
+			select {
+			case <-done:
+				return
+			default:
+				buf := make([]byte, 128)
+				_, err := outReader.Read(buf)
+				if err != nil && err != io.EOF {
+					log.Panicf("Error reading from out for test case : %s", err)
+					return
+				}
+			}
+		}
+	}()
+
+	g := New(inReader, outWriter, WithControlScheme(HomeRow()))
+
+	// Using exclusively 'I' pieces for easy testing
+	pieceSetConstructor := testNewSet(tetrimino.PieceConstructors[0])
+	initPieces := pieceSetConstructor(boardWidth(g.board), boardHeight(g.board))
+	piece, pieceSet := initPieces[0], initPieces[1:]
+
+	g.currentPiece, g.nextPieces = piece, pieceSet
+	g.newPieceSet = pieceSetConstructor
+
+	endScore, runErr := g.Run(done)
+
+	for n := 0; n < b.N; n++ {
+		var (
+			writeErr = make(chan error)
+			written  = make(chan struct{})
+		)
+		go func() {
+			// always reset the blocks prior to writing input
+			g.mutex.Lock()
+			for i := range g.board.Blocks {
+				for j := range g.board.Blocks[i] {
+					g.board.Blocks[i][j] = nil
+				}
+			}
+			g.mutex.Unlock()
+			_, err := inWriter.Write([]byte("j"))
+			if err != nil {
+				writeErr <- err
+			}
+			written <- struct{}{}
+		}()
+
+		select {
+		case err := <-runErr:
+			b.Fatalf("Error running game: %s", err)
+		case <-endScore:
+			log.Printf("game over: %d", n)
+		case err := <-writeErr:
+			b.Errorf("Error writing input: %s", err)
+		case <-written:
+		}
+	}
+	close(done)
+	inWriter.Close()
+}
+
 func fillStringSlice(input string, count int) []string {
 	sequence := []string{}
 	for i := 0; i <= count; i++ {
