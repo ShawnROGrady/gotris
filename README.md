@@ -15,7 +15,7 @@ This has been primarily tested on macOS Mojave with `$TERM=xterm-256color`. Whil
 Windows is not currently supported.
 
 ## Demo
-![demo-gif](https://github.com/ShawnROGrady/gotris/blob/add-readme/assets/gotris-demo.gif)
+![demo-gif](https://github.com/ShawnROGrady/gotris/blob/master/assets/gotris-demo.gif)
 # Configuration
 ## Options
 1. `-disable-ghost`: Don't show the 'ghost' of the current piece
@@ -26,7 +26,7 @@ Windows is not currently supported.
    -  all schemes can be viewed using `-describe-scheme` sub-command described below
 
 Quick comparison of the color options (`-light-mode` enabled on bottom, `-low-contrast` enabled on right):
-![colors](https://github.com/ShawnROGrady/gotris/blob/add-readme/assets/gotris-colors.png)
+![colors](https://github.com/ShawnROGrady/gotris/blob/master/assets/gotris-colors.png)
 
 **NOTE:** you will also see `-debug` and `-cpuprofile` listed after running `gotris -h`. These were for my personal use when building this and won't be of much use to the standard user.
 ## Sub-commands
