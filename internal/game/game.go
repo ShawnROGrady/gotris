@@ -75,8 +75,13 @@ func New(termReader io.Reader, termWriter io.Writer, opts ...Option) *Game {
 	}
 
 	// initialize the games canvas (what's rendered)
-	canvas := canvas.New(termWriter, canvasOpts...)
-	g.canvas = canvas
+	c := canvas.New(termWriter, canvasOpts...)
+	gCanvas := &gCanvas{
+		canvas:   c,
+		newCells: make(chan [][]canvas.Cell),
+		mut:      &sync.Mutex{},
+	}
+	g.canvas = gCanvas
 
 	// initialize the games board (used for game logic)
 	board := board.New(boardOpts...)
@@ -109,7 +114,6 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 		// add initial sidebar cells
 		g.updateCells(g.board.Background())
 	}
-	g.canvas.UpdateCells(g.cells(g.board))
 
 	// initialize the canvas
 	if err := g.canvas.Init(); err != nil {
@@ -117,6 +121,17 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 		return endScore, runErr
 	}
 
+	/*
+		renderErr := make(<-chan error)
+		if gCanvas, ok := g.canvas.(*gCanvas); ok {
+			renderErr = gCanvas.run(done)
+		} else {
+	*/
+
+	if gCanvas, ok := g.canvas.(*gCanvas); ok {
+		gCanvas.run(done)
+	}
+	g.canvas.UpdateCells(g.cells(g.board))
 	// render initial canvas
 	if err := g.canvas.Render(); err != nil {
 		runErr <- err
