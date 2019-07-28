@@ -138,4 +138,5 @@ type withInitialLevel int
 
 func (w withInitialLevel) Apply(g *Game) {
 	g.level = level(w)
+	g.linesCleared = int(w) * 10 // allow level to increase as expected
 }
