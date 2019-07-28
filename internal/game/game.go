@@ -121,18 +121,12 @@ func (g *Game) Run(done chan bool) (chan int, chan error) {
 		return endScore, runErr
 	}
 
-	/*
-		renderErr := make(<-chan error)
-		if gCanvas, ok := g.canvas.(*gCanvas); ok {
-			renderErr = gCanvas.run(done)
-		} else {
-	*/
-
 	if gCanvas, ok := g.canvas.(*gCanvas); ok {
 		gCanvas.run(done)
 	}
-	g.canvas.UpdateCells(g.cells(g.board))
+
 	// render initial canvas
+	g.canvas.UpdateCells(g.cells(g.board))
 	if err := g.canvas.Render(); err != nil {
 		runErr <- err
 		return endScore, runErr

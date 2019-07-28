@@ -1,6 +1,7 @@
 package game
 
 import (
+	"github.com/ShawnROGrady/gotris/internal/canvas"
 	"github.com/ShawnROGrady/gotris/internal/game/board"
 	"github.com/ShawnROGrady/gotris/internal/game/tetrimino"
 )
@@ -9,7 +10,14 @@ import (
 // This is used to assist the user in selecting options
 // e.g. WithoutGhost() should be applied if ghost pieces render oddly in the canvas
 func (g *Game) DisplayPotentialColors() error {
-	if err := g.canvas.Init(); err != nil {
+	var can canvas.Canvas
+	if gCanvas, ok := g.canvas.(*gCanvas); ok {
+		can = gCanvas.canvas
+	} else {
+		can = g.canvas
+	}
+
+	if err := can.Init(); err != nil {
 		return err
 	}
 
@@ -40,7 +48,7 @@ func (g *Game) DisplayPotentialColors() error {
 	g.board.Blocks = boardBlocks
 	g.updateCells(g.board.Background())
 	cells := g.cells(g.board)
-	g.canvas.UpdateCells(cells)
+	can.UpdateCells(cells)
 
-	return g.canvas.Render()
+	return can.Render()
 }
