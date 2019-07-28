@@ -1,10 +1,35 @@
 package game
 
 import (
+	"fmt"
 	"time"
 )
 
 type level int
+
+// the available starting difficulties
+const (
+	BeginnerDifficulty = "beginner"
+	NoviceDifficulty   = "novice"
+	ProDifficulty      = "pro"
+	ExpertDifficulty   = "expert"
+)
+
+// LevelFromDifficulty retrieves the starting level associated with a specified difficulty
+func LevelFromDifficulty(difficulty string) (int, error) {
+	switch difficulty {
+	case BeginnerDifficulty:
+		return 0, nil
+	case NoviceDifficulty:
+		return 5, nil
+	case ProDifficulty:
+		return 10, nil
+	case ExpertDifficulty:
+		return 15, nil
+	default:
+		return 0, fmt.Errorf("unrecognized difficulty: '%s'", difficulty)
+	}
+}
 
 func (l level) gTime() time.Duration {
 	var (

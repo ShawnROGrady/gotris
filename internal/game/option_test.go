@@ -24,6 +24,7 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(24), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"with arrowKeys scheme": {
@@ -41,6 +42,7 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(24), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"without ghost or side-bar": {
@@ -59,6 +61,7 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(24), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"with debug mode": {
@@ -76,6 +79,7 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(24), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"black background and color": {
@@ -94,6 +98,7 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(24), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"with width=height=40, widthScale=1": {
@@ -115,6 +120,7 @@ var optionTests = map[string]struct {
 			checkWidth(40),
 			checkHeight(44), // includes hidden rows
 			checkHiddenRows(4),
+			checkInitLevel(0),
 		},
 	},
 	"with 8 hiddenRows": {
@@ -132,6 +138,25 @@ var optionTests = map[string]struct {
 			checkWidth(10),
 			checkHeight(28), // includes hidden rows
 			checkHiddenRows(8),
+			checkInitLevel(0),
+		},
+	},
+	"with initial level = 10": {
+		options: []Option{
+			WithInitialLevel(10),
+		},
+		pass: []func(g *Game) error{
+			checkControlScheme(HomeRow()),
+			checkWithoutGhost(false),
+			checkBackground(canvas.White),
+			checkColor(canvas.White),
+			checkDebugMode(false),
+			checkWithoutSide(false),
+			checkWidthScale(2),
+			checkWidth(10),
+			checkHeight(24), // includes hidden rows
+			checkHiddenRows(4),
+			checkInitLevel(10),
 		},
 	},
 }
@@ -237,6 +262,15 @@ func checkHiddenRows(expected int) func(g *Game) error {
 		boardHiddenRows := g.board.HiddenRows()
 		if boardHiddenRows != expected {
 			return fmt.Errorf("unexpected board hiddenRows [expected = %d, actual = %d]", expected, boardHiddenRows)
+		}
+		return nil
+	}
+}
+
+func checkInitLevel(expected level) func(g *Game) error {
+	return func(g *Game) error {
+		if g.level != expected {
+			return fmt.Errorf("unexpected initial level [expected = %d, actual = %d]", expected, g.level)
 		}
 		return nil
 	}

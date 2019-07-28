@@ -5,6 +5,55 @@ import (
 	"time"
 )
 
+var lvlFromDifficultyTests = []struct {
+	difficulty    string
+	expectedLevel int
+	expectErr     bool
+}{
+	{
+		difficulty:    "beginner",
+		expectedLevel: 0,
+	},
+	{
+		difficulty:    "novice",
+		expectedLevel: 5,
+	},
+	{
+		difficulty:    "pro",
+		expectedLevel: 10,
+	},
+	{
+		difficulty:    "expert",
+		expectedLevel: 15,
+	},
+	{
+		difficulty:    "invalid",
+		expectedLevel: 0,
+		expectErr:     true,
+	},
+}
+
+func TestLevelFromDifficulty(t *testing.T) {
+	for _, test := range lvlFromDifficultyTests {
+		lvl, err := LevelFromDifficulty(test.difficulty)
+
+		if test.expectErr {
+			if err == nil {
+				t.Errorf("Unexpectedly no error getting level from difficulty '%s'", test.difficulty)
+			}
+			continue
+		}
+
+		if err != nil {
+			t.Errorf("Unexpectedly received error for difficulty '%s': %s", test.difficulty, err)
+		}
+
+		if lvl != test.expectedLevel {
+			t.Errorf("Unexpected level from difficulty '%s' (expected = %d, actual = %d)", test.difficulty, test.expectedLevel, lvl)
+		}
+	}
+}
+
 var gTimeTests = map[string]struct {
 	level         level
 	expectedGTime time.Duration

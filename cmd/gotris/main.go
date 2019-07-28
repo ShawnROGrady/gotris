@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime/pprof"
+	"strings"
 	"syscall"
 
 	"github.com/ShawnROGrady/gotris/internal/canvas"
@@ -24,6 +25,7 @@ func main() {
 	lightMode := flag.Bool("light-mode", false, "Update colors to work for light color schemes")
 	lowContrastMode := flag.Bool("low-contrast", false, "Update colors to use lower contrast (updates background to white for 'light-mode', black otherwise)")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to specified file")
+	difficulty := flag.String("difficulty", game.BeginnerDifficulty, fmt.Sprintf("the initial difficulty (options = %s)", strings.Join([]string{game.BeginnerDifficulty, game.NoviceDifficulty, game.ProDifficulty, game.ExpertDifficulty}, ", ")))
 
 	flag.Parse()
 
@@ -39,6 +41,15 @@ func main() {
 	}
 
 	opts := []game.Option{}
+
+	if difficulty != nil {
+		initLevel, err := game.LevelFromDifficulty(*difficulty)
+		if err != nil {
+			log.Fatalf("%s", err)
+			os.Exit(1)
+		}
+		opts = append(opts, game.WithInitialLevel(initLevel))
+	}
 
 	if lightMode != nil && *lightMode {
 		background := canvas.Black

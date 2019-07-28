@@ -128,3 +128,14 @@ func (w withHiddenRows) Apply(g *Game) {}
 func (w withHiddenRows) ApplyToBoard(b *board.Board) {
 	board.WithHiddenRows(int(w)).ApplyToBoard(b)
 }
+
+// WithInitialLevel returns an option that specifies the initial level
+func WithInitialLevel(level int) Option {
+	return withInitialLevel(level)
+}
+
+type withInitialLevel int
+
+func (w withInitialLevel) Apply(g *Game) {
+	g.level = level(w)
+}
