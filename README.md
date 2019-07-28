@@ -24,6 +24,7 @@ Windows is not currently supported.
 4. `-low-contrast`: Update colors to use lower contrast (updates background to white for 'light-mode', black otherwise)
 5. `-scheme`: The control scheme to use, multiple may be specified (default: home-row)
    -  all schemes can be viewed using `-describe-scheme` sub-command described below
+6. `-difficulty string`: the initial difficulty (options = beginner, novice, pro, expert) (default "beginner")
 
 Quick comparison of the color options (`-light-mode` enabled on bottom, `-low-contrast` enabled on right):
 ![colors](https://github.com/ShawnROGrady/gotris/blob/master/assets/gotris-colors.png)
@@ -39,7 +40,7 @@ The goal of this project was to create a fully featured yet simple terminal-base
 
 ## Planned Features
 Easier:
-- [ ] Initial difficulty selection
+- [x] Initial difficulty selection
 - [ ] Width+height selection
 - [ ] Other display options (opacity of ghost piece, monochrome mode, etc.)
 
