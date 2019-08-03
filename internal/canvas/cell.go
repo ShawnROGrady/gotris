@@ -1,8 +1,25 @@
 package canvas
 
 import (
+	"strconv"
 	"strings"
 )
+
+const (
+	blockCellType = iota
+	pipeCellType
+	textCellType
+)
+
+func cellTypes() []int {
+	return []int{blockCellType, pipeCellType, textCellType}
+}
+
+// Cell represents an item to be rendered on the canvas
+type Cell interface {
+	String() string
+	hash() (int, string)
+}
 
 const (
 	// block elements
@@ -19,11 +36,6 @@ const (
 	bottomLeftPipe    = "\u255A"
 	bottomRightPipe   = "\u255D"
 )
-
-// Cell represents an item to be rendered on the canvas
-type Cell interface {
-	String() string
-}
 
 // BlockCell represents a single cell on the canvas
 type BlockCell struct {
@@ -42,6 +54,25 @@ func (c *BlockCell) String() string {
 	return c.Color.background().decorate(
 		c.Color.decorate(block),
 	)
+}
+
+func (c *BlockCell) hash() (int, string) {
+	var b strings.Builder
+	col := strconv.Itoa(int(c.Color))
+	b.WriteString(col)
+	b.WriteString("_")
+
+	back := strconv.Itoa(int(c.Background))
+	b.WriteString(back)
+	b.WriteString("_")
+
+	if c.Transparent {
+		b.WriteString("1")
+	} else {
+		b.WriteString("0")
+	}
+
+	return blockCellType, b.String()
 }
 
 // PipeType represents a type of pipe cell
@@ -80,6 +111,18 @@ func (p *PipeCell) String() string {
 	default:
 		return ""
 	}
+}
+
+func (p *PipeCell) hash() (int, string) {
+	var b strings.Builder
+	col := strconv.Itoa(int(p.Color))
+	b.WriteString(col)
+	b.WriteString("_")
+
+	t := strconv.Itoa(int(p.Type))
+	b.WriteString(t)
+
+	return pipeCellType, b.String()
 }
 
 // Box wraps a block of cells in a piped box
@@ -152,6 +195,18 @@ type TextCell struct {
 
 func (t *TextCell) String() string {
 	return t.Color.decorate(t.Text)
+}
+
+func (t *TextCell) hash() (int, string) {
+	var b strings.Builder
+
+	col := strconv.Itoa(int(t.Color))
+	b.WriteString(col)
+	b.WriteString("_")
+
+	b.WriteString(t.Text)
+
+	return textCellType, b.String()
 }
 
 // CellsFromString constructs a grid of TextCells from a provided string
