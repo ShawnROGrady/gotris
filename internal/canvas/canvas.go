@@ -29,17 +29,24 @@ type TermCanvas struct {
 	debugMode  bool
 	width      int
 	height     int
+	cellCaches []map[string]string
 }
 
 // New returns a new canvas
 func New(term io.Writer, opts ...Option) *TermCanvas {
 	var cells = [][]Cell{}
 
+	cellCaches := make([]map[string]string, len(cellTypes()))
+	for i := range cellCaches {
+		cellCaches[i] = make(map[string]string)
+	}
+
 	t := &TermCanvas{
 		dest:       term,
 		background: DefaultBackground,
 		width:      DefaultWidth,
 		height:     DefaultHeight,
+		cellCaches: cellCaches,
 	}
 
 	for i := range opts {
@@ -76,7 +83,15 @@ func (c *TermCanvas) Render() error {
 				b.WriteString(block)
 				continue
 			}
-			b.WriteString(cell.String())
+			cellType, cellHash := cell.hash()
+			if cellString, ok := c.cellCaches[cellType][cellHash]; ok {
+				b.WriteString(cellString)
+				continue
+			}
+			cellString := cell.String()
+			b.WriteString(cellString)
+
+			c.cellCaches[cellType][cellHash] = cellString
 		}
 		b.WriteByte('\n')
 		b.Write(resetControl)

@@ -69,32 +69,62 @@ var renderBenchmarks = []struct {
 	{
 		name:  "4x4 update non-transparent",
 		size:  4,
-		cells: populateCells(4, false),
+		cells: populateCells(4, false, false),
 	},
 	{
 		name:  "4x4 update transparent",
 		size:  4,
-		cells: populateCells(4, true),
+		cells: populateCells(4, true, false),
 	},
 	{
 		name:  "10x10 update transparent",
 		size:  10,
-		cells: populateCells(10, true),
+		cells: populateCells(10, true, false),
 	},
 	{
 		name:  "20x20 update transparent",
 		size:  20,
-		cells: populateCells(20, true),
+		cells: populateCells(20, true, false),
 	},
 	{
 		name:  "50x50 update transparent",
 		size:  50,
-		cells: populateCells(50, true),
+		cells: populateCells(50, true, false),
 	},
 	{
 		name:  "100x100 update transparent",
 		size:  100,
-		cells: populateCells(100, true),
+		cells: populateCells(100, true, false),
+	},
+	{
+		name:  "4x4 boxed update non-transparent",
+		size:  4,
+		cells: populateCells(4, false, true),
+	},
+	{
+		name:  "4x4 boxed update transparent",
+		size:  4,
+		cells: populateCells(4, true, true),
+	},
+	{
+		name:  "10x10 boxed update transparent",
+		size:  10,
+		cells: populateCells(10, true, true),
+	},
+	{
+		name:  "20x20 boxed update transparent",
+		size:  20,
+		cells: populateCells(20, true, true),
+	},
+	{
+		name:  "50x50 boxed update transparent",
+		size:  50,
+		cells: populateCells(50, true, true),
+	},
+	{
+		name:  "100x100 boxed update transparent",
+		size:  100,
+		cells: populateCells(100, true, true),
 	},
 }
 
@@ -128,17 +158,21 @@ func BenchmarkRender(b *testing.B) {
 }
 
 // generates grid of cells for testing
-func populateCells(size int, transparent bool) [][]Cell {
+func populateCells(size int, transparent bool, box bool) [][]Cell {
+	colors := []Color{Black, Red, Green, Yellow, Blue, Magenta, Cyan, White}
 	cells := make([][]Cell, size)
 	for i := range cells {
 		row := make([]Cell, size)
 		for j := range row {
 			row[j] = &BlockCell{
-				Color:       Blue,
+				Color:       colors[(i+j)%len(colors)],
 				Transparent: transparent,
 			}
 		}
 		cells[i] = row
+	}
+	if box {
+		return Box(cells, "TEST")
 	}
 	return cells
 }
